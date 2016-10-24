@@ -1,12 +1,24 @@
 TODO list
 
+Start to do
+ - comments (aim: Self-documenting code)
+
 Views
  - CreateRetrospective
-	- better input bar for comment -> 255 characters in CreateRetrospectiveViewModel
+	- better input bar for comment max is 255 chars
 	- better size well and maybe centre it
 	- glyphcons - datepicker
-- Layout 
+ - Layout 
 	- add glyphcons
 
-Data
+Data && Migrations
  - add init values
+
+Managers
+ - add Interfaces
+ - RetrospectiveManager	
+	- make some nice structure
+
+Controler
+ - Retrospective
+	- is date valid?! (today or future)

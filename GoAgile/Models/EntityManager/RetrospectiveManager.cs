@@ -1,5 +1,6 @@
 ﻿using GoAgile.DataContexts;
 using GoAgile.Models.DB;
+using System;
 
 namespace GoAgile.Models.EntityManager
 {
@@ -11,10 +12,11 @@ namespace GoAgile.Models.EntityManager
             using (var db = AgileDb.Create())
             {
                 var dbItem = new Retrospective();
-
-                dbItem.Id = "fasfs";
-                dbItem.Project = model.Project;
+                           
+                //dbItem.Id = Guid.NewGuid();
                 dbItem.RetrospectiveName = model.RetrospectiveName;
+                dbItem.Project = model.Project;
+                dbItem.Comment = model.Comment;
                 dbItem.StartDate = model.StartDate;
                 dbItem.State = EventState.Created;
                 dbItem.Owner = user;

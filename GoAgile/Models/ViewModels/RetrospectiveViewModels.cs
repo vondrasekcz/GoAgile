@@ -20,7 +20,7 @@ namespace GoAgile.Models
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime StartDate { get; set; }
 
-        [StringLength(maximumLength: 30)]
+        [StringLength(maximumLength: 255)]
         public string Comment { get; set; }
     }
 }
