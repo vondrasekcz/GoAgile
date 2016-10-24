@@ -1,8 +1,10 @@
 ﻿using GoAgile.Models;
+using GoAgile.Models.EntityManager;
 using System.Web.Mvc;
 
 namespace GoAgile.Controllers
 {
+    // TODO Managers instancing
     public class RetrospectiveController : Controller
     {
         //
@@ -23,7 +25,11 @@ namespace GoAgile.Controllers
         {
             if (ModelState.IsValid)
             {
+                // TODO rewrite
+                var man = new RetrospectiveManager();
+                man.AddModel(model: model, user: User.Identity.Name);
 
+                // TODO return retrospective view
             }
             return View(model);
         }

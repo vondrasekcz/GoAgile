@@ -1,0 +1,14 @@
+﻿enable migrations in PM:
+
+	Enable-Migrations -ContextTypeName IdentityDb  -MigrationsDirectory DataContexts\IdentityMigrations
+	Enable-Migrations -ContextTypeName AgileDb  -MigrationsDirectory DataContexts\AgileDbMigrations
+
+add migrations in PM:
+
+	Add-Migration  -ConfigurationTypeName GoAgile.DataContexts.IdentityMigrations.Configuration "InitialCreate"
+	Add-Migration  -ConfigurationTypeName GoAgile.DataContexts.AgileDbMigrations.Configuration "InitialCreate"
+
+update database in PM:
+	
+	Update-Database -ConfigurationTypeName GoAgile.DataContexts.IdentityMigrations.Configuration
+	Update-Database -ConfigurationTypeName GoAgile.DataContexts.AgileDbMigrations.Configuration

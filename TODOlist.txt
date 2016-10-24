@@ -1,0 +1,12 @@
+TODO list
+
+Views
+ - CreateRetrospective
+	- better input bar for comment -> 255 characters in CreateRetrospectiveViewModel
+	- better size well and maybe centre it
+	- glyphcons - datepicker
+- Layout 
+	- add glyphcons
+
+Data
+ - add init values
