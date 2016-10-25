@@ -15,10 +15,14 @@ Data && Migrations
  - add init values
 
 Managers
+ - try async
  - add Interfaces
  - RetrospectiveManager	
 	- make some nice structure
 
-Controler
+Controler 
  - Retrospective
 	- is date valid?! (today or future)
+
+README.md
+ - make normal structure

@@ -18,6 +18,21 @@ namespace GoAgile.Controllers
         }
 
         //
+        // GET Retrospecive/Retrospective{Id}
+        public ActionResult Retrospective(string id)
+        {
+            // TODO rewrite
+            var man = new RetrospectiveManager();
+            var ret = man.FindModel(id);
+
+            if (ret == null)
+            {
+                return HttpNotFound();
+            }
+            return View();
+        }
+
+        //
         // POST Retrospective/CreateRerospective
         [HttpPost]
         [Authorize]

@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewBag.Title = "Retrospective";
+}
+
+
+@section scripts{
+    <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script>
+        $(function () {
+            // Reference the auto-generated proxy for the hub.
+            var userActivity = $.connection.retrospectiveHub;
+            // Create a function that the hub can call back to display messages.
+            userActivity.client.updateUsersOnlineCount = function (count) {
+                // Add the message to the page.
+                $('#usersCount').text(count);
+            };
+            $.connection.hub.start();
+        });</script>
+}
+<br>
+<div id="usersCount"></div>
+
+
+

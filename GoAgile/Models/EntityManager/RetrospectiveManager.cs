@@ -1,11 +1,23 @@
 ﻿using GoAgile.DataContexts;
 using GoAgile.Models.DB;
 using System;
+using System.Linq;
 
 namespace GoAgile.Models.EntityManager
 {
     public class RetrospectiveManager
     {
+        // just for test
+        public string FindModel(string id)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var ret = db.Retrospectives.SingleOrDefault(s => s.Id.ToString() == id);
+
+                return ret?.Id.ToString();
+            }
+        }
+
         // TODO rewrite
         public void AddModel(CreateRetrospectiveViewModel model, string user)
         {
