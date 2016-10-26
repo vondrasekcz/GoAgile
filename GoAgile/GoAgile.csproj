@@ -212,6 +212,10 @@
     <Compile Include="DataContexts\AgileDbMigrations\201610232317584_InitialCreate.Designer.cs">
       <DependentUpon>201610232317584_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataContexts\AgileDbMigrations\201610252331530_InitialCreate1.cs" />
+    <Compile Include="DataContexts\AgileDbMigrations\201610252331530_InitialCreate1.Designer.cs">
+      <DependentUpon>201610252331530_InitialCreate1.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataContexts\AgileDbMigrations\Configuration.cs" />
     <Compile Include="DataContexts\IdentityDb.cs" />
     <Compile Include="DataContexts\IdentityMigrations\201610232309552_InitialCreate.cs" />
@@ -222,6 +226,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\Event.cs" />
+    <Compile Include="Helpers\User.cs" />
     <Compile Include="Hubs\RetrospectiveHub.cs" />
     <Compile Include="Models\DB\Retrospective.cs" />
     <Compile Include="Models\DB\EventState.cs" />
@@ -398,6 +404,9 @@
   <ItemGroup>
     <EmbeddedResource Include="DataContexts\AgileDbMigrations\201610232317584_InitialCreate.resx">
       <DependentUpon>201610232317584_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201610252331530_InitialCreate1.resx">
+      <DependentUpon>201610252331530_InitialCreate1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DataContexts\IdentityMigrations\201610232309552_InitialCreate.resx">
       <DependentUpon>201610232309552_InitialCreate.cs</DependentUpon>

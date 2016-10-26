@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Microsoft.AspNet.SignalR;
+using GoAgile.Models;
 
 namespace GoAgile.Hubs
 {
     public class RetrospectiveHub : Hub
     {
+       
+
+
         /// <summary>
         /// The count of users connected.
         /// </summary>

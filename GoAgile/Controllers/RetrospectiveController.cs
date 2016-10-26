@@ -29,7 +29,8 @@ namespace GoAgile.Controllers
             {
                 return HttpNotFound();
             }
-            return View();
+            // maybe only GuidId
+            return View(new RetrospectiveViewModel { GuidId = id, State = 0});
         }
 
         //
@@ -42,9 +43,10 @@ namespace GoAgile.Controllers
             {
                 // TODO rewrite
                 var man = new RetrospectiveManager();
-                man.AddModel(model: model, user: User.Identity.Name);
+                var guidId = man.AddModel(model: model, user: User.Identity.Name);
 
-                // TODO return retrospective view
+                // return retrospective view
+                return RedirectToAction("Retrospective/" + guidId, "Retrospective");
             }
             return View(model);
         }

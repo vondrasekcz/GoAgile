@@ -7,8 +7,7 @@ namespace GoAgile.Models.DB
     public class Retrospective
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         [Required]
         [StringLength(255)]

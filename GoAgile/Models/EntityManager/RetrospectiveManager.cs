@@ -19,13 +19,14 @@ namespace GoAgile.Models.EntityManager
         }
 
         // TODO rewrite
-        public void AddModel(CreateRetrospectiveViewModel model, string user)
+        public string AddModel(CreateRetrospectiveViewModel model, string user)
         {
             using (var db = AgileDb.Create())
             {
                 var dbItem = new Retrospective();
-                           
-                //dbItem.Id = Guid.NewGuid();
+                
+              
+                dbItem.Id = Guid.NewGuid().ToString();
                 dbItem.RetrospectiveName = model.RetrospectiveName;
                 dbItem.Project = model.Project;
                 dbItem.Comment = model.Comment;
@@ -35,6 +36,8 @@ namespace GoAgile.Models.EntityManager
 
                 db.Retrospectives.Add(dbItem);
                 db.SaveChanges();
+
+                return dbItem.Id.ToString();
             }
         }         
     }

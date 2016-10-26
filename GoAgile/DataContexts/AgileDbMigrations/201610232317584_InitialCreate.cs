@@ -11,7 +11,7 @@ namespace GoAgile.DataContexts.AgileDbMigrations
                 "dbo.Retrospectives",
                 c => new
                     {
-                        Id = c.Guid(nullable: false, identity: true, defaultValueSql: "newsequentialid()"),
+                        Id = c.String(nullable: false, maxLength: 128),
                         Owner = c.String(nullable: false, maxLength: 255),
                         RetrospectiveName = c.String(nullable: false, maxLength: 255),
                         Project = c.String(nullable: false, maxLength: 255),
