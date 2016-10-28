@@ -1,16 +1,111 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Mail;
 using System.Linq;
 using System.Web;
 using Microsoft.AspNet.SignalR;
 using GoAgile.Models;
+using GoAgile.Helpers;
+using GoAgile.Models.EntityManager;
 
 namespace GoAgile.Hubs
 {
     public class RetrospectiveHub : Hub
     {
-       
 
+
+        //------------------------------------------------------------------------------
+        // TODO: some locks, own file
+        public class EventSpectiveStorage
+        {
+            private Dictionary<string, Event> _eventStore;
+
+            public bool ExistUser(string eventGuid, string userName)
+            {
+                // TODO:
+                return false;
+            }
+
+            public void AddUser(string eventGuid, string userName, string email, string clientId)
+            {
+                // TODO:
+            }
+
+            public void RemoveUser(string clientId)
+            {
+                // TODO:
+            }
+
+            public List<User> EventUsers(string eventGuid)
+            {
+                // TODO:
+                return null;
+            }
+
+            public List<User> GetOnlineUsersExceptMe(string clientId)
+            {
+                // TODO:
+                return null;
+            }
+        }
+        //------------------------------------------------------------------------------
+
+        // TODO: own file
+        private EventSpectiveStorage _eventStorage;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public RetrospectiveHub()
+        {
+            // TODO: inicialize at better place
+            var _eventStorage = new EventSpectiveStorage();
+        }
+
+
+        /// <summary>
+        /// Recieve login user request from client
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="eventGuid"></param>
+        public void loginUser(string name/*, string name, string eventGuid*/)
+        {
+            // Invalid user data
+            if (!IsUserLoginInputValid(email: "aaa@bbb.cz", name: name, eventGuid: "aaaa"))
+            {
+                // TODO:
+                Clients.Caller.invalidLoginInput();
+            }
+            else
+            {
+                //_eventStorage.AddUser(eventGuid: eventGuid, userName: name, email: email, clientId: GetClientId());
+                Clients.Caller.userLogged();
+            }
+        }
+
+        
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        //********************************************************************************************
 
         /// <summary>
         /// The count of users connected.
@@ -114,5 +209,63 @@ namespace GoAgile.Hubs
 
             return clientId;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //********************************************************************
+
+        /// <summary>
+        /// Validate email
+        /// </summary>
+        /// <param name="emailaddress">Email</param>
+        /// <returns>True is valid, otherwise false</returns>
+        private bool IsValidEmail(string emailaddress)
+        {
+            try
+            {
+                MailAddress m = new MailAddress(emailaddress);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Valdiate User Login Input
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="eventGuid"></param>
+        /// <returns>InvalidLoginUserMessage with ivalid inputs</returns>
+        private bool IsUserLoginInputValid(string email, string name, string eventGuid)
+        {
+            //var validationObj = new InvalidLoginUserMessage();
+
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(email) && !IsValidEmail(email))
+                return false;
+
+            /*if (_eventStorage.ExistUser(eventGuid: eventGuid, userName: name))
+                return false;*/
+
+            return true;
+        }
+
+
     }
 }

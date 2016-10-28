@@ -5,7 +5,7 @@ Start to do
 
 Views
  - CreateRetrospective
-	- better input bar for comment max is 255 chars
+	- validate max chars
 	- better size well and maybe centre it
 	- glyphcons - datepicker
  - Layout 

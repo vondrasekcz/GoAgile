@@ -7,121 +7,161 @@
 
 @section scripts{
     <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
-    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>    
+    <link href="~/Content/customModals.css" rel="stylesheet" />
     <script>
         $(function () {
-            var UserName = "Emil";
-            var state = 0;
-            // Reference the auto-generated proxy for the hub.
-            var connectedHub = $.connection.retrospectiveHub;
+            //  state: "waiting", "running", "presenting"
+            var state;
+
+            // Retrospective Guid
+            var guidId;
+
+            // show Login modal after page load
+            $(document).ready(function () {
+                state = "waiting";
+                $('#modalLogin').modal('show');
+            });
+            
+
+
+
+            var retHub = $.connection.retrospectiveHub;
 
             $.connection.hub.start();
 
-            // Create a function that the hub can call back to display messages.
-            connectedHub.client.updateUsersOnlineCount = function (count) {
-                // Add the message to the page.
-                $('#usersCount').text(count);
-            };            
-
-            $("#buttonOpenDialogLogin").click(function () {
-
-                $('#modalLogin').modal('show');
+            $('#modalLogInButton').click(function () {
+                retHub.server.loginUser("aaa");
             });
+
+
+            // Invalid input Login modal
+            retHub.client.invalidLoginInput = function () {
+                $('#testInValidInput').text("invalid input");
+                // TODO: 
+            };
+
+            // User is logged
+            retHub.client.userLogged = function () {
+                switch (state) {
+                    case "waiting":
+                        $('#modalWaiting').modal('show');
+                        $('#modalLogin').modal('hide');
+                        break;
+                    case "running":
+                    case "presenting":
+                        $('#modalWaiting').modal('hide');
+                        $('#modalLogin').modal('hide');
+                        break;
+                }
+            };
+
+            retHub.client.updateUsersOnlineCount = function (count) {
+                $('#usersCount').text(count);
+            };
+
+            
                            
         });</script>
 }
 
-<div class="modal fade bs-example-modal-sm" id="modalLogin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Modal title</h4>
+
+
+
+<br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <ul class="nav nav-sidebar">
+                UsersOnline:
+                <div id="usersCount"></div>
+            </ul>
+            <ul class="nav nav-sidebar">
+                var state:
+                <div id="varstate"></div>
+            </ul>
+            <ul class="nav nav-sidebar">
+                GuidId:
+                @Html.DisplayFor(m => m.GuidId)
+            </ul>
+            <ul class="nav nav-sidebar">
+                State:
+                @Html.DisplayFor(m => m.State)
+            </ul>
+            <ul class="nav nav-sidebar">
+                Name:
+                @Html.DisplayFor(m => m.Name)
+            </ul>
+            <ul class="nav nav-sidebar">
+                Email:
+                @Html.DisplayFor(m => m.Email)
+            </ul>
+        </div>
+        <div class="col-md-10">
+            <div class="well well-lg">
+                TODO:
+                <input class="btn" id="buttonOpenDialogLogin" value="Open">
             </div>
         </div>
     </div>
 </div>
+<br>
 
 
-<div class="modal hide fade" id="aaa" data-keyboard="false" data-backdrop="static">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalLogin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Enter Retrospective</h1>
             </div>
             <div class="modal-body">
-                <form>
+                <form id="logInForm">
                     <div class="form-group">
-                        <label for="recipient-name" class="control-label">Recipient:</label>
-                        <input type="text" class="form-control" id="recipient-name">
+                        <label for="recipient-name" class="control-label">NickName:</label>
+                        <input type="text" class="form-control" id="modalNickName" name="modalNickName" placeholder="Enter Nick Name">
                     </div>
                     <div class="form-group">
-                        <label for="message-text" class="control-label">Message:</label>
-                        <textarea class="form-control" id="message-text"></textarea>
+                        <label for="message-text" class="control-label">Email:</label>
+                        <input type="text" class="form-control" id="modalEmail" name="modalEmail" placeholder="Enter Email">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Send message</button>
+                <!-- remove after implementation of valdiation messages --> <div id="testInValidInput"></div>
+                <button type="button" id="modalLogInButton" class="btn btn-primary text-center">Enter</button>
             </div>
-        </div>
-    </div>
-</div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
-
-
-
-
-
-
-
-
-
-
-
-    <br>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-2">
-                <ul class="nav nav-sidebar">
-                    UsersOnline:
-                    <div id="usersCount"></div>
-                </ul>
-                <ul class="nav nav-sidebar">
-                    var state:
-                    <div id="varstate"></div>
-                </ul>
-                <ul class="nav nav-sidebar">
-                    GuidId:
-                    @Html.DisplayFor(m => m.GuidId)
-                </ul>
-                <ul class="nav nav-sidebar">
-                    State:
-                    @Html.DisplayFor(m => m.State)
-                </ul>
-                <ul class="nav nav-sidebar">
-                    Name:
-                    @Html.DisplayFor(m => m.Name)
-                </ul>
-                <ul class="nav nav-sidebar">
-                    Email:
-                    @Html.DisplayFor(m => m.Email)
-                </ul>
+<!-- Modal -->
+<div class="modal fade" id="modalWaiting" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Waiting for the Start</h1>
             </div>
-            <div class="col-md-10">
-                <div class="well well-lg">
-                    TODO:
-                    <input class="btn" id="buttonOpenDialogLogin" value="Open">
-                </div>
+            <div class="modal-body">
+                Please Wait until Retrospective starts.
             </div>
-        </div>
-    </div>
-    <br>
-
-
-
-
-
-
-
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
