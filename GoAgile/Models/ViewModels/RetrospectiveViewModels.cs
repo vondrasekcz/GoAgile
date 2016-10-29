@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace GoAgile.Models
 {
@@ -24,14 +25,20 @@ namespace GoAgile.Models
         public string Comment { get; set; }
     }
 
-    public class RetrospectiveViewModel
+    public class RetrospectiveViewModel : AsSerializeable
     {
         public string GuidId { get; set; }
 
-        public int State { get; set; }
+        public string State { get; set; }
 
-        public string Name { get; set; }
+        public string Owner { get; set; }
+    }
 
-        public string Email { get; set; }
+    public abstract class AsSerializeable
+    {
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }

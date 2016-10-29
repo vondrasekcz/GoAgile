@@ -2,8 +2,8 @@
 {
     public enum EventState
     {
-        Created,
-        Running,
-        Finished
+        waiting,
+        running,
+        presenting
     }
 }

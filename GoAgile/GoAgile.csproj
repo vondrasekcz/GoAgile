@@ -227,6 +227,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Event.cs" />
+    <Compile Include="Helpers\ReturnObjRetrospective.cs" />
     <Compile Include="Helpers\User.cs" />
     <Compile Include="Hubs\RetrospectiveHub.cs" />
     <Compile Include="Models\DB\Retrospective.cs" />

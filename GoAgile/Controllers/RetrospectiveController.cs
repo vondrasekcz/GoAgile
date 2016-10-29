@@ -1,6 +1,7 @@
 ﻿using GoAgile.Models;
 using GoAgile.Models.EntityManager;
 using System.Web.Mvc;
+using GoAgile.Helpers;
 
 namespace GoAgile.Controllers
 {
@@ -22,15 +23,25 @@ namespace GoAgile.Controllers
         public ActionResult Retrospective(string id)
         {
             // TODO rewrite
-            var man = new RetrospectiveManager();
-            var ret = man.FindModel(id);
+
+            if (User.Identity.IsAuthenticated)
+            {
+
+            }
+
+            var man = new RetrospectiveManager();                         
+            var ret = man.FindModel(id);  
 
             if (ret == null)
-            {
                 return HttpNotFound();
-            }
-            // maybe only GuidId
-            return View(new RetrospectiveViewModel { GuidId = id, State = 0});
+            // Rewrite this owner system meybe own page for owner
+            else
+            {
+                if (User.Identity.IsAuthenticated && User.Identity.Name == ret.Owner)
+                    return View(new RetrospectiveViewModel { GuidId = id, State = ret.State, Owner = "owner" });
+                else
+                    return View(new RetrospectiveViewModel { GuidId = id, State = ret.State, Owner = "sorryBro" });
+            }                   
         }
 
         //

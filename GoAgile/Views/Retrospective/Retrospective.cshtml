@@ -4,12 +4,13 @@
     ViewBag.Title = "Retrospective";
 }
 
-
 @section scripts{
     <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
     <script type="text/javascript" src="~/signalr/hubs"></script>    
     <link href="~/Content/customModals.css" rel="stylesheet" />
     <script>
+        // TODO: own script file
+
         $(function () {
             //  state: "waiting", "running", "presenting"
             var state;
@@ -17,28 +18,40 @@
             // Retrospective Guid
             var guidId;
 
+            // Admin
+            var isOwner;
+
             // show Login modal after page load
             $(document).ready(function () {
-                state = "waiting";
-                $('#modalLogin').modal('show');
-            });
-            
+                state = '@Model.State';
+                guidId = '@Model.GuidId';
+                isOwner = '@Model.Owner';
 
+                if (isOwner == "owner")
+                    $('#modalOwner').modal('show');
+                else
+                    $('#modalLogin').modal('show');
+
+                // TODO: delete
+                $('#sendstate').text(state);
+                $('#sendguid').text(guidId);
+                $('#curstate').text(state);
+            });
 
 
             var retHub = $.connection.retrospectiveHub;
 
             $.connection.hub.start();
 
+            // Login user
             $('#modalLogInButton').click(function () {
-                retHub.server.loginUser("aaa");
+                retHub.server.loginUser($('#modalNickName').val(), $('#modalEmail').val(), guidId);
             });
-
 
             // Invalid input Login modal
             retHub.client.invalidLoginInput = function () {
                 $('#testInValidInput').text("invalid input");
-                // TODO: 
+                // TODO:
             };
 
             // User is logged
@@ -56,14 +69,25 @@
                 }
             };
 
+            // Start Retrospective
+            $('#startRetrospective').click(function () {
+                retHub.server.startRetrospective(guidId);
+            });
+
+            // Retrospective started
+            retHub.client.startRequest = function () {
+                state = "running";
+                $('#modalWaiting').modal('hide');
+                $('#modalOwner').modal('hide');
+            }
+
             retHub.client.updateUsersOnlineCount = function (count) {
                 $('#usersCount').text(count);
             };
 
-            
-                           
         });</script>
 }
+
 
 
 
@@ -77,32 +101,41 @@
                 <div id="usersCount"></div>
             </ul>
             <ul class="nav nav-sidebar">
-                var state:
-                <div id="varstate"></div>
+                current state:
+                <div id="curstate"></div>
             </ul>
             <ul class="nav nav-sidebar">
-                GuidId:
-                @Html.DisplayFor(m => m.GuidId)
+                send guid:
+                <div id="sendguid"></div>
             </ul>
             <ul class="nav nav-sidebar">
-                State:
-                @Html.DisplayFor(m => m.State)
-            </ul>
-            <ul class="nav nav-sidebar">
-                Name:
-                @Html.DisplayFor(m => m.Name)
-            </ul>
-            <ul class="nav nav-sidebar">
-                Email:
-                @Html.DisplayFor(m => m.Email)
+                send state:
+                <div id="sendstate"></div>
             </ul>
         </div>
         <div class="col-md-10">
-            <div class="well well-lg">
-                TODO:
-                <input class="btn" id="buttonOpenDialogLogin" value="Open">
+                <div class="row">
+
+                    <div class="col-sm-4 text-center">
+                        <div class="well">
+                            <div class="title-marketing"><h3>Start</h3></div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="well">
+                            <div class="title-marketing"><h3>Stop</h3></div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="well">
+                            <div class="title-marketing"><h3>Continue</h3></div>
+
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
     </div>
 </div>
 <br>
@@ -125,7 +158,7 @@
 
 
 
-<!-- Modal -->
+<!-- Modal LogIn-->
 <div class="modal fade" id="modalLogin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -152,7 +185,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!-- Modal -->
+<!-- Modal Waiting-->
 <div class="modal fade" id="modalWaiting" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -161,6 +194,24 @@
             </div>
             <div class="modal-body">
                 Please Wait until Retrospective starts.
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal Owner-->
+<div class="modal fade" id="modalOwner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Start the Retrospective</h1>
+            </div>
+            <div class="modal-body">
+                <div>Copy this URL and sent to your team</div>
+                <div id="modalUrl"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="startRetrospective" class="btn btn-primary text-center">Start the Retrospective</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

@@ -69,14 +69,11 @@ namespace GoAgile.Hubs
         /// <param name="email"></param>
         /// <param name="name"></param>
         /// <param name="eventGuid"></param>
-        public void loginUser(string name/*, string name, string eventGuid*/)
+        public void loginUser(string name, string email, string eventGuid)
         {
-            // Invalid user data
-            if (!IsUserLoginInputValid(email: "aaa@bbb.cz", name: name, eventGuid: "aaaa"))
-            {
-                // TODO:
+            if (!IsUserLoginInputValid(email: "aaa@bbb.cz", name: name, eventGuid: eventGuid))
+                // TODO: Return object with valdiation messages
                 Clients.Caller.invalidLoginInput();
-            }
             else
             {
                 //_eventStorage.AddUser(eventGuid: eventGuid, userName: name, email: email, clientId: GetClientId());
@@ -84,7 +81,13 @@ namespace GoAgile.Hubs
             }
         }
 
-        
+        [Authorize]
+        public void startRetrospective(string eventGuid)
+        {
+            //var users = _eventStorage.EventUsers(eventGuid);
+            // TODO: only event users
+            Clients.All.startRequest();
+        }
 
 
 
@@ -92,7 +95,8 @@ namespace GoAgile.Hubs
 
 
 
-        
+
+
 
 
 
@@ -252,6 +256,8 @@ namespace GoAgile.Hubs
         /// <returns>InvalidLoginUserMessage with ivalid inputs</returns>
         private bool IsUserLoginInputValid(string email, string name, string eventGuid)
         {
+            // TODO: return error and validation messages
+
             //var validationObj = new InvalidLoginUserMessage();
 
             if (string.IsNullOrWhiteSpace(name))

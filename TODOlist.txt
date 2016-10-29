@@ -26,3 +26,7 @@ Controler
 
 README.md
  - make normal structure
+
+ Hubs:
+  - RetrospectiveHub
+	- find and add user in same method
