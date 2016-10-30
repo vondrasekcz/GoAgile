@@ -12,6 +12,16 @@
         // TODO: own script file
 
         $(function () {
+
+       
+            
+
+
+            //**************************************
+
+            // Page URL
+            var url;
+
             //  state: "waiting", "running", "presenting"
             var state;
 
@@ -26,6 +36,8 @@
                 state = '@Model.State';
                 guidId = '@Model.GuidId';
                 isOwner = '@Model.Owner';
+                url = $(location).attr('href');
+                $('#modalUrl').text(url);
 
                 if (isOwner == "owner")
                     $('#modalOwner').modal('show');
@@ -85,8 +97,103 @@
                 $('#usersCount').text(count);
             };
 
+
+
+
+            // Start column Add
+            $('#btnstart').click(function () {
+                $('#startlist').append(
+                    $('<li class="list-group-item well clearfix">').append(
+                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Start"></textarea>' +
+                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
+                ));
+            });
+
+            // Continue column Add
+            $('#btncontinue').click(function () {
+                $('#continuelist').append(
+                    $('<li class="list-group-item well clearfix">').append(
+                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Continue"></textarea>' +
+                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
+                ));
+            });
+
+            // Stop column Add
+            $('#btnstop').click(function () {
+                $('#stoplist').append(
+                    $('<li class="list-group-item well clearfix">').append(
+                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Stop"></textarea>' +
+                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
+                ));
+            });
+
+            // Delete Item from columns
+            $(document).on('click', '.delete', function () {
+                $(this).parent().remove();
+            });
+
         });</script>
 }
+
+
+
+
+<!-- Modal LogIn-->
+<div class="modal fade" id="modalLogin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Enter Retrospective</h1>
+            </div>
+            <div class="modal-body">
+                <form id="logInForm">
+                    <div class="form-group">
+                        <label class="control-label">NickName:</label>
+                        <input type="text" class="form-control" id="modalNickName" name="modalNickName" placeholder="Enter Nick Name">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Email:</label>
+                        <input type="text" class="form-control" id="modalEmail" name="modalEmail" placeholder="Enter Email">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <!-- remove after implementation of valdiation messages --> <div id="testInValidInput"></div>
+                <button type="button" id="modalLogInButton" class="btn btn-primary text-center">Enter</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- Modal Waiting-->
+<div class="modal fade" id="modalWaiting" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Waiting for the Start</h1>
+            </div>
+            <div class="modal-body">
+                Please Wait until Retrospective starts.
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- Modal Owner-->
+<div class="modal fade" id="modalOwner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Start the Retrospective</h1>
+            </div>
+            <div class="modal-body">
+                <label class="control-label">Copy this URL and sent to your team:</label>
+                <div class="well" id="modalUrl"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="startRetrospective" class="btn btn-primary text-center">Start the Retrospective</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 
@@ -113,106 +220,29 @@
                 <div id="sendstate"></div>
             </ul>
         </div>
+        <!-- Columns Start, Continue, Stop -->
         <div class="col-md-10">
-                <div class="row">
-
-                    <div class="col-sm-4 text-center">
-                        <div class="well">
-                            <div class="title-marketing"><h3>Start</h3></div>
-
-                        </div>
-                    </div>
-                    <div class="col-sm-4 text-center">
-                        <div class="well">
-                            <div class="title-marketing"><h3>Stop</h3></div>
-
-                        </div>
-                    </div>
-                    <div class="col-sm-4 text-center">
-                        <div class="well">
-                            <div class="title-marketing"><h3>Continue</h3></div>
-
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col-sm-4 text-center">
+                    <div class="title-marketing"><h3>Start</h3></div>
+                    <ul class="list-group" id="startlist">
+                    </ul>
+                    <button type="button" id="btnstart" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                </div>
+                <div class="col-sm-4 text-center">
+                    <div class="title-marketing"><h3>Stop</h3></div>
+                    <ul class="list-group" id="continuelist">
+                    </ul>
+                    <button type="button" id="btncontinue" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                </div>
+                <div class="col-sm-4 text-center">
+                    <div class="title-marketing"><h3>Continue</h3></div>
+                    <ul class="list-group" id="stoplist">
+                    </ul>
+                    <button type="button" id="btnstop" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                 </div>
             </div>
+        </div>
     </div>
 </div>
 <br>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Modal LogIn-->
-<div class="modal fade" id="modalLogin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary text-center">
-                <h1>Enter Retrospective</h1>
-            </div>
-            <div class="modal-body">
-                <form id="logInForm">
-                    <div class="form-group">
-                        <label for="recipient-name" class="control-label">NickName:</label>
-                        <input type="text" class="form-control" id="modalNickName" name="modalNickName" placeholder="Enter Nick Name">
-                    </div>
-                    <div class="form-group">
-                        <label for="message-text" class="control-label">Email:</label>
-                        <input type="text" class="form-control" id="modalEmail" name="modalEmail" placeholder="Enter Email">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <!-- remove after implementation of valdiation messages --> <div id="testInValidInput"></div>
-                <button type="button" id="modalLogInButton" class="btn btn-primary text-center">Enter</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<!-- Modal Waiting-->
-<div class="modal fade" id="modalWaiting" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary text-center">
-                <h1>Waiting for the Start</h1>
-            </div>
-            <div class="modal-body">
-                Please Wait until Retrospective starts.
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<!-- Modal Owner-->
-<div class="modal fade" id="modalOwner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary text-center">
-                <h1>Start the Retrospective</h1>
-            </div>
-            <div class="modal-body">
-                <div>Copy this URL and sent to your team</div>
-                <div id="modalUrl"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="startRetrospective" class="btn btn-primary text-center">Start the Retrospective</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->

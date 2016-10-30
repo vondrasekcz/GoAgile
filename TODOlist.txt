@@ -8,6 +8,8 @@ Views
 	- validate max chars
 	- better size well and maybe centre it
 	- glyphcons - datepicker
+ - Retrospective
+	- textarea auto-expand: http://www.jacklmoore.com/autosize/
  - Layout 
 	- add glyphcons
 
