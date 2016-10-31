@@ -2,7 +2,7 @@
 using GoAgile.Models.DB;
 using System;
 using System.Linq;
-using GoAgile.Helpers;
+using GoAgile.Helpers.Objects;
 
 namespace GoAgile.Models.EntityManager
 {
@@ -50,6 +50,20 @@ namespace GoAgile.Models.EntityManager
 
                 return dbItem.Id.ToString();
             }
-        }         
+        }
+
+        // TODO rewrite
+        public void StartRetrospective(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var dbItem = db.Retrospectives
+                    .Single(s => s.Id == guidId);
+
+                dbItem.State = EventState.running;
+
+                db.SaveChanges();
+            }
+        } 
     }
 }

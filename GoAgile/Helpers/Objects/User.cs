@@ -1,4 +1,4 @@
-﻿namespace GoAgile.Helpers
+﻿namespace GoAgile.Helpers.Objects
 {
     public class User
     {

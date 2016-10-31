@@ -1,0 +1,111 @@
+﻿@using GoAgile.Models
+@model ManageRetrospectiveViewModel
+
+@{
+    ViewBag.Title = "ManageRetrospective";
+}
+
+<h2>ManageRetrospective</h2>
+
+
+@section scripts{
+    <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <link href="~/Content/customModals.css" rel="stylesheet" />
+    <script>
+        $(function ()
+        {
+            // Retrospective URL
+            var ret_url;
+
+            //  state: "waiting", "running", "presenting"
+            var state;
+
+            // Retrospective Guid
+            var guidId;
+
+            $(document).ready(function () {
+                ret_url = '@Model.Url';
+                state = '@Model.State';
+                guidId = '@Model.GuidId';
+
+                $('#aaa').text(ret_url);
+                $('#modalUrl').text(ret_url);
+
+                $('#modalOwner').modal('show');
+            });
+
+
+
+            var retHub = $.connection.retrospectiveHub;
+
+            $.connection.hub.start();
+
+            // Start Retrospective
+            $('#startRetrospective').click(function () {
+                retHub.server.startRetrospective(guidId);
+            });
+
+            // Retrospective started
+            retHub.client.startRequest = function () {
+                state = "running";
+                $('#modalOwner').modal('hide');
+            }
+
+            //retHub.client.refreshOnlineUsers = function (users) {
+            //    while (users != null)
+            //    {
+            //        $(users).each(function (index, element) {
+            //            $('#online_users').append(
+            //            '<li class="list-group-item>' + element.Name + '</li>'
+            //            );
+            //        });                   
+            //    }
+            //}
+
+        });
+    </script>
+}
+
+<br/>
+<div id="aaa"></div>
+
+
+
+
+<!-- Trash Code-->
+<!-- Modal Owner-->
+<div class="modal fade" id="modalOwner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Start the Retrospective</h1>
+            </div>
+            <div class="modal-body">
+                <label class="control-label">Copy this URL and sent to your team:</label>
+                <div class="well" id="modalUrl"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="startRetrospective" class="btn btn-primary text-center">Start the Retrospective</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="title-marketing"><h3>OnlineUsers</h3></div>
+            <ul class="list-group" id="online_users"></ul>
+        </div>
+        <!-- Columns Start, Continue, Stop -->
+        <div class="col-md-10">
+
+        </div>
+    </div>
+</div>
+<br>
+

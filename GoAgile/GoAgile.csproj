@@ -226,9 +226,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\Event.cs" />
-    <Compile Include="Helpers\ReturnObjRetrospective.cs" />
-    <Compile Include="Helpers\User.cs" />
+    <Compile Include="Helpers\Objects\Event.cs" />
+    <Compile Include="Helpers\LogicEntities\EventStorage.cs" />
+    <Compile Include="Helpers\Objects\ReturnObjRetrospective.cs" />
+    <Compile Include="Helpers\Objects\User.cs" />
     <Compile Include="Hubs\RetrospectiveHub.cs" />
     <Compile Include="Models\DB\Retrospective.cs" />
     <Compile Include="Models\DB\EventState.cs" />
@@ -391,6 +392,7 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Home\GoAgile.cshtml" />
     <Content Include="Views\Retrospective\CreateRetrospective.cshtml" />
+    <Content Include="Views\Retrospective\ManageRetrospective.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

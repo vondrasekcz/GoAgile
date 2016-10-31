@@ -12,37 +12,18 @@
         // TODO: own script file
 
         $(function () {
-
-       
-            
-
-
-            //**************************************
-
-            // Page URL
-            var url;
-
             //  state: "waiting", "running", "presenting"
             var state;
 
             // Retrospective Guid
             var guidId;
 
-            // Admin
-            var isOwner;
-
             // show Login modal after page load
             $(document).ready(function () {
                 state = '@Model.State';
-                guidId = '@Model.GuidId';
-                isOwner = '@Model.Owner';
-                url = $(location).attr('href');
-                $('#modalUrl').text(url);
+                guidId = '@Model.GuidId';                
 
-                if (isOwner == "owner")
-                    $('#modalOwner').modal('show');
-                else
-                    $('#modalLogin').modal('show');
+                $('#modalLogin').modal('show');
 
                 // TODO: delete
                 $('#sendstate').text(state);
@@ -81,17 +62,14 @@
                 }
             };
 
-            // Start Retrospective
-            $('#startRetrospective').click(function () {
-                retHub.server.startRetrospective(guidId);
-            });
+          
 
             // Retrospective started
             retHub.client.startRequest = function () {
                 state = "running";
                 $('#modalWaiting').modal('hide');
-                $('#modalOwner').modal('hide');
             }
+
 
             retHub.client.updateUsersOnlineCount = function (count) {
                 $('#usersCount').text(count);
@@ -177,25 +155,6 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-<!-- Modal Owner-->
-<div class="modal fade" id="modalOwner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary text-center">
-                <h1>Start the Retrospective</h1>
-            </div>
-            <div class="modal-body">
-                <label class="control-label">Copy this URL and sent to your team:</label>
-                <div class="well" id="modalUrl"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="startRetrospective" class="btn btn-primary text-center">Start the Retrospective</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-
 
 
 

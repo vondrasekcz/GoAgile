@@ -1,5 +1,9 @@
 TODO list
 
+Scripts 
+ - duplicates
+ - own files
+
 Start to do
  - comments (aim: Self-documenting code)
 
@@ -9,7 +13,9 @@ Views
 	- better size well and maybe centre it
 	- glyphcons - datepicker
  - Retrospective
-	- textarea auto-expand: http://www.jacklmoore.com/autosize/
+	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
+	- title and some description
+ - ManageRetrospective
  - Layout 
 	- add glyphcons
 

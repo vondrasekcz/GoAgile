@@ -25,20 +25,19 @@ namespace GoAgile.Models
         public string Comment { get; set; }
     }
 
-    public class RetrospectiveViewModel : AsSerializeable
+    public class ManageRetrospectiveViewModel
+    {
+        public string GuidId { get; set; }
+
+        public string Url { get; set; }
+
+        public string State { get; set; }
+    } 
+
+    public class RetrospectiveViewModel 
     {
         public string GuidId { get; set; }
 
         public string State { get; set; }
-
-        public string Owner { get; set; }
-    }
-
-    public abstract class AsSerializeable
-    {
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this);
-        }
     }
 }

@@ -12,55 +12,8 @@ namespace GoAgile.Hubs
 {
     public class RetrospectiveHub : Hub
     {
-
-
-        //------------------------------------------------------------------------------
-        // TODO: some locks, own file
-        public class EventSpectiveStorage
-        {
-            private Dictionary<string, Event> _eventStore;
-
-            public bool ExistUser(string eventGuid, string userName)
-            {
-                // TODO:
-                return false;
-            }
-
-            public void AddUser(string eventGuid, string userName, string email, string clientId)
-            {
-                // TODO:
-            }
-
-            public void RemoveUser(string clientId)
-            {
-                // TODO:
-            }
-
-            public List<User> EventUsers(string eventGuid)
-            {
-                // TODO:
-                return null;
-            }
-
-            public List<User> GetOnlineUsersExceptMe(string clientId)
-            {
-                // TODO:
-                return null;
-            }
-        }
-        //------------------------------------------------------------------------------
-
-        // TODO: own file
-        private EventSpectiveStorage _eventStorage;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public RetrospectiveHub()
-        {
-            // TODO: inicialize at better place
-            var _eventStorage = new EventSpectiveStorage();
-        }
+        // TODO: own file, static?
+        //private static EventStorage _eventStorage = new EventStorage();
 
 
         /// <summary>
@@ -78,18 +31,43 @@ namespace GoAgile.Hubs
             {
                 //_eventStorage.AddUser(eventGuid: eventGuid, userName: name, email: email, clientId: GetClientId());
                 Clients.Caller.userLogged();
+                //OnlineUsers(eventGuid);
             }
         }
 
+        /// <summary>
+        /// Retrospective starts, change state to 'running'
+        /// </summary>
+        /// <param name="eventGuid"></param>
         [Authorize]
         public void startRetrospective(string eventGuid)
         {
-            //var users = _eventStorage.EventUsers(eventGuid);
-            // TODO: only event users
+            //_eventStorage.AddUser(eventGuid, Context.User.Identity.Name, Context.User.Identity.Name, GetClientId());
+
+            var man = new RetrospectiveManager();
+
+            man.StartRetrospective(eventGuid);
+
+            //var ret = _eventStorage.EventUsers(eventGuid);
+            //var connIds = ret
+            //    .Select(s => s.ConnectionId)
+            //    .ToList();
+
+            //Clients.Clients(connIds).startRequest();
+
             Clients.All.startRequest();
         }
 
 
+        //public void OnlineUsers(string eventGuid)
+        //{
+        //    var ret = _eventStorage.EventUsers(eventGuid);
+        //    var connIds = ret
+        //        .Select(s => s.ConnectionId)
+        //        .ToList();
+
+        //    Clients.Clients(connIds).refreshOnlineUsers(ret);
+        //}
 
 
 
@@ -108,8 +86,7 @@ namespace GoAgile.Hubs
 
 
 
-
-        //********************************************************************************************
+        //*****************Counter Things***************************************************************************
 
         /// <summary>
         /// The count of users connected.
@@ -179,6 +156,10 @@ namespace GoAgile.Hubs
         public override System.Threading.Tasks.Task OnDisconnected(bool aaa)
         {
             string clientId = GetClientId();
+
+            //var eventGuid = _eventStorage.RemoveUser(clientId);
+            //if (eventGuid != null)
+            //    OnlineUsers(eventGuid);
 
             if (Users.IndexOf(clientId) > -1)
             {
