@@ -24,88 +24,151 @@
             // Retrospective Guid
             var guidId;
 
+            // Page loaded
             $(document).ready(function () {
                 ret_url = '@Model.Url';
                 state = '@Model.State';
                 guidId = '@Model.GuidId';
 
-                $('#aaa').text(ret_url);
-                $('#modalUrl').text(ret_url);
-
-                $('#modalOwner').modal('show');
+                $('#div_url').text(ret_url);
+                //$("#manage_running").children().hide();
             });
 
-
+            //To show it: $("#myId").removeClass('hidden');
+            //To hide it: $("#myId").addClass('hidden');
 
             var retHub = $.connection.retrospectiveHub;
 
             $.connection.hub.start();
 
-            // Start Retrospective
-            $('#startRetrospective').click(function () {
-                retHub.server.startRetrospective(guidId);
+            // Start Retrospective running
+            $('#btn_start_running').click(function () {
+                retHub.server.startRetrospectiveRunning(guidId);
             });
 
-            // Retrospective started
-            retHub.client.startRequest = function () {
+            // Start Retrospective presenting
+            // TODO:
+            $('#btn_stop_running').click(function () {
+                retHub.server.startRetrospectiveRunning(guidId);
+            });
+
+            // Retrospective started running
+            retHub.client.startRunningMode = function () {
                 state = "running";
-                $('#modalOwner').modal('hide');
             }
 
-            //retHub.client.refreshOnlineUsers = function (users) {
-            //    while (users != null)
-            //    {
-            //        $(users).each(function (index, element) {
-            //            $('#online_users').append(
-            //            '<li class="list-group-item>' + element.Name + '</li>'
-            //            );
-            //        });                   
-            //    }
-            //}
+            // Retrospective started presenting
+            retHub.client.startPresentingMode = function () {
+                state = "presenting";
+            }
+
+            // Start column Add
+            $('#btnstart').click(function () {
+                $('#startlist').append(
+                    $('<li class="list-group-item well clearfix">').append(
+                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Start"></textarea>' +
+                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
+                ));
+            });
+
+            // Continue column Add
+            $('#btncontinue').click(function () {
+                $('#continuelist').append(
+                    $('<li class="list-group-item well clearfix">').append(
+                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Continue"></textarea>' +
+                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
+                ));
+            });
+
+            // Stop column Add
+            $('#btnstop').click(function () {
+                $('#stoplist').append(
+                    $('<li class="list-group-item well clearfix">').append(
+                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Stop"></textarea>' +
+                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
+                ));
+            });
+
+            // Delete Item from columns
+            $(document).on('click', '.delete', function () {
+                $(this).parent().remove();
+            });
+
 
         });
     </script>
 }
 
-<br/>
-<div id="aaa"></div>
 
 
+ <!-- Page -->
+<div class="container-fluid">      
+        <div class="row">
+            <!-- Online USers panel-->
+            <div class="col-md-2">
+                <div class="title-marketing"><h3>OnlineUsers</h3></div>
+                <ul class="list-group" id="online_users"></ul>
+            </div> <!-- /Online USers panel -->
+           
+            <div class="col-md-10">
+                <!-- Top well URL -->
+                <div class="well"> 
+                    <div class="row text-center">
+                        <div class="col-sm-12 text-center">
+                            <h3>Send this URL to your team</h3>
+                            <font size="4"><div id="div_url"></div></font>
+                        </div>
+                    </div>
+                    <!-- Running State Manager -->
+                    <div class="row" id="manage_running">
+                        <div class="col-md-6 text-center">
 
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <h3>Retrospective Control</h3>
+                            <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
+                                <button type="button" id="btn_start_running" class="btn btn-primary text-center">Start</button>
+                                <button type="button" id="btn_stop_running" class="btn btn-primary text-center">Stop</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
 
-<!-- Trash Code-->
-<!-- Modal Owner-->
-<div class="modal fade" id="modalOwner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary text-center">
-                <h1>Start the Retrospective</h1>
+                        </div>
+                    </div> <!-- /Running State Manager -->
+                    <!-- Presenting State Manager -->
+                    <div class="row" id="manage_presenting">
+                        <div class="col-md-6 text-center">
+
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <h3>Retrospective Control</h3>
+                            <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
+                                <button type="button" id="btn_stop" class="btn btn-primary text-center">Stop</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+
+                        </div>
+                    </div> <!-- /Presenting State Manager -->
+                </div> <!-- /Top well URL -->
+                <!-- Columns Start, Continue, Stop -->
+                <div class="row">
+                    <div class="col-sm-4 text-center">
+                        <div class="title-marketing"><h3>Start</h3></div>
+                        <ul class="list-group" id="startlist"></ul>
+                        <button type="button" id="btnstart" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="title-marketing"><h3>Stop</h3></div>
+                        <ul class="list-group" id="continuelist"></ul>
+                        <button type="button" id="btncontinue" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="title-marketing"><h3>Continue</h3></div>
+                        <ul class="list-group" id="stoplist"></ul>
+                        <button type="button" id="btnstop" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                    </div>
+                </div><!-- /Columns Start, Continue, Stop -->
             </div>
-            <div class="modal-body">
-                <label class="control-label">Copy this URL and sent to your team:</label>
-                <div class="well" id="modalUrl"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="startRetrospective" class="btn btn-primary text-center">Start the Retrospective</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-
-
-<br>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-2">
-            <div class="title-marketing"><h3>OnlineUsers</h3></div>
-            <ul class="list-group" id="online_users"></ul>
         </div>
-        <!-- Columns Start, Continue, Stop -->
-        <div class="col-md-10">
-
-        </div>
-    </div>
 </div>
-<br>
-

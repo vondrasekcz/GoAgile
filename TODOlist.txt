@@ -8,6 +8,7 @@ Start to do
  - comments (aim: Self-documenting code)
 
 Views
+ - How to properly show/hide modal: hide or hidden???
  - CreateRetrospective
 	- validate max chars
 	- better size well and maybe centre it
@@ -16,6 +17,7 @@ Views
 	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
 	- title and some description
  - ManageRetrospective
+	- Link not so much responsive
  - Layout 
 	- add glyphcons
 

@@ -53,7 +53,7 @@ namespace GoAgile.Models.EntityManager
         }
 
         // TODO rewrite
-        public void StartRetrospective(string guidId)
+        public void ChangeToRetrospectiveRunning(string guidId)
         {
             using (var db = AgileDb.Create())
             {
@@ -64,6 +64,22 @@ namespace GoAgile.Models.EntityManager
 
                 db.SaveChanges();
             }
-        } 
+        }
+
+        // TODO rewrite
+        public void ChangeToRetrospectivePresenting(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var dbItem = db.Retrospectives
+                    .Single(s => s.Id == guidId);
+
+                dbItem.State = EventState.presenting;
+
+                db.SaveChanges();
+            }
+        }
+
+
     }
 }

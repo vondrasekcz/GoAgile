@@ -227,7 +227,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Objects\Event.cs" />
-    <Compile Include="Helpers\LogicEntities\EventStorage.cs" />
     <Compile Include="Helpers\Objects\ReturnObjRetrospective.cs" />
     <Compile Include="Helpers\Objects\User.cs" />
     <Compile Include="Hubs\RetrospectiveHub.cs" />
@@ -396,6 +395,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Helpers\LogicEntities\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

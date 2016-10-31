@@ -12,8 +12,7 @@ namespace GoAgile.Hubs
 {
     public class RetrospectiveHub : Hub
     {
-        // TODO: own file, static?
-        //private static EventStorage _eventStorage = new EventStorage();
+       
 
 
         /// <summary>
@@ -24,14 +23,14 @@ namespace GoAgile.Hubs
         /// <param name="eventGuid"></param>
         public void loginUser(string name, string email, string eventGuid)
         {
-            if (!IsUserLoginInputValid(email: "aaa@bbb.cz", name: name, eventGuid: eventGuid))
+            if (!IsUserLoginInputValid(email: email, name: name, eventGuid: eventGuid))
                 // TODO: Return object with valdiation messages
                 Clients.Caller.invalidLoginInput();
             else
             {
-                //_eventStorage.AddUser(eventGuid: eventGuid, userName: name, email: email, clientId: GetClientId());
+                
                 Clients.Caller.userLogged();
-                //OnlineUsers(eventGuid);
+
             }
         }
 
@@ -40,37 +39,30 @@ namespace GoAgile.Hubs
         /// </summary>
         /// <param name="eventGuid"></param>
         [Authorize]
-        public void startRetrospective(string eventGuid)
+        public void startRetrospectiveRunning(string eventGuid)
         {
-            //_eventStorage.AddUser(eventGuid, Context.User.Identity.Name, Context.User.Identity.Name, GetClientId());
-
+            // TODO: inicialize in constructor or somwhere else
             var man = new RetrospectiveManager();
+            man.ChangeToRetrospectiveRunning(eventGuid);
 
-            man.StartRetrospective(eventGuid);
-
-            //var ret = _eventStorage.EventUsers(eventGuid);
-            //var connIds = ret
-            //    .Select(s => s.ConnectionId)
-            //    .ToList();
-
-            //Clients.Clients(connIds).startRequest();
-
-            Clients.All.startRequest();
+            // TODO: only to specific group by eventGuid
+            Clients.All.startRunningMode();
         }
 
+        /// <summary>
+        /// Retrospective starts, change state to 'presenting'
+        /// </summary>
+        /// <param name="eventGuid"></param>
+        [Authorize]
+        public void startRetrospectivePresenting(string eventGuid)
+        {
+            // TODO: inicialize in constructor or somwhere else
+            var man = new RetrospectiveManager();
+            man.ChangeToRetrospectivePresenting(eventGuid);
 
-        //public void OnlineUsers(string eventGuid)
-        //{
-        //    var ret = _eventStorage.EventUsers(eventGuid);
-        //    var connIds = ret
-        //        .Select(s => s.ConnectionId)
-        //        .ToList();
-
-        //    Clients.Clients(connIds).refreshOnlineUsers(ret);
-        //}
-
-
-
+            // TODO: only to specific group by eventGuid
+            Clients.All.startPresentingMode();
+        }
 
 
 
@@ -156,10 +148,6 @@ namespace GoAgile.Hubs
         public override System.Threading.Tasks.Task OnDisconnected(bool aaa)
         {
             string clientId = GetClientId();
-
-            //var eventGuid = _eventStorage.RemoveUser(clientId);
-            //if (eventGuid != null)
-            //    OnlineUsers(eventGuid);
 
             if (Users.IndexOf(clientId) > -1)
             {
