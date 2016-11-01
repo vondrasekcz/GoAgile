@@ -1,5 +1,4 @@
 ﻿@using GoAgile.Models
-@using GoAgile.Helpers.Objects
 
 @model ManageRetrospectiveViewModel
 
@@ -45,17 +44,15 @@
                         disableListButtons(true);
                         $('#manage_presenting').children().hide();
                         $('#btn_stop_running').prop('disabled', true);
-                        $('#modalFinished').modal('hide');
                         break;
                     case "running":
                         $("#manage_presenting").children().hide();
                         $('#btn_start_running').prop('disabled', true);
-                        $('#modalFinished').modal('hide');
+                        disableListButtons(false);
                         break;
                     case "presenting":
                         disableListButtons(true);
                         $("#manage_running").children().hide();
-                        $('#modalFinished').modal('hide');
                         // TODO: get shared items
                         $('.share').prop('disabled', false);
                         break;
@@ -178,13 +175,18 @@
                 $('#btn_stop_addItem').prop('disabled', state);
             };
 
+
+            retHub.client.updateUsersOnlineCount = function (count) {
+                $('#online_users').text(count);
+            };
+
         });
     </script>
 }
 
 
 <!-- Modal Finished-->
-<div class="modal fade" id="modalFinished" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+<div class="modal fade" id="modalFinished" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-primary text-center">
@@ -209,7 +211,7 @@
             <!-- Online USers panel-->
             <div class="col-md-2">
                 <div class="title-marketing"><h3>Online Users</h3></div>
-                <ul class="list-group" id="online_users"></ul>
+                <div id="online_users"></div>
             </div> <!-- /Online USers panel -->
            
             <div class="col-md-10">

@@ -8,7 +8,6 @@ Start to do
  - comments (aim: Self-documenting code)
 
 Views
- - if presenting add items
  - How to properly show/hide modal: hide or hidden???
  - CreateRetrospective
 	- validate max chars
@@ -18,9 +17,9 @@ Views
 	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
 	- title and some description
  - ManageRetrospective
-	- control panels
+	- control panels, titles
 	- timer
-	- if connected at presenting, load shared items by hub not by ManageRetrospectiveViewModel
+	- if connected at presenting, load shared items
  - Layout 
 	- add glyphcons
 
@@ -43,4 +42,4 @@ README.md
  Hubs:
   - RetrospectiveHub
 	- online users
-	- maybe recieve object?
+	- maybe recieve object? instead of string, string, ...

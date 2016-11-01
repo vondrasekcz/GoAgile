@@ -8,6 +8,8 @@
     <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
     <script type="text/javascript" src="~/signalr/hubs"></script>    
     <link href="~/Content/customModals.css" rel="stylesheet" />
+    <link href="~/Content/customWell.css" rel="stylesheet" />
+    <link href="~/Content/customeText.css" rel="stylesheet" />
     <script>
         // TODO: own script file
 
@@ -18,17 +20,17 @@
             // Retrospective Guid
             var guidId;
 
+            // User Name
+            var user;
+
             // Page Loaded -> show login modal
             $(document).ready(function () {
                 state = '@Model.State';
                 guidId = '@Model.GuidId';                
-
-                $('#modalLogin').modal('show');
-
-                // TODO: delete
-                $('#sendstate').text(state);
-                $('#sendguid').text(guidId);
-                $('#curstate').text(state);
+                if (state == "finished")
+                    $('#modalFinished').modal('show');                   
+                else
+                    $('#modalLogin').modal('show');
             });
 
 
@@ -42,84 +44,147 @@
             });
 
             // Invalid input Login modal
+            // TODO: valdiate message
             retHub.client.invalidLoginInput = function () {
                 $('#testInValidInput').text("invalid input");
-                // TODO:
             };
 
             // User is logged
-            retHub.client.userLogged = function () {
+            retHub.client.userLogged = function (nickName) {
+
+                // TODO: get shared items
+
+                user = nickName;
                 switch (state) {
                     case "waiting":
-                        $('#modalWaiting').modal('show');
+                        disableListButtons(true);
                         $('#modalLogin').modal('hide');
+                        $('#modalWaiting').modal('show');
                         break;
                     case "running":
-                    case "presenting":
-                        $('#modalWaiting').modal('hide');
+                        disableListButtons(false);
                         $('#modalLogin').modal('hide');
                         break;
-                    case "finished":
+                    case "presenting":                      
+                        disableListButtons(true);                        
+                        $('.share').prop('disabled', false);
+                        $('#modalLogin').modal('hide');
+                        break;
+                    case "finished":                        
+                        $('#modalFinished').modal('show');
+                        $('#modalLogin').modal('hide');
                         break;
                 }
             };
-
-          
-
-            // Retrospective started
-            retHub.client.startRequest = function () {
-                state = "running";
-                $('#modalWaiting').modal('hide');
-            }
-
 
             retHub.client.updateUsersOnlineCount = function (count) {
                 $('#usersCount').text(count);
             };
 
 
+            // Navigate to home page
+            $('#btn_home').click(function () {
+                // TODO:
+            });
 
+            // Navigate to Retrospective History
+            $('#btn_history').click(function () {
+                // TODO:
+            });
+
+            // Share Item
+            $(document).on('click', '.share', function () {
+
+                listId = $(this).parent().parent().parent().attr('id');
+                column = $(this).parent().parent().parent().attr('name');
+                text = $(this).parent().parent().find('.itemText').val();
+
+                $(this).parent().parent().remove();
+
+                retHub.server.sendSharedItem(listId, column, text, user, guidId);
+            });
+
+            // Retrospective started running
+            retHub.client.startRunningMode = function () {
+                state = "running";
+                $('#modalWaiting').modal('hide');
+                disableListButtons(false);
+            }
+
+            // Retrospective started presenting
+            retHub.client.startPresentingMode = function () {
+                state = "presenting";
+                $('#modalWaiting').modal('hide');
+                $('.share').prop('disabled', false);
+                disableListButtons(true);
+            }
+
+            // Retrospective is finished
+            retHub.client.retrospectiveFinished = function () {
+                state = "finished";
+                $('#modalFinished').modal('show');
+            }
+
+            // Recieve shared Item
+            retHub.client.recieveSharedItem = function (item) {
+                $('#' + item.listId).prepend(
+                 $('<li class="list-group-item well well-success  clearfix listBlock">').append(
+                     $('<h4>' + item.column + '</h4><h5>by ' + item.autor + '</h5>' +
+                       '<textarea type="textarea" class="form-control itemText" rows="3">' + item.text + '</textarea>'
+              )));
+            }
 
             // Start column Add
-            $('#btnstart').click(function () {
-                $('#startlist').append(
-                    $('<li class="list-group-item well clearfix">').append(
-                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Start"></textarea>' +
-                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
-                ));
+            $('#btn_start_addItem').click(function () {
+                addListItem("list_start", "start");
             });
 
             // Continue column Add
-            $('#btncontinue').click(function () {
-                $('#continuelist').append(
-                    $('<li class="list-group-item well clearfix">').append(
-                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Continue"></textarea>' +
-                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
-                ));
+            $('#btn_continue_addItem').click(function () {
+                addListItem("list_continue", "Continue");
             });
 
             // Stop column Add
-            $('#btnstop').click(function () {
-                $('#stoplist').append(
-                    $('<li class="list-group-item well clearfix">').append(
-                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Stop"></textarea>' +
-                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
-                ));
+            $('#btn_stop_addItem').click(function () {
+                addListItem("list_stop", "Stop");
             });
+
+            // Add list item to list
+            function addListItem(list, placeholder) {
+                $('#' + list).append(
+                   $('<li class="list-group-item well clearfix listBlock">').append(
+                       $('<textarea type="textarea" class="form-control itemText" rows="3" placeholder="' + placeholder + '"></textarea>' +
+                         '<div class="btn-group" role="group">' +
+                         '<input type="button" class="btn btn-success share" disabled value="Share"/>' +
+                         '<input type="button" class="btn btn-danger delete" value="Delete"/>' +
+                         '</div>'
+                )));
+            };
 
             // Delete Item from columns
             $(document).on('click', '.delete', function () {
-                $(this).parent().remove();
+                $(this).parent().parent().remove();
             });
 
-        });</script>
+            // Disable list add (+) buttons
+            function disableListButtons(state) {
+                $('#btn_start_addItem').prop('disabled', state);
+                $('#btn_continue_addItem').prop('disabled', state);
+                $('#btn_stop_addItem').prop('disabled', state);
+            };
+
+
+
+
+        });
+    </script>
 }
 
 
 
 
 <!-- Modal LogIn-->
-<div class="modal fade" id="modalLogin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+<div class="modal fade" id="modalLogin" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-primary text-center">
@@ -145,7 +210,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <!-- Modal Waiting-->
-<div class="modal fade" id="modalWaiting" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+<div class="modal fade" id="modalWaiting" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-primary text-center">
@@ -157,52 +222,51 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
+<!-- Modal Finished-->
+<div class="modal fade" id="modalFinished" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Retrospective is Done</h1>
+            </div>
+            <div class="modal-body">
+                Go to home page or see retrospective data
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
+                <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 <br>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-2">
-            <ul class="nav nav-sidebar">
-                UsersOnline:
-                <div id="usersCount"></div>
-            </ul>
-            <ul class="nav nav-sidebar">
-                current state:
-                <div id="curstate"></div>
-            </ul>
-            <ul class="nav nav-sidebar">
-                send guid:
-                <div id="sendguid"></div>
-            </ul>
-            <ul class="nav nav-sidebar">
-                send state:
-                <div id="sendstate"></div>
-            </ul>
+            <h3>UsersOnline:</h3>
+            <div id="usersCount"></div>
         </div>
         <!-- Columns Start, Continue, Stop -->
         <div class="col-md-10">
             <div class="row">
                 <div class="col-sm-4 text-center">
                     <div class="title-marketing"><h3>Start</h3></div>
-                    <ul class="list-group" id="startlist">
-                    </ul>
-                    <button type="button" id="btnstart" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                    <ul class="list-group" name="Start" id="list_start"></ul>
+                    <button type="button" id="btn_start_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                 </div>
                 <div class="col-sm-4 text-center">
                     <div class="title-marketing"><h3>Stop</h3></div>
-                    <ul class="list-group" id="continuelist">
-                    </ul>
-                    <button type="button" id="btncontinue" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                    <ul class="list-group" name="Stop" id="list_stop"></ul>
+                    <button type="button" id="btn_stop_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                 </div>
                 <div class="col-sm-4 text-center">
                     <div class="title-marketing"><h3>Continue</h3></div>
-                    <ul class="list-group" id="stoplist">
-                    </ul>
-                    <button type="button" id="btnstop" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                    <ul class="list-group" name="Continue" id="list_continue"></ul>
+                    <button type="button" id="btn_continue_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                 </div>
-            </div>
+            </div><!-- /Columns Start, Continue, Stop -->
         </div>
     </div>
 </div>

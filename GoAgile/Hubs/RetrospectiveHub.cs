@@ -29,7 +29,7 @@ namespace GoAgile.Hubs
             else
             {
                 
-                Clients.Caller.userLogged();
+                Clients.Caller.userLogged(name);
 
             }
         }
