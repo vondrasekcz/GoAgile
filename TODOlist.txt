@@ -18,6 +18,7 @@ Views
 	- title and some description
  - ManageRetrospective
 	- Link not so much responsive
+	- disable share button in running -> enable in presenting
  - Layout 
 	- add glyphcons
 
@@ -39,4 +40,4 @@ README.md
 
  Hubs:
   - RetrospectiveHub
-	- find and add user in same method
+	- online users

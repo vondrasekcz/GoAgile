@@ -43,14 +43,14 @@ namespace GoAgile.Hubs
         {
             // TODO: inicialize in constructor or somwhere else
             var man = new RetrospectiveManager();
-            man.ChangeToRetrospectiveRunning(eventGuid);
+            man.ChangeRetrospectiveToRunning(eventGuid);
 
             // TODO: only to specific group by eventGuid
             Clients.All.startRunningMode();
         }
 
         /// <summary>
-        /// Retrospective starts, change state to 'presenting'
+        /// Retrospective presenting starts, change state to 'presenting'
         /// </summary>
         /// <param name="eventGuid"></param>
         [Authorize]
@@ -58,15 +58,26 @@ namespace GoAgile.Hubs
         {
             // TODO: inicialize in constructor or somwhere else
             var man = new RetrospectiveManager();
-            man.ChangeToRetrospectivePresenting(eventGuid);
+            man.ChangeRetrospectiveToPresenting(eventGuid);
 
             // TODO: only to specific group by eventGuid
             Clients.All.startPresentingMode();
         }
 
+        /// <summary>
+        /// Retrospective is finished
+        /// </summary>
+        /// <param name="eventGuid"></param>
+        [Authorize]
+        public void retrospectiveComplete(string eventGuid)
+        {
+            // TODO: inicialize in constructor or somwhere else
+            var man = new RetrospectiveManager();
+            man.ChangeToRetrospectiveToFinished(eventGuid);
 
-
-
+            // TODO: only to specific group by eventGuid
+            Clients.All.retrospectiveFinished();
+        }
 
 
 

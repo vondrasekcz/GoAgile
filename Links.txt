@@ -1,0 +1,6 @@
+Used:
+https://bootstrap-datepicker.readthedocs.io/en/latest/
+
+look at:
+ - timer
+	http://www.jqueryscript.net/tags.php?/timer/

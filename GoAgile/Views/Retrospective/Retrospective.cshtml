@@ -12,7 +12,7 @@
         // TODO: own script file
 
         $(function () {
-            //  state: "waiting", "running", "presenting"
+            //  state: "waiting", "running", "presenting", "finished"
             var state;
 
             // Retrospective Guid
@@ -58,6 +58,8 @@
                     case "presenting":
                         $('#modalWaiting').modal('hide');
                         $('#modalLogin').modal('hide');
+                        break;
+                    case "finished":
                         break;
                 }
             };

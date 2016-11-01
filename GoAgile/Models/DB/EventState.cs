@@ -4,6 +4,7 @@
     {
         waiting,
         running,
-        presenting
+        presenting,
+        finished
     }
 }

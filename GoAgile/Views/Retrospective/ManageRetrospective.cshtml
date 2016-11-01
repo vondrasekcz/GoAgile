@@ -18,7 +18,7 @@
             // Retrospective URL
             var ret_url;
 
-            //  state: "waiting", "running", "presenting"
+            //  state: "waiting", "running", "presenting", "finished"
             var state;
 
             // Retrospective Guid
@@ -30,8 +30,29 @@
                 state = '@Model.State';
                 guidId = '@Model.GuidId';
 
-                $('#div_url').text(ret_url);
-                //$("#manage_running").children().hide();
+                $('#div_url').text(ret_url);     
+                
+                switch (state) {
+                    case "waiting":
+                        disableListButtons(true);
+                        $('#manage_presenting').children().hide();
+                        $('#btn_stop_running').prop('disabled', true);
+                        $('#modalFinished').modal('hide');
+                        break;
+                    case "running":
+                        $("#manage_presenting").children().hide();
+                        $('#btn_start_running').prop('disabled', true);
+                        $('#modalFinished').modal('hide');
+                        break;
+                    case "presenting":
+                        disableListButtons(true);
+                        $("#manage_running").children().hide();
+                        $('#modalFinished').modal('hide');
+                        break;
+                    case "finished":
+                        $('#modalFinished').modal('show');
+                        break;
+                }
             });
 
             //To show it: $("#myId").removeClass('hidden');
@@ -47,57 +68,113 @@
             });
 
             // Start Retrospective presenting
-            // TODO:
             $('#btn_stop_running').click(function () {
-                retHub.server.startRetrospectiveRunning(guidId);
+                retHub.server.startRetrospectivePresenting(guidId);
             });
+
+            // Finish Retrospective
+            $('#btn_stop_presenting').click(function () {
+                retHub.server.retrospectiveComplete(guidId);
+            }); 
+
+            // Navigate to home page
+            $('#btn_home').click(function () {
+                // TODO:
+            });
+
+            // Navigate to Retrospective History
+            $('#btn_history').click(function () {
+                // TODO:
+            }); 
+            
+           
 
             // Retrospective started running
             retHub.client.startRunningMode = function () {
                 state = "running";
+                $('#btn_start_running').prop('disabled', true);
+                $('#btn_stop_running').prop('disabled', false);
+                disableListButtons(false);
             }
-
+            
             // Retrospective started presenting
             retHub.client.startPresentingMode = function () {
                 state = "presenting";
+                $("#manage_running").children().hide();
+                $("#manage_presenting").children().show();
+                disableListButtons(true);
             }
 
+            // Retrospective is finished
+            retHub.client.retrospectiveFinished = function () {
+                state = "finished";
+                $('#modalFinished').modal('show');
+            }
+
+
+
+
             // Start column Add
-            $('#btnstart').click(function () {
-                $('#startlist').append(
-                    $('<li class="list-group-item well clearfix">').append(
-                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Start"></textarea>' +
-                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
-                ));
+            $('#btn_start_addItem').click(function () {
+                addListItem("list_start", "start");
             });
 
             // Continue column Add
-            $('#btncontinue').click(function () {
-                $('#continuelist').append(
-                    $('<li class="list-group-item well clearfix">').append(
-                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Continue"></textarea>' +
-                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
-                ));
+            $('#btn_continue_addItem').click(function () {
+                addListItem("list_continue", "Continue");
             });
 
             // Stop column Add
-            $('#btnstop').click(function () {
-                $('#stoplist').append(
-                    $('<li class="list-group-item well clearfix">').append(
-                        $('<textarea type="textarea" class="form-control" rows="3" placeholder="Stop"></textarea>' +
-                          '<input type="button" class="btn btn-primary delete pull-right" value="Delete"/>')
-                ));
+            $('#btn_stop_addItem').click(function () {
+                addListItem("list_stop", "Stop");
             });
+
+            // Add list item to list
+            function addListItem(list, placeholder) {
+                $('#' + list).append(
+                   $('<li class="list-group-item well clearfix">').append(
+                       $('<textarea type="textarea" class="form-control" rows="3" placeholder="' + placeholder + '"></textarea>' +
+                         '<div class="btn-group" role="group">' +
+                         '<input type="button" class="btn btn-primary share" value="Share"/>' +
+                         '<input type="button" class="btn btn-danger delete" value="Delete"/>' +                
+                         '</div>')
+               ));
+            };
 
             // Delete Item from columns
             $(document).on('click', '.delete', function () {
-                $(this).parent().remove();
+                $(this).parent().parent().remove();
             });
 
+            // Disable list add (+) buttons
+            function disableListButtons(state) {
+                $('#btn_start_addItem').prop('disabled', state);
+                $('#btn_continue_addItem').prop('disabled', state);
+                $('#btn_stop_addItem').prop('disabled', state);
+            };
 
         });
     </script>
 }
+
+
+<!-- Modal Finished-->
+<div class="modal fade" id="modalFinished" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h1>Retrospective is Done</h1>
+            </div>
+            <div class="modal-body">
+                Go to home page or see retrospective data
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
+                <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 
@@ -106,7 +183,7 @@
         <div class="row">
             <!-- Online USers panel-->
             <div class="col-md-2">
-                <div class="title-marketing"><h3>OnlineUsers</h3></div>
+                <div class="title-marketing"><h3>Online Users</h3></div>
                 <ul class="list-group" id="online_users"></ul>
             </div> <!-- /Online USers panel -->
            
@@ -120,15 +197,15 @@
                         </div>
                     </div>
                     <!-- Running State Manager -->
-                    <div class="row" id="manage_running">
+                    <h3>Retrospective</h3>
+                        <div class="row" id="manage_running">
                         <div class="col-md-6 text-center">
 
                         </div>
-                        <div class="col-md-6 text-center">
-                            <h3>Retrospective Control</h3>
-                            <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
+                        <div class="col-md-6 text-center">                            
+                            <div class="btn-group btn-group-lg pull-right" role="group">
                                 <button type="button" id="btn_start_running" class="btn btn-primary text-center">Start</button>
-                                <button type="button" id="btn_stop_running" class="btn btn-primary text-center">Stop</button>
+                                <button type="button" id="btn_stop_running" class="btn btn-danger text-center">Stop</button>
                             </div>
                         </div>
                         <div class="col-md-4 text-center">
@@ -137,13 +214,13 @@
                     </div> <!-- /Running State Manager -->
                     <!-- Presenting State Manager -->
                     <div class="row" id="manage_presenting">
+                        <h3>Presenting Phase</h3>
                         <div class="col-md-6 text-center">
 
                         </div>
-                        <div class="col-md-6 text-center">
-                            <h3>Retrospective Control</h3>
+                        <div class="col-md-6 text-center">                            
                             <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
-                                <button type="button" id="btn_stop" class="btn btn-primary text-center">Stop</button>
+                                <button type="button" id="btn_stop_presenting" class="btn btn-danger text-center">Finish Retrospective</button>
                             </div>
                         </div>
                         <div class="col-md-4 text-center">
@@ -155,20 +232,21 @@
                 <div class="row">
                     <div class="col-sm-4 text-center">
                         <div class="title-marketing"><h3>Start</h3></div>
-                        <ul class="list-group" id="startlist"></ul>
-                        <button type="button" id="btnstart" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                        <ul class="list-group" id="list_start"></ul>
+                        <button type="button" id="btn_start_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
                     <div class="col-sm-4 text-center">
                         <div class="title-marketing"><h3>Stop</h3></div>
-                        <ul class="list-group" id="continuelist"></ul>
-                        <button type="button" id="btncontinue" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                        <ul class="list-group" id="list_continue"></ul>
+                        <button type="button" id="btn_continue_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
                     <div class="col-sm-4 text-center">
                         <div class="title-marketing"><h3>Continue</h3></div>
-                        <ul class="list-group" id="stoplist"></ul>
-                        <button type="button" id="btnstop" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                        <ul class="list-group" id="list_stop"></ul>
+                        <button type="button" id="btn_stop_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
                 </div><!-- /Columns Start, Continue, Stop -->
             </div>
         </div>
 </div>
+
