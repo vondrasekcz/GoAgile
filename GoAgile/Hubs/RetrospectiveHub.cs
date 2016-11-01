@@ -35,18 +35,18 @@ namespace GoAgile.Hubs
         }
 
         /// <summary>
-        /// 
+        /// Save and send shared Retrospective item
         /// </summary>
         /// <param name="listId"></param>
         /// <param name="column"></param>
         /// <param name="text"></param>
         /// <param name="user"></param>
-        public void sendItem(string listId, string column, string text, string user)
+        public void sendSharedItem(string listId, string column, string text, string user, string eventGuid)
         {
             // TODO: add item to database
 
             // TODO: only to specific group by eventGuid
-            Clients.All.recieveItem(new ItemObject() { autor = user, column = column, listId = listId, text = text });
+            Clients.All.recieveSharedItem(new ItemObject() { autor = user, column = column, listId = listId, text = text });
         }
 
         /// <summary>

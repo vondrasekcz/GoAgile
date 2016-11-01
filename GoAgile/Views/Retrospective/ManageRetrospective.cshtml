@@ -1,4 +1,6 @@
 ﻿@using GoAgile.Models
+@using GoAgile.Helpers.Objects
+
 @model ManageRetrospectiveViewModel
 
 @{
@@ -15,8 +17,7 @@
     <link href="~/Content/customWell.css" rel="stylesheet" />
     <link href="~/Content/customeText.css" rel="stylesheet" />
     <script>
-        $(function ()
-        {
+        $(function () {
             // Retrospective URL
             var ret_url;
 
@@ -31,13 +32,14 @@
 
             // Page loaded
             $(document).ready(function () {
+
                 ret_url = '@Model.Url';
                 state = '@Model.State';
                 guidId = '@Model.GuidId';
                 user = "Project Manager";
 
-                $('#div_url').text(ret_url);     
-                
+                $('#div_url').text(ret_url);
+
                 switch (state) {
                     case "waiting":
                         disableListButtons(true);
@@ -54,6 +56,8 @@
                         disableListButtons(true);
                         $("#manage_running").children().hide();
                         $('#modalFinished').modal('hide');
+                        // TODO: get shared items
+                        $('.share').prop('disabled', false);
                         break;
                     case "finished":
                         $('#modalFinished').modal('show');
@@ -61,10 +65,10 @@
                 }
             });
 
-
+            // Inicialize hub connection
             var retHub = $.connection.retrospectiveHub;
-
             $.connection.hub.start();
+
 
             // Start Retrospective running
             $('#btn_start_running').click(function () {
@@ -79,7 +83,7 @@
             // Finish Retrospective
             $('#btn_stop_presenting').click(function () {
                 retHub.server.retrospectiveComplete(guidId);
-            }); 
+            });
 
             // Navigate to home page
             $('#btn_home').click(function () {
@@ -89,8 +93,8 @@
             // Navigate to Retrospective History
             $('#btn_history').click(function () {
                 // TODO:
-            }); 
-                       
+            });
+
             // Share Item
             $(document).on('click', '.share', function () {
 
@@ -100,11 +104,8 @@
 
                 $(this).parent().parent().remove();
 
-                retHub.server.sendItem(listId, column, text, user);              
+                retHub.server.sendSharedItem(listId, column, text, user, guidId);
             });
-
-
-
 
             // Retrospective started running
             retHub.client.startRunningMode = function () {
@@ -113,12 +114,13 @@
                 $('#btn_stop_running').prop('disabled', false);
                 disableListButtons(false);
             }
-            
+
             // Retrospective started presenting
             retHub.client.startPresentingMode = function () {
                 state = "presenting";
                 $("#manage_running").children().hide();
                 $("#manage_presenting").children().show();
+                $('.share').prop('disabled', false);
                 disableListButtons(true);
             }
 
@@ -128,15 +130,14 @@
                 $('#modalFinished').modal('show');
             }
 
-            // Recieve Item
-            retHub.client.recieveItem = function (item) {
+            // Recieve shared Item
+            retHub.client.recieveSharedItem = function (item) {
                 $('#' + item.listId).prepend(
                  $('<li class="list-group-item well well-success  clearfix listBlock">').append(
                      $('<h4>' + item.column + '</h4><h5>by ' + item.autor + '</h5>' +
                        '<textarea type="textarea" class="form-control itemText" rows="3">' + item.text + '</textarea>'
               )));
             }
-
 
             // Start column Add
             $('#btn_start_addItem').click(function () {
@@ -159,8 +160,8 @@
                    $('<li class="list-group-item well clearfix listBlock">').append(
                        $('<textarea type="textarea" class="form-control itemText" rows="3" placeholder="' + placeholder + '"></textarea>' +
                          '<div class="btn-group" role="group">' +
-                         '<input type="button" class="btn btn-success share" value="Share"/>' +
-                         '<input type="button" class="btn btn-danger delete" value="Delete"/>' +                
+                         '<input type="button" class="btn btn-success share" disabled value="Share"/>' +
+                         '<input type="button" class="btn btn-danger delete" value="Delete"/>' +
                          '</div>'
                 )));
             };
@@ -169,8 +170,6 @@
             $(document).on('click', '.delete', function () {
                 $(this).parent().parent().remove();
             });
-
-            
 
             // Disable list add (+) buttons
             function disableListButtons(state) {
@@ -211,8 +210,6 @@
             <div class="col-md-2">
                 <div class="title-marketing"><h3>Online Users</h3></div>
                 <ul class="list-group" id="online_users"></ul>
-                <ul class="list-group" id="online_text1"></ul>
-                <ul class="list-group" id="online_text2"></ul>
             </div> <!-- /Online USers panel -->
            
             <div class="col-md-10">
@@ -265,13 +262,13 @@
                     </div>
                     <div class="col-sm-4 text-center">
                         <div class="title-marketing"><h3>Stop</h3></div>
-                        <ul class="list-group" name="Stop" id="list_continue"></ul>
-                        <button type="button" id="btn_continue_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                        <ul class="list-group" name="Stop" id="list_stop"></ul>
+                        <button type="button" id="btn_stop_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
                     <div class="col-sm-4 text-center">
                         <div class="title-marketing"><h3>Continue</h3></div>
-                        <ul class="list-group" name="Continue" id="list_stop"></ul>
-                        <button type="button" id="btn_stop_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                        <ul class="list-group" name="Continue" id="list_continue"></ul>
+                        <button type="button" id="btn_continue_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
                 </div><!-- /Columns Start, Continue, Stop -->
             </div>

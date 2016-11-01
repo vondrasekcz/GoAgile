@@ -46,7 +46,7 @@ namespace GoAgile.Controllers
             if (User.Identity.Name == eventInfo.Owner)
             {
                 string url = Url.Action("Retrospective/" + id, "Retrospective", null, Request.Url.Scheme);
-                return View(new ManageRetrospectiveViewModel { Url = url, State = eventInfo.State, GuidId = id});
+                return View(new ManageRetrospectiveViewModel { Url = url, State = eventInfo.State, GuidId = id });
             }                
             else
                 return RedirectToAction("ManageRetrospective/" + id, "Retrospective");
@@ -63,14 +63,13 @@ namespace GoAgile.Controllers
                 // TODO rewrite
                 var man = new RetrospectiveManager();
                 var guidId = man.AddModel(model: model, user: User.Identity.Name);
+                      
 
                 // return retrospective view
                 return RedirectToAction("ManageRetrospective/" + guidId, "Retrospective");
             }
             return View(model);
         }
-
-       
 
     }
 
