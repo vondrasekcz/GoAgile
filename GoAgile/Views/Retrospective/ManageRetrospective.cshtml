@@ -12,6 +12,8 @@
     <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
     <script type="text/javascript" src="~/signalr/hubs"></script>
     <link href="~/Content/customModals.css" rel="stylesheet" />
+    <link href="~/Content/customWell.css" rel="stylesheet" />
+    <link href="~/Content/customeText.css" rel="stylesheet" />
     <script>
         $(function ()
         {
@@ -24,11 +26,15 @@
             // Retrospective Guid
             var guidId;
 
+            // User Name
+            var user;
+
             // Page loaded
             $(document).ready(function () {
                 ret_url = '@Model.Url';
                 state = '@Model.State';
                 guidId = '@Model.GuidId';
+                user = "Project Manager";
 
                 $('#div_url').text(ret_url);     
                 
@@ -55,8 +61,6 @@
                 }
             });
 
-            //To show it: $("#myId").removeClass('hidden');
-            //To hide it: $("#myId").addClass('hidden');
 
             var retHub = $.connection.retrospectiveHub;
 
@@ -86,8 +90,21 @@
             $('#btn_history').click(function () {
                 // TODO:
             }); 
-            
-           
+                       
+            // Share Item
+            $(document).on('click', '.share', function () {
+
+                listId = $(this).parent().parent().parent().attr('id');
+                column = $(this).parent().parent().parent().attr('name');
+                text = $(this).parent().parent().find('.itemText').val();
+
+                $(this).parent().parent().remove();
+
+                retHub.server.sendItem(listId, column, text, user);              
+            });
+
+
+
 
             // Retrospective started running
             retHub.client.startRunningMode = function () {
@@ -111,7 +128,14 @@
                 $('#modalFinished').modal('show');
             }
 
-
+            // Recieve Item
+            retHub.client.recieveItem = function (item) {
+                $('#' + item.listId).prepend(
+                 $('<li class="list-group-item well well-success  clearfix listBlock">').append(
+                     $('<h4>' + item.column + '</h4><h5>by ' + item.autor + '</h5>' +
+                       '<textarea type="textarea" class="form-control itemText" rows="3">' + item.text + '</textarea>'
+              )));
+            }
 
 
             // Start column Add
@@ -132,19 +156,21 @@
             // Add list item to list
             function addListItem(list, placeholder) {
                 $('#' + list).append(
-                   $('<li class="list-group-item well clearfix">').append(
-                       $('<textarea type="textarea" class="form-control" rows="3" placeholder="' + placeholder + '"></textarea>' +
+                   $('<li class="list-group-item well clearfix listBlock">').append(
+                       $('<textarea type="textarea" class="form-control itemText" rows="3" placeholder="' + placeholder + '"></textarea>' +
                          '<div class="btn-group" role="group">' +
-                         '<input type="button" class="btn btn-primary share" value="Share"/>' +
+                         '<input type="button" class="btn btn-success share" value="Share"/>' +
                          '<input type="button" class="btn btn-danger delete" value="Delete"/>' +                
-                         '</div>')
-               ));
+                         '</div>'
+                )));
             };
 
             // Delete Item from columns
             $(document).on('click', '.delete', function () {
                 $(this).parent().parent().remove();
             });
+
+            
 
             // Disable list add (+) buttons
             function disableListButtons(state) {
@@ -179,12 +205,14 @@
 
 
  <!-- Page -->
-<div class="container-fluid">      
+<div class="container">      
         <div class="row">
             <!-- Online USers panel-->
             <div class="col-md-2">
                 <div class="title-marketing"><h3>Online Users</h3></div>
                 <ul class="list-group" id="online_users"></ul>
+                <ul class="list-group" id="online_text1"></ul>
+                <ul class="list-group" id="online_text2"></ul>
             </div> <!-- /Online USers panel -->
            
             <div class="col-md-10">
@@ -193,7 +221,7 @@
                     <div class="row text-center">
                         <div class="col-sm-12 text-center">
                             <h3>Send this URL to your team</h3>
-                            <font size="4"><div id="div_url"></div></font>
+                            <font size="4"><div class="breake-word" id="div_url"></div></font>
                         </div>
                     </div>
                     <!-- Running State Manager -->
@@ -232,17 +260,17 @@
                 <div class="row">
                     <div class="col-sm-4 text-center">
                         <div class="title-marketing"><h3>Start</h3></div>
-                        <ul class="list-group" id="list_start"></ul>
+                        <ul class="list-group" name="Start" id="list_start"></ul>
                         <button type="button" id="btn_start_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
                     <div class="col-sm-4 text-center">
                         <div class="title-marketing"><h3>Stop</h3></div>
-                        <ul class="list-group" id="list_continue"></ul>
+                        <ul class="list-group" name="Stop" id="list_continue"></ul>
                         <button type="button" id="btn_continue_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
                     <div class="col-sm-4 text-center">
                         <div class="title-marketing"><h3>Continue</h3></div>
-                        <ul class="list-group" id="list_stop"></ul>
+                        <ul class="list-group" name="Continue" id="list_stop"></ul>
                         <button type="button" id="btn_stop_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
                 </div><!-- /Columns Start, Continue, Stop -->

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Web;
 using Microsoft.AspNet.SignalR;
 using GoAgile.Models;
-using GoAgile.Helpers;
+using GoAgile.Helpers.Objects;
 using GoAgile.Models.EntityManager;
 
 namespace GoAgile.Hubs
@@ -32,6 +32,21 @@ namespace GoAgile.Hubs
                 Clients.Caller.userLogged();
 
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="listId"></param>
+        /// <param name="column"></param>
+        /// <param name="text"></param>
+        /// <param name="user"></param>
+        public void sendItem(string listId, string column, string text, string user)
+        {
+            // TODO: add item to database
+
+            // TODO: only to specific group by eventGuid
+            Clients.All.recieveItem(new ItemObject() { autor = user, column = column, listId = listId, text = text });
         }
 
         /// <summary>
@@ -65,7 +80,7 @@ namespace GoAgile.Hubs
         }
 
         /// <summary>
-        /// Retrospective is finished
+        /// Retrospective is finished change state to 'finished'
         /// </summary>
         /// <param name="eventGuid"></param>
         [Authorize]
