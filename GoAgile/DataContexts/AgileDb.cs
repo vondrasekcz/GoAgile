@@ -16,5 +16,6 @@ namespace GoAgile.DataContexts
         }
 
         public DbSet<Retrospective> Retrospectives { get; set; }
+        public DbSet<RetrospectiveItem> RetrospectiveItems { get; set; }
     }
 }

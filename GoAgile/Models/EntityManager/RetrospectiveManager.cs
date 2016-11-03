@@ -94,6 +94,25 @@ namespace GoAgile.Models.EntityManager
             }
         }
 
+        // TODO rewrite
+        public void AddRetrospectiveItem(string column, string text, string user, string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var dbItem = new RetrospectiveItem();
+
+
+                dbItem.Id = Guid.NewGuid().ToString();
+                dbItem.Retrospective = guidId;
+                dbItem.Section = column;
+                dbItem.UserName = user;
+                dbItem.Text = text;
+
+                db.RetrospectiveItems.Add(dbItem);
+                db.SaveChanges();
+            }
+        }
+
         
     }
 }

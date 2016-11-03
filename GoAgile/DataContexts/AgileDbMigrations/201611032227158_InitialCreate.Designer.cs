@@ -13,7 +13,7 @@ namespace GoAgile.DataContexts.AgileDbMigrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201610232317584_InitialCreate"; }
+            get { return "201611032227158_InitialCreate"; }
         }
         
         string IMigrationMetadata.Source

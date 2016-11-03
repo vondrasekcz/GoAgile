@@ -12,7 +12,3 @@ update database in PM:
 	
 	Update-Database -ConfigurationTypeName GoAgile.DataContexts.IdentityMigrations.Configuration
 	Update-Database -ConfigurationTypeName GoAgile.DataContexts.AgileDbMigrations.Configuration
-
-warning
- - change Id = c.Guid(nullable: false, identity: true, defaultValueSql: "newsequentialid()")
-	to generate guid

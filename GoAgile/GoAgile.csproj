@@ -208,19 +208,15 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RetrospectiveController.cs" />
     <Compile Include="DataContexts\AgileDb.cs" />
-    <Compile Include="DataContexts\AgileDbMigrations\201610232317584_InitialCreate.cs" />
-    <Compile Include="DataContexts\AgileDbMigrations\201610232317584_InitialCreate.Designer.cs">
-      <DependentUpon>201610232317584_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DataContexts\AgileDbMigrations\201610252331530_InitialCreate1.cs" />
-    <Compile Include="DataContexts\AgileDbMigrations\201610252331530_InitialCreate1.Designer.cs">
-      <DependentUpon>201610252331530_InitialCreate1.cs</DependentUpon>
+    <Compile Include="DataContexts\AgileDbMigrations\201611032227158_InitialCreate.cs" />
+    <Compile Include="DataContexts\AgileDbMigrations\201611032227158_InitialCreate.Designer.cs">
+      <DependentUpon>201611032227158_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="DataContexts\AgileDbMigrations\Configuration.cs" />
     <Compile Include="DataContexts\IdentityDb.cs" />
-    <Compile Include="DataContexts\IdentityMigrations\201610232309552_InitialCreate.cs" />
-    <Compile Include="DataContexts\IdentityMigrations\201610232309552_InitialCreate.Designer.cs">
-      <DependentUpon>201610232309552_InitialCreate.cs</DependentUpon>
+    <Compile Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.cs" />
+    <Compile Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.Designer.cs">
+      <DependentUpon>201611032226556_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="DataContexts\IdentityMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
@@ -233,6 +229,7 @@
     <Compile Include="Hubs\RetrospectiveHub.cs" />
     <Compile Include="Models\DB\Retrospective.cs" />
     <Compile Include="Models\DB\EventState.cs" />
+    <Compile Include="Models\DB\RetrospectiveItem.cs" />
     <Compile Include="Models\EntityManager\RetrospectiveManager.cs" />
     <Compile Include="Models\ViewModels\AccountViewModels.cs" />
     <Compile Include="Models\EntityManager\IdentityModels.cs" />
@@ -409,14 +406,11 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201610232317584_InitialCreate.resx">
-      <DependentUpon>201610232317584_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611032227158_InitialCreate.resx">
+      <DependentUpon>201611032227158_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201610252331530_InitialCreate1.resx">
-      <DependentUpon>201610252331530_InitialCreate1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DataContexts\IdentityMigrations\201610232309552_InitialCreate.resx">
-      <DependentUpon>201610232309552_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.resx">
+      <DependentUpon>201611032226556_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

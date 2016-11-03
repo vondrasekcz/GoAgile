@@ -4,6 +4,9 @@ Scripts
  - duplicates
  - own files
 
+ GoAgile
+  - UseName(email) instead of ProjectManager?
+
 Start to do
  - comments (aim: Self-documenting code)
 
@@ -16,6 +19,8 @@ Views
  - Retrospective
 	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
 	- title and some description
+	- if connected at presenting, load shared items
+	- now is able to write to textarea in presenting phase that is so bad!!!
  - ManageRetrospective
 	- control panels, titles
 	- timer
@@ -25,12 +30,14 @@ Views
 
 Data && Migrations
  - add init values
+ - Models/DB - attributes
 
 Managers
  - try async
  - add Interfaces
  - RetrospectiveManager	
 	- make some nice structure
+	- DateStarted, TimeStated, DateFinished, TimeFinished
 
 Controler 
  - Retrospective

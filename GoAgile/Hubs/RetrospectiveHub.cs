@@ -44,6 +44,8 @@ namespace GoAgile.Hubs
         public void sendSharedItem(string listId, string column, string text, string user, string eventGuid)
         {
             // TODO: add item to database
+            var man = new RetrospectiveManager();
+            man.AddRetrospectiveItem(column: column, text: text, user: user, guidId: eventGuid);
 
             // TODO: only to specific group by eventGuid
             Clients.All.recieveSharedItem(new ItemObject() { autor = user, column = column, listId = listId, text = text });

@@ -8,6 +8,18 @@ namespace GoAgile.DataContexts.AgileDbMigrations
         public override void Up()
         {
             CreateTable(
+                "dbo.RetrospectiveItems",
+                c => new
+                    {
+                        Id = c.String(nullable: false, maxLength: 128),
+                        Retrospective = c.String(nullable: false, maxLength: 255),
+                        UserName = c.String(nullable: false, maxLength: 255),
+                        Section = c.String(nullable: false, maxLength: 255),
+                        Text = c.String(nullable: false, maxLength: 255),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
                 "dbo.Retrospectives",
                 c => new
                     {
@@ -26,6 +38,7 @@ namespace GoAgile.DataContexts.AgileDbMigrations
         public override void Down()
         {
             DropTable("dbo.Retrospectives");
+            DropTable("dbo.RetrospectiveItems");
         }
     }
 }
