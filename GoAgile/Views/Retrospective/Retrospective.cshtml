@@ -97,7 +97,7 @@
 
                 listId = $(this).parent().parent().parent().attr('id');
                 column = $(this).parent().parent().parent().attr('name');
-                text = $(this).parent().parent().find('.itemText').val();
+                text = $(this).parent().parent().find('.itemPending').val();
 
                 $(this).parent().parent().remove();
 
@@ -116,6 +116,7 @@
                 state = "presenting";
                 $('#modalWaiting').modal('hide');
                 $('.share').prop('disabled', false);
+                $('.itemPending').prop('disabled', true);
                 disableListButtons(true);
             }
 
@@ -130,7 +131,7 @@
                 $('#' + item.listId).prepend(
                  $('<li class="list-group-item well well-success  clearfix listBlock">').append(
                      $('<h4>' + item.column + '</h4><h5>by ' + item.autor + '</h5>' +
-                       '<textarea type="textarea" class="form-control itemText" rows="3">' + item.text + '</textarea>'
+                       '<textarea type="textarea" class="form-control itemPending" disabled rows="3">' + item.text + '</textarea>'
               )));
             }
 
@@ -153,7 +154,7 @@
             function addListItem(list, placeholder) {
                 $('#' + list).append(
                    $('<li class="list-group-item well clearfix listBlock">').append(
-                       $('<textarea type="textarea" class="form-control itemText" rows="3" placeholder="' + placeholder + '"></textarea>' +
+                       $('<textarea type="textarea" class="form-control itemPending" rows="3" placeholder="' + placeholder + '"></textarea>' +
                          '<div class="btn-group" role="group">' +
                          '<input type="button" class="btn btn-success share" disabled value="Share"/>' +
                          '<input type="button" class="btn btn-danger delete" value="Delete"/>' +
