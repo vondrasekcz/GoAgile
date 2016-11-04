@@ -29,6 +29,10 @@
             // User Name
             var user;
 
+            // List of items 
+            // TODO: binary search and inser at position
+            var itemIdList = [];
+
             // Page loaded
             $(document).ready(function () {
 
@@ -42,17 +46,17 @@
                 switch (state) {
                     case "waiting":
                         disableListButtons(true);
-                        $('#manage_presenting').children().hide();
+                        $('#manage_running').show();
                         $('#btn_stop_running').prop('disabled', true);
                         break;
                     case "running":
-                        $("#manage_presenting").children().hide();
+                        $("#manage_running").show();
                         $('#btn_start_running').prop('disabled', true);
                         disableListButtons(false);
                         break;
                     case "presenting":
+                        $('#manage_presenting').show();
                         disableListButtons(true);
-                        $("#manage_running").children().hide();
                         // TODO: get shared items, and itemPending with enabled share button
                         break;
                     case "finished":
@@ -63,7 +67,11 @@
 
             // Inicialize hub connection
             var retHub = $.connection.retrospectiveHub;
-            $.connection.hub.start();
+
+            $.connection.hub.start().done(function () {
+                if (state == "presenting")
+                    retHub.server.sendAllSharedItems(guidId);
+            });
 
 
             // Start Retrospective running
@@ -114,8 +122,8 @@
             // Retrospective started presenting
             retHub.client.startPresentingMode = function () {
                 state = "presenting";
-                $("#manage_running").children().hide();
-                $("#manage_presenting").children().show();
+                $("#manage_running").hide();
+                $("#manage_presenting").show();
                 $('.share').prop('disabled', false);
                 $('.itemPending').prop('disabled', true);
                 disableListButtons(true);
@@ -129,11 +137,16 @@
 
             // Recieve shared Item
             retHub.client.recieveSharedItem = function (item) {
-                $('#' + item.listId).prepend(
-                 $('<li class="list-group-item well well-success clearfix listBlock">').append(
-                     $('<h4>' + item.column + '</h4><h5>by ' + item.autor + '</h5>' +
-                       '<textarea type="textarea" class="form-control itemPending" disabled rows="3">' + item.text + '</textarea>'
-              )));
+                addSharedItem(item.itemGuid, item.listId, item.column, item.autor, item.text);
+            }
+
+            // Recieve all shared Items
+            retHub.client.recieveAllSharedItems = function (data) {
+                var item = $.parseJSON(data);
+
+                for (var i = 0; i < item.length; i++) {
+                    addSharedItem(item[i].itemGuid, item[i].listId, item[i].column, item[i].autor, item[i].text);
+                }
             }
 
             // Start column Add
@@ -161,6 +174,26 @@
                          '<input type="button" class="btn btn-danger delete" value="Delete"/>' +
                          '</div>'
                 )));
+            };
+
+            // Add shared Item to list
+            function addSharedItem(itemGuid, listId, column, autor, text) {
+                var exist = false;
+
+                for (var i = 0; i < itemIdList.length; i++) {
+                    if (itemGuid == itemIdList[i])
+                        exist = true;
+                }
+
+                if (exist == false) {
+                    itemIdList.push(itemGuid);
+
+                    $('#' + listId).prepend(
+                        $('<li class="list-group-item well well-success  clearfix listBlock">').append(
+                            $('<h4>' + column + '</h4><h5>by ' + autor + '</h5>' +
+                              '<textarea type="textarea" class="form-control itemPending" disabled rows="3">' + text + '</textarea>'
+                    )));
+                }
             };
 
             // Delete Item from columns
@@ -224,8 +257,7 @@
                         </div>
                     </div>
                     <!-- Running State Manager -->
-                    <h3>Retrospective</h3>
-                        <div class="row" id="manage_running">
+                    <div class="row" hidden id="manage_running">
                         <div class="col-md-6 text-center">
 
                         </div>
@@ -235,12 +267,10 @@
                                 <button type="button" id="btn_stop_running" class="btn btn-danger text-center">Stop</button>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
-
-                        </div>
+                        
                     </div> <!-- /Running State Manager -->
                     <!-- Presenting State Manager -->
-                    <div class="row" id="manage_presenting">
+                    <div class="row" hidden id="manage_presenting">
                         <h3>Presenting Phase</h3>
                         <div class="col-md-6 text-center">
 
@@ -250,9 +280,7 @@
                                 <button type="button" id="btn_stop_presenting" class="btn btn-danger text-center">Finish Retrospective</button>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
-
-                        </div>
+                        
                     </div> <!-- /Presenting State Manager -->
                 </div> <!-- /Top well URL -->
                 <!-- Columns Start, Continue, Stop -->

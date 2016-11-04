@@ -5,13 +5,13 @@ Scripts
  - own files
 
  GoAgile
-  - UseName(email) instead of ProjectManager?
-  - CLIENT - maybe same state structure for easy read code
+  - CLIENT - !!!!! some state structure for easy reading code !!!!!!!!!!!!!!!!!
 
 Start to do
  - comments (aim: Self-documenting code)
 
 Views
+ - if disabled textrea dont change it to grey color
  - How to properly show/hide modal: hide or hidden???
  - CreateRetrospective
 	- validate max chars
@@ -20,11 +20,13 @@ Views
  - Retrospective
 	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
 	- title and some description
-	- if connected at presenting, load shared items
+	- binary search and insert at position - sortedIdList in ManageRetrospective too
+	- after connect in presenting show all shared items in right order in ManageRetrospective too
  - ManageRetrospective
 	- control panels, titles
 	- timer
 	- if connected at presenting, load shared items
+	- if connected at running or presenting share pending items
 	- if send or crete any item, share to others ProjectManagers devices
  - Layout 
 	- add glyphcons
@@ -51,3 +53,4 @@ README.md
   - RetrospectiveHub
 	- online users
 	- maybe recieve object? instead of string, string, ...
+	- Disble log name as Project Manager

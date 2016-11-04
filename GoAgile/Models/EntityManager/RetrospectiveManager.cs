@@ -3,6 +3,7 @@ using GoAgile.Models.DB;
 using System;
 using System.Linq;
 using GoAgile.Helpers.Objects;
+using System.Collections.Generic;
 
 namespace GoAgile.Models.EntityManager
 {
@@ -35,8 +36,8 @@ namespace GoAgile.Models.EntityManager
             using (var db = AgileDb.Create())
             {
                 var dbItem = new Retrospective();
-                
-              
+
+
                 dbItem.Id = Guid.NewGuid().ToString();
                 dbItem.RetrospectiveName = model.RetrospectiveName;
                 dbItem.Project = model.Project;
@@ -95,7 +96,7 @@ namespace GoAgile.Models.EntityManager
         }
 
         // TODO rewrite
-        public void AddRetrospectiveItem(string column, string text, string user, string guidId)
+        public string AddRetrospectiveItem(string column, string text, string user, string guidId)
         {
             using (var db = AgileDb.Create())
             {
@@ -110,9 +111,32 @@ namespace GoAgile.Models.EntityManager
 
                 db.RetrospectiveItems.Add(dbItem);
                 db.SaveChanges();
+
+                return dbItem.Id;
             }
+            
         }
 
-        
+        // TODO rewrite
+        public List<ItemObject> GetAllSharedItems(string GuidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var ret = db.RetrospectiveItems
+                    .Where(w => w.Retrospective == GuidId)
+                    .Select(s => new ItemObject()
+                    {
+                        autor = s.UserName,
+                        column = s.Section,
+                        text = s.Text,
+                        itemGuid = s.Id,
+                        listId = s.Section == "Start" ? "list_start" : (s.Section == "Stop" ? "list_stop" : "list_continue")
+                    }).ToList();
+
+                return ret;
+            }
+
+        }
+
     }
 }

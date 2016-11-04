@@ -7,6 +7,8 @@ namespace GoAgile.Helpers.Objects
 {
     public class ItemObject
     {
+        public string itemGuid { get; set; }
+
         public string listId { get; set; }
 
         public string column { get; set; }

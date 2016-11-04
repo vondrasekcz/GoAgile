@@ -23,6 +23,11 @@
             // User Name
             var user;
 
+            // List of items 
+            // TODO: binary search and inser at position
+            var itemIdList = [];
+
+
             // Page Loaded -> show login modal
             $(document).ready(function () {
                 state = '@Model.State';
@@ -36,7 +41,10 @@
 
             var retHub = $.connection.retrospectiveHub;
 
-            $.connection.hub.start();
+            $.connection.hub.start().done(function () {
+                if (state == "presenting" )
+                    retHub.server.sendAllSharedItems(guidId);
+            });
 
             // Login user
             $('#modalLogInButton').click(function () {
@@ -76,11 +84,6 @@
                         break;
                 }
             };
-
-            retHub.client.updateUsersOnlineCount = function (count) {
-                $('#usersCount').text(count);
-            };
-
 
             // Navigate to home page
             $('#btn_home').click(function () {
@@ -128,12 +131,18 @@
 
             // Recieve shared Item
             retHub.client.recieveSharedItem = function (item) {
-                $('#' + item.listId).prepend(
-                 $('<li class="list-group-item well well-success  clearfix listBlock">').append(
-                     $('<h4>' + item.column + '</h4><h5>by ' + item.autor + '</h5>' +
-                       '<textarea type="textarea" class="form-control itemPending" disabled rows="3">' + item.text + '</textarea>'
-              )));
+                addSharedItem(item.itemGuid, item.listId, item.column, item.autor, item.text);
             }
+
+            // Recieve all shared Items
+            retHub.client.recieveAllSharedItems = function (data) {
+                var item = $.parseJSON(data);            
+
+                for (var i = 0; i < item.length; i++) {
+                    addSharedItem(item[i].itemGuid, item[i].listId, item[i].column, item[i].autor, item[i].text);
+                }
+            }
+
 
             // Start column Add
             $('#btn_start_addItem').click(function () {
@@ -150,7 +159,7 @@
                 addListItem("list_stop", "Stop");
             });
 
-            // Add list item to list
+            // Add list pending item to list
             function addListItem(list, placeholder) {
                 $('#' + list).append(
                    $('<li class="list-group-item well clearfix listBlock">').append(
@@ -160,6 +169,26 @@
                          '<input type="button" class="btn btn-danger delete" value="Delete"/>' +
                          '</div>'
                 )));
+            };
+
+            // Add shared Item to list
+            function addSharedItem(itemGuid, listId, column, autor, text) {
+                var exist = false;
+
+                for (var i = 0; i < itemIdList.length; i++) {
+                    if (itemGuid == itemIdList[i])
+                        exist = true;
+                }
+
+                if (exist == false) {
+                    itemIdList.push(itemGuid);
+
+                    $('#' + listId).prepend(
+                        $('<li class="list-group-item well well-success  clearfix listBlock">').append(
+                            $('<h4>' + column + '</h4><h5>by ' + autor + '</h5>' +
+                              '<textarea type="textarea" class="form-control itemPending" disabled rows="3">' + text + '</textarea>'
+                    )));
+                }
             };
 
             // Delete Item from columns
@@ -175,7 +204,9 @@
             };
 
 
-
+            retHub.client.updateUsersOnlineCount = function (count) {
+                $('#usersCount').text(count);
+            };
 
         });
     </script>
