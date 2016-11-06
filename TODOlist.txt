@@ -14,12 +14,12 @@ Views
  - if disabled textrea dont change it to grey color
  - How to properly show/hide modal: hide or hidden???
  - CreateRetrospective
-	- validate max chars
 	- better size well and maybe centre it
 	- glyphcons - datepicker
  - Retrospective
 	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
 	- title and some description
+	- resize textarea only vertical
 	- binary search and insert at position - sortedIdList in ManageRetrospective too
 	- after connect in presenting show all shared items in right order in ManageRetrospective too
  - ManageRetrospective
@@ -37,9 +37,7 @@ Data && Migrations
 
 Managers
  - try async
- - add Interfaces
  - RetrospectiveManager	
-	- make some nice structure
 	- DateStarted, TimeStated, DateFinished, TimeFinished
 
 Controler 

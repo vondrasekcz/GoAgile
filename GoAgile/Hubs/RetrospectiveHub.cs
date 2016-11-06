@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Net.Mail;
 using Microsoft.AspNet.SignalR;
 using GoAgile.Helpers.Objects;
-using GoAgile.Models.EntityManager;
+using GoAgile.Dal;
 using Newtonsoft.Json;
 
 namespace GoAgile.Hubs
 {
     public class RetrospectiveHub : Hub
     {
-       
+        private IRetrospectiveManager _retrospectiveMan;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public RetrospectiveHub()
+        {
+            _retrospectiveMan = new RetrospectiveManager();
+        }
 
 
         /// <summary>
@@ -41,9 +49,7 @@ namespace GoAgile.Hubs
         /// <param name="user"></param>
         public void sendSharedItem(string listId, string column, string text, string user, string eventGuid)
         {
-            // TODO: add item to database
-            var man = new RetrospectiveManager();
-            var itemId = man.AddRetrospectiveItem(column: column, text: text, user: user, guidId: eventGuid);
+            var itemId = _retrospectiveMan.AddRetrospectiveItem(new RetrospectiveItemModel { Column = column, Text = text, User = user}, retrospectiveGuidId: eventGuid);
 
             // TODO: only to specific group by eventGuid
             Clients.All.recieveSharedItem(new ItemObject() { autor = user, column = column, listId = listId, text = text, itemGuid = itemId });
@@ -55,9 +61,7 @@ namespace GoAgile.Hubs
         /// <param name="eventGuid"></param>
         public void sendAllSharedItems(string eventGuid)
         {
-            // TODO: get data from database
-            var man = new RetrospectiveManager();
-            var list = man.GetAllSharedItems(eventGuid);
+            var list = _retrospectiveMan.GetAllSharedItems(eventGuid);
 
             string ret = JsonConvert.SerializeObject(list);
 
@@ -72,9 +76,7 @@ namespace GoAgile.Hubs
         [Authorize]
         public void startRetrospectiveRunning(string eventGuid)
         {
-            // TODO: inicialize in constructor or somwhere else
-            var man = new RetrospectiveManager();
-            man.ChangeRetrospectiveToRunning(eventGuid);
+            _retrospectiveMan.ChangeRetrospectiveToRunning(eventGuid);
 
             // TODO: only to specific group by eventGuid
             Clients.All.startRunningMode();
@@ -87,9 +89,7 @@ namespace GoAgile.Hubs
         [Authorize]
         public void startRetrospectivePresenting(string eventGuid)
         {
-            // TODO: inicialize in constructor or somwhere else
-            var man = new RetrospectiveManager();
-            man.ChangeRetrospectiveToPresenting(eventGuid);
+            _retrospectiveMan.ChangeRetrospectiveToPresenting(eventGuid);
 
             // TODO: only to specific group by eventGuid
             Clients.All.startPresentingMode();
@@ -102,9 +102,7 @@ namespace GoAgile.Hubs
         [Authorize]
         public void retrospectiveComplete(string eventGuid)
         {
-            // TODO: inicialize in constructor or somwhere else
-            var man = new RetrospectiveManager();
-            man.ChangeToRetrospectiveToFinished(eventGuid);
+            _retrospectiveMan.ChangeToRetrospectiveToFinished(eventGuid);
 
             // TODO: only to specific group by eventGuid
             Clients.All.retrospectiveFinished();

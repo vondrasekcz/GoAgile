@@ -1,12 +1,23 @@
-﻿using GoAgile.Models;
-using GoAgile.Models.EntityManager;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using GoAgile.Models;
+using GoAgile.Dal;
+using GoAgile.Helpers.Objects;
 
 namespace GoAgile.Controllers
 {
     // TODO Managers instancing
     public class RetrospectiveController : Controller
     {
+        private IRetrospectiveManager _retrospectiveMan;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public RetrospectiveController()
+        {
+            _retrospectiveMan = new RetrospectiveManager();
+        }
+
         //
         // GET Retrospecive/CreateRetrospective
         [Authorize]
@@ -21,9 +32,7 @@ namespace GoAgile.Controllers
         // GET Retrospecive/Retrospective{Id}
         public ActionResult Retrospective(string id)
         {
-            // TODO rewrite
-            var man = new RetrospectiveManager();
-            var eventInfo = man.FindModel(id);
+            var eventInfo = _retrospectiveMan.FindModel(id);
 
             if (eventInfo == null)
                 return HttpNotFound();
@@ -36,9 +45,7 @@ namespace GoAgile.Controllers
         [Authorize]
         public ActionResult ManageRetrospective(string id)
         {
-            // TODO:  RetrospectiveManager, interface, ...
-            var man = new RetrospectiveManager();
-            var eventInfo = man.FindModel(id);
+            var eventInfo = _retrospectiveMan.FindModel(id);
 
             if (eventInfo == null)
                 return HttpNotFound();
@@ -60,18 +67,22 @@ namespace GoAgile.Controllers
         {
             if (ModelState.IsValid)
             {
-                // TODO rewrite
-                var man = new RetrospectiveManager();
-                var guidId = man.AddModel(model: model, user: User.Identity.Name);
-                      
+                var retModel = new RetrospectiveModel();
+                retModel.Comment = model.Comment;
+                retModel.Owner = User.Identity.Name;
+                retModel.Project = model.Project;
+                retModel.RetrospectiveName = model.RetrospectiveName;
+                retModel.StartDate = model.StartDate;
 
-                // return retrospective view
+                var guidId = _retrospectiveMan.AddModel(retModel);
+                
                 return RedirectToAction("ManageRetrospective/" + guidId, "Retrospective");
             }
             return View(model);
         }
 
+
+
+
     }
-
-
 }

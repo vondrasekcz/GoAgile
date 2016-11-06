@@ -207,6 +207,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RetrospectiveController.cs" />
+    <Compile Include="Dal\IRetrospectiveManager.cs" />
     <Compile Include="DataContexts\AgileDb.cs" />
     <Compile Include="DataContexts\AgileDbMigrations\201611032227158_InitialCreate.cs" />
     <Compile Include="DataContexts\AgileDbMigrations\201611032227158_InitialCreate.Designer.cs">
@@ -224,13 +225,14 @@
     </Compile>
     <Compile Include="Helpers\Objects\Event.cs" />
     <Compile Include="Helpers\Objects\ItemObject.cs" />
-    <Compile Include="Helpers\Objects\ReturnObjRetrospective.cs" />
+    <Compile Include="Helpers\Objects\RetrospectiveItemModel.cs" />
+    <Compile Include="Helpers\Objects\RetrospectiveModel.cs" />
     <Compile Include="Helpers\Objects\User.cs" />
     <Compile Include="Hubs\RetrospectiveHub.cs" />
     <Compile Include="Models\DB\Retrospective.cs" />
     <Compile Include="Models\DB\EventState.cs" />
     <Compile Include="Models\DB\RetrospectiveItem.cs" />
-    <Compile Include="Models\EntityManager\RetrospectiveManager.cs" />
+    <Compile Include="Dal\RetrospectiveManager.cs" />
     <Compile Include="Models\ViewModels\AccountViewModels.cs" />
     <Compile Include="Models\EntityManager\IdentityModels.cs" />
     <Compile Include="Models\ViewModels\ManageViewModels.cs" />
@@ -395,7 +397,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Helpers\LogicEntities\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
