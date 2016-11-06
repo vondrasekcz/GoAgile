@@ -223,6 +223,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\Logic\UsersStore.cs" />
     <Compile Include="Helpers\Objects\Event.cs" />
     <Compile Include="Helpers\Objects\ItemObject.cs" />
     <Compile Include="Helpers\Objects\RetrospectiveItemModel.cs" />

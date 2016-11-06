@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Mail;
 using Microsoft.AspNet.SignalR;
+using GoAgile.Helpers.Logic;
 using GoAgile.Helpers.Objects;
 using GoAgile.Dal;
 using Newtonsoft.Json;
@@ -10,6 +11,10 @@ namespace GoAgile.Hubs
 {
     public class RetrospectiveHub : Hub
     {
+        private static UsersStore _store = new UsersStore();
+
+        private static readonly object Locker = new object();
+
         private IRetrospectiveManager _retrospectiveMan;
 
         /// <summary>
@@ -120,17 +125,10 @@ namespace GoAgile.Hubs
 
         //*****************Counter Things***************************************************************************
 
-        /// <summary>
-        /// The count of users connected.
-        /// </summary>
+
         public static List<string> Users = new List<string>();
 
-        /// <summary>
-        /// Sends the update user count to the listening view.
-        /// </summary>
-        /// <param name="count">
-        /// The count.
-        /// </param>
+
         public void Send(int count)
         {
             // Call the addNewMessageToPage method to update clients.
@@ -138,12 +136,7 @@ namespace GoAgile.Hubs
             context.Clients.All.updateUsersOnlineCount(count);
         }
 
-        /// <summary>
-        /// The OnConnected event.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
+
         public override System.Threading.Tasks.Task OnConnected()
         {
             string clientId = GetClientId();
@@ -159,12 +152,7 @@ namespace GoAgile.Hubs
             return base.OnConnected();
         }
 
-        /// <summary>
-        /// The OnReconnected event.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
+
         public override System.Threading.Tasks.Task OnReconnected()
         {
             string clientId = GetClientId();
@@ -179,14 +167,29 @@ namespace GoAgile.Hubs
             return base.OnReconnected();
         }
 
-        /// <summary>
-        /// The OnDisconnected event.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
+
+        public void logUser(string name)
+        {
+            lock (_store) { _store.AddUser(name, GetClientId()); }
+            UsersChanged();
+        }
+
+        public void UsersChanged()
+        {
+            var list = _store.GetAllUsers();
+
+            string ret = JsonConvert.SerializeObject(list);
+
+            Clients.All.recieveOnlineUsers(ret);
+        }
+
         public override System.Threading.Tasks.Task OnDisconnected(bool aaa)
         {
+            bool a;
+            lock (_store) { a = _store.Delete(GetClientId()); }
+            if (a)
+                UsersChanged();
+
             string clientId = GetClientId();
 
             if (Users.IndexOf(clientId) > -1)
@@ -200,12 +203,7 @@ namespace GoAgile.Hubs
             return base.OnDisconnected(aaa);
         }
 
-        /// <summary>
-        /// Get's the currently connected Id of the client.
-        /// This is unique for each client and is used to identify
-        /// a connection.
-        /// </summary>
-        /// <returns>The client Id.</returns>
+
         private string GetClientId()
         {
             string clientId = "";

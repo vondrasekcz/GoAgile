@@ -59,7 +59,7 @@
 
             // User is logged
             retHub.client.userLogged = function (nickName) {
-
+                retHub.server.logUser(nickName);
                 // TODO: get shared items
 
                 user = nickName;

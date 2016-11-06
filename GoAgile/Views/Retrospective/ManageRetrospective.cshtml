@@ -71,6 +71,8 @@
             $.connection.hub.start().done(function () {
                 if (state == "presenting")
                     retHub.server.sendAllSharedItems(guidId);
+
+                retHub.server.logUser("PM");
             });
 
 
@@ -210,7 +212,19 @@
 
 
             retHub.client.updateUsersOnlineCount = function (count) {
-                $('#online_users').text(count);
+                $('#online_users').text('count: ' + count);
+            };
+
+            retHub.client.recieveOnlineUsers = function (data) {
+                var items = $.parseJSON(data);
+
+                $('#list_users').empty();
+                
+                for (var i = 0; i < items.length; i++) {
+                    $('#list_users').append(                       
+                        '<li class"list-group-item users">' + items[i] + '</li>'
+                    );
+                }
             };
 
         });
@@ -245,6 +259,8 @@
             <div class="col-md-2">
                 <div class="title-marketing"><h3>Online Users</h3></div>
                 <div id="online_users"></div>
+                <div class="title-marketing"><h3>Users:</h3></div>
+                <ul class="list-group" name="users" id="list_users"></ul>
             </div> <!-- /Online USers panel -->
            
             <div class="col-md-10">
