@@ -25,7 +25,6 @@ Views
  - ManageRetrospective
 	- control panels, titles
 	- timer
-	- if connected at presenting, load shared items
 	- if connected at running or presenting share pending items
 	- if send or crete any item, share to others ProjectManagers devices
  - Layout 
@@ -33,7 +32,7 @@ Views
 
 Data && Migrations
  - add init values
- - Models/DB - attributes
+ - Models/DB - attributes rework
 
 Managers
  - try async
@@ -49,6 +48,6 @@ README.md
 
  Hubs:
   - RetrospectiveHub
-	- online users
+	- online users - send to specific groups only
 	- maybe recieve object? instead of string, string, ...
 	- Disble log name as Project Manager

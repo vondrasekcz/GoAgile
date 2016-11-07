@@ -57,7 +57,7 @@
                     case "presenting":
                         $('#manage_presenting').show();
                         disableListButtons(true);
-                        // TODO: get shared items, and itemPending with enabled share button
+                        // TODO: get all itemPending from ither PMs with enabled share button
                         break;
                     case "finished":
                         $('#modalFinished').modal('show');
@@ -72,7 +72,7 @@
                 if (state == "presenting")
                     retHub.server.sendAllSharedItems(guidId);
 
-                retHub.server.logUser("PM");
+                retHub.server.logPm(guidId);
             });
 
 

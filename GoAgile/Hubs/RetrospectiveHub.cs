@@ -11,7 +11,7 @@ namespace GoAgile.Hubs
 {
     public class RetrospectiveHub : Hub
     {
-        private static UsersStore _store = new UsersStore();
+        private static UserStorageVer2 _store = new UserStorageVer2();
 
         private static readonly object Locker = new object();
 
@@ -168,27 +168,35 @@ namespace GoAgile.Hubs
         }
 
 
-        public void logUser(string name)
+        public void logPm(string guidId)
         {
-            lock (_store) { _store.AddUser(name, GetClientId()); }
-            UsersChanged();
+            lock (_store) { _store.AddPm(connectionId: GetClientId(), retrospectiveGuidId: guidId); }
+            UsersChanged(guidId);
         }
 
-        public void UsersChanged()
+        public void logUser(string name, string guidId)
         {
-            var list = _store.GetAllUsers();
+            lock (_store) { _store.AddUser(name: name,connectionId: GetClientId(), retrospectiveGuidId: guidId); }
+            UsersChanged(guidId);
+        }
+
+        public void UsersChanged(string guidId)
+        {
+            var list = _store.GetAllUsers(guidId);
 
             string ret = JsonConvert.SerializeObject(list);
 
-            Clients.All.recieveOnlineUsers(ret);
+            var recievers = _store.GetAllConnectionIds(guidId);
+
+            Clients.Clients(recievers).recieveOnlineUsers(ret);
         }
 
         public override System.Threading.Tasks.Task OnDisconnected(bool aaa)
         {
-            bool a;
-            lock (_store) { a = _store.Delete(GetClientId()); }
-            if (a)
-                UsersChanged();
+            string ret;
+            lock (_store) { ret = _store.Delete(GetClientId()); }
+            if (ret != null)
+                UsersChanged(ret);
 
             string clientId = GetClientId();
 

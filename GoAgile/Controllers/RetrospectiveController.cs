@@ -5,7 +5,6 @@ using GoAgile.Helpers.Objects;
 
 namespace GoAgile.Controllers
 {
-    // TODO Managers instancing
     public class RetrospectiveController : Controller
     {
         private IRetrospectiveManager _retrospectiveMan;
