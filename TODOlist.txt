@@ -6,6 +6,7 @@ Scripts
 
  GoAgile
   - CLIENT - !!!!! some state structure for easy reading code !!!!!!!!!!!!!!!!!
+  - After registered it's redirected to index -> index doesn't exist
 
 Start to do
  - comments (aim: Self-documenting code)
@@ -29,6 +30,10 @@ Views
 	- if send or crete any item, share to others ProjectManagers devices
  - Layout 
 	- add glyphcons
+ - Events
+	- which columns?
+	- style table
+	- bottom page is riding a litle bit 
 
 Data && Migrations
  - add init values

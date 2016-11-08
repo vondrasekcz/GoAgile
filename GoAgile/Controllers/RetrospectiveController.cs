@@ -7,6 +7,9 @@ namespace GoAgile.Controllers
 {
     public class RetrospectiveController : Controller
     {
+        /// <summary>
+        /// Dal for Retrospective controller
+        /// </summary>
         private IRetrospectiveManager _retrospectiveMan;
 
         /// <summary>

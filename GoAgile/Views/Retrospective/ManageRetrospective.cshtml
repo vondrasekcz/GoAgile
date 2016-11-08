@@ -29,7 +29,7 @@
             // User Name
             var user;
 
-            // List of items 
+            // List of items
             // TODO: binary search and inser at position
             var itemIdList = [];
 
@@ -89,11 +89,6 @@
             // Finish Retrospective
             $('#btn_stop_presenting').click(function () {
                 retHub.server.retrospectiveComplete(guidId);
-            });
-
-            // Navigate to home page
-            $('#btn_home').click(function () {
-                // TODO:
             });
 
             // Navigate to Retrospective History
@@ -219,9 +214,9 @@
                 var items = $.parseJSON(data);
 
                 $('#list_users').empty();
-                
+
                 for (var i = 0; i < items.length; i++) {
-                    $('#list_users').append(                       
+                    $('#list_users').append(
                         '<li class"list-group-item users">' + items[i] + '</li>'
                     );
                 }
@@ -243,7 +238,8 @@
                 Go to home page or see retrospective data
             </div>
             <div class="modal-footer">
-                <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
+                <button type="button" id="btn_home" class="btn btn-primary text-center"
+                        onclick="@("window.location.href='" + @Url.Action("GoAgile", "Home") + "'");">Home</button>
                 <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
             </div>
         </div><!-- /.modal-content -->

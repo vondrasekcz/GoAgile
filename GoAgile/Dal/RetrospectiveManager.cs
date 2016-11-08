@@ -7,7 +7,6 @@ using System.Collections.Generic;
 
 namespace GoAgile.Dal
 {
-    // TODO: ineterface
     public class RetrospectiveManager : IRetrospectiveManager
     {
         /// <inheritdoc />

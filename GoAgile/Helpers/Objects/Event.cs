@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using GoAgile.Models.DB;
 
 namespace GoAgile.Helpers.Objects
 {
@@ -8,8 +6,14 @@ namespace GoAgile.Helpers.Objects
     {
         public string IdGuid { get; set; }
 
-        public string State { get; set; }
+        public string RetrospectiveName { get; set; }
 
-        public List<User> Users { get; set; }
+        public string Project { get; set; }
+
+        public string Comment { get; set; }
+
+        public DateTime DateStart { get; set; }
+
+        public string State { get; set; }
     }
 }

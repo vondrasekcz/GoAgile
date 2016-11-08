@@ -85,11 +85,6 @@
                 }
             };
 
-            // Navigate to home page
-            $('#btn_home').click(function () {
-                // TODO:
-            });
-
             // Navigate to Retrospective History
             $('#btn_history').click(function () {
                 // TODO:
@@ -265,7 +260,8 @@
                 Go to home page or see retrospective data
             </div>
             <div class="modal-footer">
-                <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
+                <button type="button" id="btn_home" class="btn btn-primary text-center" 
+                        onclick="@("window.location.href='" + @Url.Action("GoAgile", "Home") + "'");">Home</button>
                 <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
             </div>
         </div><!-- /.modal-content -->

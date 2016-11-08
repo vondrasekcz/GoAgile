@@ -207,6 +207,8 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RetrospectiveController.cs" />
+    <Compile Include="Dal\HomeManager.cs" />
+    <Compile Include="Dal\IHomeManager.cs" />
     <Compile Include="Dal\IRetrospectiveManager.cs" />
     <Compile Include="DataContexts\AgileDb.cs" />
     <Compile Include="DataContexts\AgileDbMigrations\201611032227158_InitialCreate.cs" />
@@ -255,6 +257,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\customeText.css" />
     <Content Include="Content\customModals.css" />
+    <Content Include="Content\customTable.css" />
     <Content Include="Content\customWell.css" />
     <Content Include="DataContexts\Migrations.txt" />
     <Content Include="favicon.ico" />
@@ -367,9 +370,8 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\Events.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
     <Content Include="Views\Account\ConfirmEmail.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />

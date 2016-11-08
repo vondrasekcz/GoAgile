@@ -1,0 +1,66 @@
+﻿@model IEnumerable<GoAgile.Helpers.Objects.Event>
+
+@{
+    ViewBag.Title = "My Events";
+}
+    
+@section scripts{
+<link href="~/Content/customTable.css" rel="stylesheet" />
+
+
+<script>
+    $(function () {
+
+        // Add rows into table
+        $(document).ready(function () {
+            var data = @Html.Raw(Json.Encode(Model));
+
+            for (var i = 0; i < data.length; i++) {
+                $('#tableBody').append(
+                    '<tr class="clickable-row" name="' + data[i].IdGuid + '" state="' + data[i].State + '">'+
+                        '<td class="text-left">' + data[i].IdGuid + '</td>'+
+                        '<td class="text-left">' + data[i].RetrospectiveName + '</td>'+
+                        '<td class="text-left">' + data[i].Project + '</td>'+
+                        '<td class="text-left">' + data[i].State + '</td>'+
+                        '<td class="text-left">' + data[i].DateStart + '</td>'+
+                    '</tr>'
+                );
+            }
+        });
+
+        // Redirect to Event's detail page or Event
+        $('#myTable').on('click', '.clickable-row', function(event) {
+            var guidId = $(this).attr("name");
+            var state = $(this).attr("state");
+
+            if (state == "finished")
+                // TODO: url to detail page
+                var a = 1;
+            else
+            {
+                var url = '@Url.Action("ManageRetrospective", "Retrospective")' + "/" + guidId;
+                window.location.href = url;
+            }
+        });
+
+    });
+</script>
+}
+
+
+<body>
+    <h3>Data Table</h3>
+    <table class="table" id="myTable">
+        <thead>
+            <tr>
+                <th class="text-left">Guid</th>
+                <th class="text-left">Name</th>
+                <th class="text-left">Project</th>
+                <th class="text-left">State</th>
+                <th class="text-left">Planned Start</th>
+            </tr>
+        </thead>
+        <tbody class="table-hover" id="tableBody">
+        </tbody>
+    </table>
+</body>

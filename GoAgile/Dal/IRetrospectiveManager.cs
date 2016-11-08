@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using GoAgile.Helpers.Objects;
-using GoAgile.Models.DB;
 
 namespace GoAgile.Dal
 {
