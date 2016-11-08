@@ -228,6 +228,7 @@
     <Compile Include="Helpers\Logic\UsersStore.cs" />
     <Compile Include="Helpers\Logic\UserStorageVer2.cs" />
     <Compile Include="Helpers\Objects\Event.cs" />
+    <Compile Include="Helpers\Objects\FullRetrospectiveModel.cs" />
     <Compile Include="Helpers\Objects\ItemObject.cs" />
     <Compile Include="Helpers\Objects\RetrospectiveItemModel.cs" />
     <Compile Include="Helpers\Objects\RetrospectiveModel.cs" />
@@ -395,6 +396,7 @@
     <Content Include="Views\Home\GoAgile.cshtml" />
     <Content Include="Views\Retrospective\CreateRetrospective.cshtml" />
     <Content Include="Views\Retrospective\ManageRetrospective.cshtml" />
+    <Content Include="Views\Retrospective\RetrospectiveDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

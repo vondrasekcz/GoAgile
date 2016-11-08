@@ -6,7 +6,7 @@ Scripts
 
  GoAgile
   - CLIENT - !!!!! some state structure for easy reading code !!!!!!!!!!!!!!!!!
-  - After registered it's redirected to index -> index doesn't exist
+  - now someModel -> someModelView ?? feel bad
 
 Start to do
  - comments (aim: Self-documenting code)
@@ -43,6 +43,7 @@ Managers
  - try async
  - RetrospectiveManager	
 	- DateStarted, TimeStated, DateFinished, TimeFinished
+	- rename FindModel to GetModel
 
 Controler 
  - Retrospective

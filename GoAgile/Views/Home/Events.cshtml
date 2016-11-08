@@ -33,11 +33,11 @@
             var guidId = $(this).attr("name");
             var state = $(this).attr("state");
 
-            if (state == "finished")
-                // TODO: url to detail page
-                var a = 1;
-            else
-            {
+            if (state == "finished") {
+                var url = '@Url.Action("RetrospectiveDetail", "Retrospective")' + "/" + guidId;
+                window.location.href = url;
+            }
+            else {
                 var url = '@Url.Action("ManageRetrospective", "Retrospective")' + "/" + guidId;
                 window.location.href = url;
             }

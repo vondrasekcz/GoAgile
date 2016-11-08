@@ -31,6 +31,21 @@ namespace GoAgile.Controllers
         }
 
         //
+        // GET Retrospecive/RetrospectiveDetail{Id}
+        public ActionResult RetrospectiveDetail(string id)
+        {
+            var retrospectiveModel = _retrospectiveMan.FindModel(id);
+
+            if (retrospectiveModel == null)
+                return HttpNotFound();
+
+            var retrospectiveItemsModel = _retrospectiveMan.GetAllSharedItems(id);
+            var model = new FullRetrospectiveModel() { Model = retrospectiveModel, Items = retrospectiveItemsModel };
+
+            return View(model);
+        }
+
+        //
         // GET Retrospecive/Retrospective{Id}
         public ActionResult Retrospective(string id)
         {
