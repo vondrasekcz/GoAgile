@@ -89,7 +89,7 @@ namespace GoAgile.Controllers
                 retModel.Owner = User.Identity.Name;
                 retModel.Project = model.Project;
                 retModel.RetrospectiveName = model.RetrospectiveName;
-                retModel.StartDate = model.StartDate;
+                retModel.DatePlanned = model.DatePlanned;
 
                 var guidId = _retrospectiveMan.AddModel(retModel);
                 

@@ -15,17 +15,33 @@
             var data = @Html.Raw(Json.Encode(Model));
 
             for (var i = 0; i < data.length; i++) {
-                $('#tableBody').append(
-                    '<tr class="clickable-row" name="' + data[i].IdGuid + '" state="' + data[i].State + '">'+
-                        '<td class="text-left">' + data[i].IdGuid + '</td>'+
-                        '<td class="text-left">' + data[i].RetrospectiveName + '</td>'+
-                        '<td class="text-left">' + data[i].Project + '</td>'+
-                        '<td class="text-left">' + data[i].State + '</td>'+
-                        '<td class="text-left">' + data[i].DateStart + '</td>'+
-                    '</tr>'
-                );
+                if (data[i].State == "finished") {
+                    addRow('tableBodyFinished', data[i]);
+                }
+                else if (data[i].State == "waiting") {
+                    addRow('tableBodyWaiting', data[i]);
+                }
+                else {
+                    addRow('tableBodyInProgress', data[i]);
+                }
+                addRow('tableBodyAll', data[i]);
             }
         });
+
+        // Add Row to table
+        function addRow(table, model) {
+            $('#' + table).append(
+                   '<tr class="clickable-row" name="' + model.IdGuid + '" state="' + model.State + '">'+
+                       '<td class="text-left">' + model.Name + '</td>'+
+                       '<td class="text-left">' + model.Project + '</td>'+
+                       '<td class="text-left">' + model.State + '</td>'+
+                       '<td class="text-left">' + model.Comment + '</td>'+
+                       '<td class="text-left">' + model.DatePlanned + '</td>'+
+                       '<td class="text-left">' + model.DateStarted + '</td>'+
+                       '<td class="text-left">' + model.DateFinished + '</td>'+
+                   '</tr>'
+               );
+        };
 
         // Redirect to Event's detail page or Event
         $('#myTable').on('click', '.clickable-row', function(event) {
@@ -48,18 +64,87 @@
 
 
 <body>
-    <h3>Data Table</h3>
-    <table class="table" id="myTable">
-        <thead>
-            <tr>
-                <th class="text-left">Guid</th>
-                <th class="text-left">Name</th>
-                <th class="text-left">Project</th>
-                <th class="text-left">State</th>
-                <th class="text-left">Planned Start</th>
-            </tr>
-        </thead>
-        <tbody class="table-hover" id="tableBody">
-        </tbody>
-    </table>
+    <div id="exTab1" class="container">
+        <h3>Your Events</h3>
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#all" data-toggle="tab">All</a>
+            </li>
+            <li>
+                <a href="#waiting" data-toggle="tab">Waiting</a>
+            </li>
+            <li>
+                <a href="#inprogress" data-toggle="tab">In Progress</a>
+            </li>
+            <li>
+                <a href="#finished" data-toggle="tab">Finished</a>
+            </li>
+        </ul>
+        <div class="tab-content clearfix">
+            <div class="tab-pane active" id="all">
+                <table class="table" id="myTableAll">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Name</th>
+                            <th class="text-left">Project</th>
+                            <th class="text-left">State</th>
+                            <th class="text-left">Comment</th>
+                            <th class="text-left">Planned</th>
+                            <th class="text-left">Started</th>
+                            <th class="text-left">Finished</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-hover" id="tableBodyAll"></tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="waiting">
+                <table class="table" id="myTableWaiting">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Name</th>
+                            <th class="text-left">Project</th>
+                            <th class="text-left">State</th>
+                            <th class="text-left">Comment</th>
+                            <th class="text-left">Planned</th>
+                            <th class="text-left">Started</th>
+                            <th class="text-left">Finished</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-hover" id="tableBodyWaiting"></tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="inprogress">
+                <table class="table" id="myTableInProgress">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Name</th>
+                            <th class="text-left">Project</th>
+                            <th class="text-left">State</th>
+                            <th class="text-left">Comment</th>
+                            <th class="text-left">Planned</th>
+                            <th class="text-left">Started</th>
+                            <th class="text-left">Finished</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-hover" id="tableBodyInProgress"></tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="finished">
+                <table class="table" id="myTableFinished">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Name</th>
+                            <th class="text-left">Project</th>
+                            <th class="text-left">State</th>
+                            <th class="text-left">Comment</th>
+                            <th class="text-left">Planned</th>
+                            <th class="text-left">Started</th>
+                            <th class="text-left">Finished</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-hover" id="tableBodyFinished"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </body>

@@ -10,18 +10,34 @@ namespace GoAgile.Dal
         /// <inheritdoc />
         public IList<EventModel> GetUsersAllEvents(string userName)
         {
-            // TODO: sort, add other dates, rework data and table
+            // TODO: sort, add other dates
             using (var db = AgileDb.Create())
             {
                 var dataRetrospective = db.Retrospectives
                     .Where(w => w.Owner == userName)
+                    .OrderBy(o => o.DateStared)
                     .Select(s => new EventModel()
                     {
                         IdGuid = s.Id,
-                        RetrospectiveName = s.RetrospectiveName,
+                        Name = s.RetrospectiveName,
                         Project = s.Project,
-                        DateStart = s.StartDate,
-                        Comment = s.Comment,
+                        DatePlanned = s.DatePlanned == null ? "-"
+                                      : s.DatePlanned.Value.Day.ToString() + "." + 
+                                      s.DatePlanned.Value.Month.ToString() + "." + 
+                                      s.DatePlanned.Value.Year.ToString(),
+                        DateFinished = s.DateFinished == null ? "-" 
+                                       : s.DateFinished.Value.Day.ToString() + "." +
+                                       s.DateFinished.Value.Month.ToString() + "." +
+                                       s.DateFinished.Value.Year.ToString() + " " +
+                                       s.DateFinished.Value.Hour.ToString() + ":" +
+                                       s.DateFinished.Value.Minute.ToString(),
+                        DateStarted = s.DateStared == null ? "-"
+                                      : s.DateStared.Value.Day.ToString() + "." +
+                                      s.DateStared.Value.Month.ToString() + "." +
+                                      s.DateStared.Value.Year.ToString() + " " +
+                                      s.DateStared.Value.Hour.ToString() + ":" +
+                                      s.DateStared.Value.Minute.ToString(),
+                        Comment = s.Comment == null ? "-" : s.Comment,
                         State = s.State.ToString()
                     }).ToList();
 

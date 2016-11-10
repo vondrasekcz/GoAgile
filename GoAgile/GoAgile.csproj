@@ -215,6 +215,18 @@
     <Compile Include="DataContexts\AgileDbMigrations\201611032227158_InitialCreate.Designer.cs">
       <DependentUpon>201611032227158_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataContexts\AgileDbMigrations\201611102100548_AddDatesToRetrospectives.cs" />
+    <Compile Include="DataContexts\AgileDbMigrations\201611102100548_AddDatesToRetrospectives.Designer.cs">
+      <DependentUpon>201611102100548_AddDatesToRetrospectives.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataContexts\AgileDbMigrations\201611102252274_AllowNullInDatesRetrospectives.cs" />
+    <Compile Include="DataContexts\AgileDbMigrations\201611102252274_AllowNullInDatesRetrospectives.Designer.cs">
+      <DependentUpon>201611102252274_AllowNullInDatesRetrospectives.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataContexts\AgileDbMigrations\201611102304332_RetrospectiveRepairsNulls.cs" />
+    <Compile Include="DataContexts\AgileDbMigrations\201611102304332_RetrospectiveRepairsNulls.Designer.cs">
+      <DependentUpon>201611102304332_RetrospectiveRepairsNulls.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataContexts\AgileDbMigrations\Configuration.cs" />
     <Compile Include="DataContexts\IdentityDb.cs" />
     <Compile Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.cs" />
@@ -410,6 +422,15 @@
   <ItemGroup>
     <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611032227158_InitialCreate.resx">
       <DependentUpon>201611032227158_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611102100548_AddDatesToRetrospectives.resx">
+      <DependentUpon>201611102100548_AddDatesToRetrospectives.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611102252274_AllowNullInDatesRetrospectives.resx">
+      <DependentUpon>201611102252274_AllowNullInDatesRetrospectives.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611102304332_RetrospectiveRepairsNulls.resx">
+      <DependentUpon>201611102304332_RetrospectiveRepairsNulls.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.resx">
       <DependentUpon>201611032226556_InitialCreate.cs</DependentUpon>

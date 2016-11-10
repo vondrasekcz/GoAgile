@@ -6,7 +6,9 @@ Scripts
 
  GoAgile
   - CLIENT - !!!!! some state structure for easy reading code !!!!!!!!!!!!!!!!!
-  - do something with Helpers
+  - Application Name and logo
+  - SignalR - browser limits now 5 connections
+	- https://www.future-processing.pl/blog/signalr-handling-browser-connection-limits/ 
 
 Start to do
  - comments (aim: Self-documenting code)
@@ -31,22 +33,13 @@ Views
  - Layout 
 	- add glyphcons
  - Events
-	- which columns?
-	- style table
-	- bottom page is riding a litle bit 
+	- bottom page is running a litle bit  - cause of last row
 
 Data && Migrations
  - add init values
- - Models/DB - attributes rework
 
 Managers
  - try async
- - RetrospectiveManager	
-	- DateStarted, TimeStated, DateFinished, TimeFinished
-
-Controler 
- - Retrospective
-	- is date valid?! (today or future)
 
 README.md
  - make normal structure
@@ -54,5 +47,6 @@ README.md
  Hubs:
   - RetrospectiveHub
 	- online users - send to specific groups only
+    - when state is finished, dont store online users
 	- maybe recieve object? instead of string, string, ...
 	- Disble log name as Project Manager

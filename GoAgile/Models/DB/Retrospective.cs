@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GoAgile.Models.DB
 {
@@ -21,8 +20,11 @@ namespace GoAgile.Models.DB
         [StringLength(255)]
         public string Project { get; set; }
 
-        [Required]        
-        public DateTime StartDate { get; set; }
+        public DateTime? DatePlanned { get; set; }
+
+        public DateTime? DateStared { get; set; }
+
+        public DateTime? DateFinished { get; set; }   
 
         [StringLength(255)]
         public string Comment { get; set; }

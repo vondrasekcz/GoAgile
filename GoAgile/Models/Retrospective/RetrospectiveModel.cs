@@ -10,7 +10,11 @@ namespace GoAgile.Models.Retrospective
 
         public string Owner { get; set; }
 
-        public DateTime StartDate { get; set; }
+        public DateTime? DatePlanned { get; set; }
+
+        public DateTime? DateStarted { get; set; }
+
+        public DateTime? DateFinished { get; set; }
 
         public string  State { get; set; }
 

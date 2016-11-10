@@ -15,11 +15,10 @@ namespace GoAgile.Models
         [StringLength(maximumLength: 30)]
         public string Project { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Start Date")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime StartDate { get; set; }
+        public DateTime? DatePlanned { get; set; }
 
         [StringLength(maximumLength: 255)]
         public string Comment { get; set; }

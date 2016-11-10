@@ -20,7 +20,7 @@ namespace GoAgile.Dal
                 dbItem.RetrospectiveName = model.RetrospectiveName;
                 dbItem.Project = model.Project;
                 dbItem.Comment = model.Comment;
-                dbItem.StartDate = model.StartDate;
+                dbItem.DatePlanned = model.DatePlanned;
                 dbItem.State = EventState.waiting;
                 dbItem.Owner = model.Owner;
 
@@ -48,7 +48,7 @@ namespace GoAgile.Dal
                         Owner = model.Owner,
                         Comment = model.Comment,
                         State = Enum.GetName(typeof(EventState), model.State),
-                        StartDate = model.StartDate
+                        DatePlanned = model.DatePlanned
                     };
 
                 return ret;
@@ -104,6 +104,7 @@ namespace GoAgile.Dal
                     .Single(s => s.Id == guidId);
 
                 dbItem.State = EventState.running;
+                dbItem.DateStared = DateTime.Now;
 
                 db.SaveChanges();
             }
@@ -132,6 +133,7 @@ namespace GoAgile.Dal
                     .Single(s => s.Id == guidId);
 
                 dbItem.State = EventState.finished;
+                dbItem.DateFinished = DateTime.Now;
 
                 db.SaveChanges();
             }
