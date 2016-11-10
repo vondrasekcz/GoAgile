@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GoAgile.Helpers.Objects;
+using GoAgile.Models.Retrospective;
 
 namespace GoAgile.Dal
 {
@@ -18,7 +18,7 @@ namespace GoAgile.Dal
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>
         /// <returns>Retrospective model</returns>
-        RetrospectiveModel FindModel(string guidId);
+        RetrospectiveModel GetModel(string guidId);
 
         /// <summary>
         /// Add RetrospectiveItem to database
@@ -33,7 +33,7 @@ namespace GoAgile.Dal
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>
         /// <returns>IList of Retrospective shared Items</returns>
-        IList<ItemObject> GetAllSharedItems(string guidId);
+        IList<RetrospectiveItemModel> GetAllSharedItems(string guidId);
 
         /// <summary>
         /// Change Retrospective state to "running"

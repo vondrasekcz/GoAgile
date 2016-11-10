@@ -6,14 +6,14 @@ Scripts
 
  GoAgile
   - CLIENT - !!!!! some state structure for easy reading code !!!!!!!!!!!!!!!!!
-  - now someModel -> someModelView ?? feel bad
+  - do something with Helpers
 
 Start to do
  - comments (aim: Self-documenting code)
 
 Views
  - if disabled textrea dont change it to grey color
- - How to properly show/hide modal: hide or hidden???
+ - restructure hidding, first hide, then show
  - CreateRetrospective
 	- better size well and maybe centre it
 	- glyphcons - datepicker
@@ -43,7 +43,6 @@ Managers
  - try async
  - RetrospectiveManager	
 	- DateStarted, TimeStated, DateFinished, TimeFinished
-	- rename FindModel to GetModel
 
 Controler 
  - Retrospective

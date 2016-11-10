@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace GoAgile.Helpers.Objects
+namespace GoAgile.Models.Retrospective
 {
-    public class Event
+    public class EventModel
     {
         public string IdGuid { get; set; }
 

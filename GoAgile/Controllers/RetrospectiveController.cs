@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
 using GoAgile.Models;
 using GoAgile.Dal;
-using GoAgile.Helpers.Objects;
+using GoAgile.Models.Retrospective;
 
 namespace GoAgile.Controllers
 {
@@ -34,7 +34,7 @@ namespace GoAgile.Controllers
         // GET Retrospecive/RetrospectiveDetail{Id}
         public ActionResult RetrospectiveDetail(string id)
         {
-            var retrospectiveModel = _retrospectiveMan.FindModel(id);
+            var retrospectiveModel = _retrospectiveMan.GetModel(id);
 
             if (retrospectiveModel == null)
                 return HttpNotFound();
@@ -49,12 +49,12 @@ namespace GoAgile.Controllers
         // GET Retrospecive/Retrospective{Id}
         public ActionResult Retrospective(string id)
         {
-            var eventInfo = _retrospectiveMan.FindModel(id);
+            var eventInfo = _retrospectiveMan.GetModel(id);
 
             if (eventInfo == null)
                 return HttpNotFound();
             else
-                return View(new RetrospectiveViewModel { GuidId = id, State = eventInfo.State});
+                return View(new RetrospectiveInitModel { GuidId = id, State = eventInfo.State});
         }
 
         //
@@ -62,7 +62,7 @@ namespace GoAgile.Controllers
         [Authorize]
         public ActionResult ManageRetrospective(string id)
         {
-            var eventInfo = _retrospectiveMan.FindModel(id);
+            var eventInfo = _retrospectiveMan.GetModel(id);
 
             if (eventInfo == null)
                 return HttpNotFound();
@@ -70,7 +70,7 @@ namespace GoAgile.Controllers
             if (User.Identity.Name == eventInfo.Owner)
             {
                 string url = Url.Action("Retrospective/" + id, "Retrospective", null, Request.Url.Scheme);
-                return View(new ManageRetrospectiveViewModel { Url = url, State = eventInfo.State, GuidId = id });
+                return View(new RetrospectiveInitModel { Url = url, State = eventInfo.State, GuidId = id });
             }                
             else
                 return RedirectToAction("ManageRetrospective/" + id, "Retrospective");

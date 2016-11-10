@@ -24,20 +24,4 @@ namespace GoAgile.Models
         [StringLength(maximumLength: 255)]
         public string Comment { get; set; }
     }
-
-    public class ManageRetrospectiveViewModel
-    {
-        public string GuidId { get; set; }
-
-        public string Url { get; set; }
-
-        public string State { get; set; }
-    } 
-
-    public class RetrospectiveViewModel 
-    {
-        public string GuidId { get; set; }
-
-        public string State { get; set; }
-    }
 }

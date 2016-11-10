@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GoAgile.Helpers.Objects;
+using GoAgile.Models.Retrospective;
 
 namespace GoAgile.Dal
 {
@@ -10,6 +10,6 @@ namespace GoAgile.Dal
         /// </summary>
         /// <param name="userName"></param>
         /// <returns></returns>
-        IList<Event> GetUsersAllEvents(string userName);
+        IList<EventModel> GetUsersAllEvents(string userName);
     }
 }

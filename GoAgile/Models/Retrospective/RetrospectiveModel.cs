@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GoAgile.Helpers.Objects
+namespace GoAgile.Models.Retrospective
 {
     public class RetrospectiveModel
     {

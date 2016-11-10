@@ -2,7 +2,7 @@
 using GoAgile.Models.DB;
 using System;
 using System.Linq;
-using GoAgile.Helpers.Objects;
+using GoAgile.Models.Retrospective;
 using System.Collections.Generic;
 
 namespace GoAgile.Dal
@@ -32,7 +32,7 @@ namespace GoAgile.Dal
         }
 
         /// <inheritdoc />
-        RetrospectiveModel IRetrospectiveManager.FindModel(string guidId)
+        RetrospectiveModel IRetrospectiveManager.GetModel(string guidId)
         {
             using (var db = AgileDb.Create())
             {
@@ -65,7 +65,7 @@ namespace GoAgile.Dal
                 dbItem.Id = Guid.NewGuid().ToString();
                 dbItem.Retrospective = retrospectiveGuidId;
                 dbItem.Section = modelItem.Column;
-                dbItem.UserName = modelItem.User;
+                dbItem.UserName = modelItem.Autor;
                 dbItem.Text = modelItem.Text;
 
                 db.RetrospectiveItems.Add(dbItem);
@@ -76,19 +76,19 @@ namespace GoAgile.Dal
         }
 
         /// <inheritdoc />
-        IList<ItemObject> IRetrospectiveManager.GetAllSharedItems(string guidId)
+        IList<RetrospectiveItemModel> IRetrospectiveManager.GetAllSharedItems(string guidId)
         {
             using (var db = AgileDb.Create())
             {
                 var ret = db.RetrospectiveItems
                     .Where(w => w.Retrospective == guidId)
-                    .Select(s => new ItemObject()
+                    .Select(s => new RetrospectiveItemModel()
                     {
-                        autor = s.UserName,
-                        column = s.Section,
-                        text = s.Text,
-                        itemGuid = s.Id,
-                        listId = s.Section == "Start" ? "list_start" : (s.Section == "Stop" ? "list_stop" : "list_continue")
+                        Autor = s.UserName,
+                        Column = s.Section,
+                        Text = s.Text,
+                        ItemGuid = s.Id,
+                        ListId = s.Section == "Start" ? "list_start" : (s.Section == "Stop" ? "list_stop" : "list_continue")
                     }).ToList();
 
                 return ret;

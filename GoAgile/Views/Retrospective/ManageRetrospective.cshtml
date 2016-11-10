@@ -1,6 +1,5 @@
-﻿@using GoAgile.Models
-
-@model ManageRetrospectiveViewModel
+﻿@using GoAgile.Models.Retrospective
+@model RetrospectiveInitModel
 
 @{
     ViewBag.Title = "ManageRetrospective";
@@ -12,9 +11,9 @@
 @section scripts{
     <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
     <script type="text/javascript" src="~/signalr/hubs"></script>
-    <link href="~/Content/customModals.css" rel="stylesheet" />
-    <link href="~/Content/customWell.css" rel="stylesheet" />
-    <link href="~/Content/customeText.css" rel="stylesheet" />
+    <link href="~/Content/GoAgileContent/modals.css" rel="stylesheet" />
+    <link href="~/Content/GoAgileContent/text.css" rel="stylesheet" />
+    <link href="~/Content/GoAgileContent/well.css" rel="stylesheet" />
     <script>
         $(function () {
             // Retrospective URL
@@ -93,7 +92,14 @@
 
             // Navigate to Retrospective History
             $('#btn_history').click(function () {
-                // TODO:
+                var url = '@Url.Action("RetrospectiveDetail", "Retrospective")' + "/" + guidId;
+                window.location.href = url;
+            });
+
+            // Navigate to Home page
+            $('#btn_home').click(function () {
+                var url = '@Url.Action("GoAgile", "Home")';
+                window.location.href = url;
             });
 
             // Share Item
@@ -134,7 +140,7 @@
 
             // Recieve shared Item
             retHub.client.recieveSharedItem = function (item) {
-                addSharedItem(item.itemGuid, item.listId, item.column, item.autor, item.text);
+                addSharedItem(item.ItemGuid, item.ListId, item.Column, item.Autor, item.Text);
             }
 
             // Recieve all shared Items
@@ -142,7 +148,7 @@
                 var item = $.parseJSON(data);
 
                 for (var i = 0; i < item.length; i++) {
-                    addSharedItem(item[i].itemGuid, item[i].listId, item[i].column, item[i].autor, item[i].text);
+                    addSharedItem(item[i].ItemGuid, item[i].ListId, item[i].Column, item[i].Autor, item[i].Text);
                 }
             }
 
@@ -238,8 +244,7 @@
                 Go to home page or see retrospective data
             </div>
             <div class="modal-footer">
-                <button type="button" id="btn_home" class="btn btn-primary text-center"
-                        onclick="@("window.location.href='" + @Url.Action("GoAgile", "Home") + "'");">Home</button>
+                <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
                 <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
             </div>
         </div><!-- /.modal-content -->

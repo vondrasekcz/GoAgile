@@ -1,12 +1,11 @@
-﻿@model IEnumerable<GoAgile.Helpers.Objects.Event>
+﻿@model IEnumerable<GoAgile.Models.Retrospective.EventModel>
 
 @{
     ViewBag.Title = "My Events";
 }
     
 @section scripts{
-<link href="~/Content/customTable.css" rel="stylesheet" />
-
+<link href="~/Content/GoAgileContent/table.css" rel="stylesheet" />
 
 <script>
     $(function () {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Mail;
 using Microsoft.AspNet.SignalR;
 using GoAgile.Helpers.Logic;
-using GoAgile.Helpers.Objects;
+using GoAgile.Models.Retrospective;
 using GoAgile.Dal;
 using Newtonsoft.Json;
 
@@ -54,10 +54,11 @@ namespace GoAgile.Hubs
         /// <param name="user"></param>
         public void sendSharedItem(string listId, string column, string text, string user, string eventGuid)
         {
-            var itemId = _retrospectiveMan.AddRetrospectiveItem(new RetrospectiveItemModel { Column = column, Text = text, User = user}, retrospectiveGuidId: eventGuid);
-
+            var itemModel = new RetrospectiveItemModel { Column = column, Text = text, Autor = user, ListId = listId };
+            itemModel.ItemGuid = _retrospectiveMan.AddRetrospectiveItem(itemModel, retrospectiveGuidId: eventGuid);
+            
             // TODO: only to specific group by eventGuid
-            Clients.All.recieveSharedItem(new ItemObject() { autor = user, column = column, listId = listId, text = text, itemGuid = itemId });
+            Clients.All.recieveSharedItem(itemModel);
         }
 
         /// <summary>
@@ -67,12 +68,10 @@ namespace GoAgile.Hubs
         public void sendAllSharedItems(string eventGuid)
         {
             var list = _retrospectiveMan.GetAllSharedItems(eventGuid);
-
             string ret = JsonConvert.SerializeObject(list);
 
             Clients.Caller.recieveAllSharedItems(ret);
         }
-
 
         /// <summary>
         /// Retrospective starts, change state to 'running'
