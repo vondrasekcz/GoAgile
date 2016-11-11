@@ -42,12 +42,42 @@
                    '</tr>'
                );
         };
-
-        // Redirect to Event's detail page or Event
-        $('#myTable').on('click', '.clickable-row', function(event) {
+        
+        // in TableAll Row is clicked
+        $('#myTableAll').on('click', '.clickable-row', function(event) {
             var guidId = $(this).attr("name");
             var state = $(this).attr("state");
 
+            rowClicked(guidId, state);
+        });
+
+        // in TableWaiting Row is clicked
+        $('#myTableWaiting').on('click', '.clickable-row', function(event) {
+            var guidId = $(this).attr("name");
+            var state = $(this).attr("state");
+
+            rowClicked(guidId, state);
+        });
+
+        // in TableinProgress Row is clicked
+        $('#myTableInProgress').on('click', '.clickable-row', function(event) {
+            var guidId = $(this).attr("name");
+            var state = $(this).attr("state");
+
+            rowClicked(guidId, state);
+        });
+
+        // in TableFinished Row is clicked
+        $('#myTableFinished').on('click', '.clickable-row', function(event) {
+            var guidId = $(this).attr("name");
+            var state = $(this).attr("state");
+
+            rowClicked(guidId, state);
+        });
+
+        // Redirect to Event's detail page or Event
+        function rowClicked(guidId, state)
+        {
             if (state == "finished") {
                 var url = '@Url.Action("RetrospectiveDetail", "Retrospective")' + "/" + guidId;
                 window.location.href = url;
@@ -56,7 +86,7 @@
                 var url = '@Url.Action("ManageRetrospective", "Retrospective")' + "/" + guidId;
                 window.location.href = url;
             }
-        });
+        };
 
     });
 </script>
