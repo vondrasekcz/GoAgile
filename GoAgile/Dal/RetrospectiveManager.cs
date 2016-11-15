@@ -1,4 +1,5 @@
 ﻿using GoAgile.DataContexts;
+using GoAgile.Models;
 using GoAgile.Models.DB;
 using System;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace GoAgile.Dal
     public class RetrospectiveManager : IRetrospectiveManager
     {
         /// <inheritdoc />
-        string IRetrospectiveManager.AddModel(RetrospectiveModel model)
+        string IRetrospectiveManager.AddModel(CreateRetrospectiveViewModel model, string user)
         {
             using (var db = AgileDb.Create())
             {
@@ -22,7 +23,7 @@ namespace GoAgile.Dal
                 dbItem.Comment = model.Comment;
                 dbItem.DatePlanned = model.DatePlanned;
                 dbItem.State = EventState.waiting;
-                dbItem.Owner = model.Owner;
+                dbItem.Owner = user;
 
                 db.Retrospectives.Add(dbItem);
                 db.SaveChanges();
@@ -47,9 +48,46 @@ namespace GoAgile.Dal
                         Project = model.Project,
                         Owner = model.Owner,
                         Comment = model.Comment,
+                        DatePlanned = model.DatePlanned == null ? "-"
+                                      : model.DatePlanned.Value.Day.ToString() + "." +
+                                      model.DatePlanned.Value.Month.ToString() + "." +
+                                      model.DatePlanned.Value.Year.ToString(),
+                        DateFinished = model.DateFinished == null ? "-"
+                                       : model.DateFinished.Value.Day.ToString() + "." +
+                                       model.DateFinished.Value.Month.ToString() + "." +
+                                       model.DateFinished.Value.Year.ToString() + " " +
+                                       model.DateFinished.Value.Hour.ToString() + ":" +
+                                       model.DateFinished.Value.Minute.ToString(),
+                        DateStarted = model.DateStared == null ? "-"
+                                      : model.DateStared.Value.Day.ToString() + "." +
+                                      model.DateStared.Value.Month.ToString() + "." +
+                                      model.DateStared.Value.Year.ToString() + " " +
+                                      model.DateStared.Value.Hour.ToString() + ":" +
+                                      model.DateStared.Value.Minute.ToString(),
                         State = Enum.GetName(typeof(EventState), model.State),
-                        DatePlanned = model.DatePlanned
                     };
+
+                return ret;
+            }
+        }
+
+        /// <inheritdoc />
+        RetrospectiveInitModel IRetrospectiveManager.GetInitModel(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var model = db
+                    .Retrospectives.SingleOrDefault(s => s.Id == guidId);
+
+                if (model == null)
+                    return null;
+
+                var ret = new RetrospectiveInitModel()
+                {
+                   GuidId = model.Id,
+                   State = Enum.GetName(typeof(EventState), model.State),
+                   Owner = model.Owner
+                };
 
                 return ret;
             }

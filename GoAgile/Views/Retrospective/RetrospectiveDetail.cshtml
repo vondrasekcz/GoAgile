@@ -1,7 +1,95 @@
-﻿
+﻿@model GoAgile.Models.Retrospective.FullRetrospectiveModel
+
 @{
-    ViewBag.Title = "RetrospectiveDetail";
+    ViewBag.Title = "Retrospective Detail";
 }
 
-<h2>RetrospectiveDetail</h2>
+@section scripts{
+    <link href="~/Content/GoAgileContent/well.css" rel="stylesheet" />
+<script>
+    $(function () {
+
+        // Page Load
+        $(document).ready(function () {
+            var data = @Html.Raw(Json.Encode(Model));
+            $('#div_name').text(data.ModelItem.RetrospectiveName + ' - ' +  data.ModelItem.Project);
+            $('#div_datePlanned').text(data.ModelItem.DatePlanned);
+            $('#div_dateStarted').text(data.ModelItem.DateStarted);
+            $('#div_dateFinished').text(data.ModelItem.DateFinished);
+            $('#div_comment').text('Comment: ' + data.ModelItem.Comment);
+
+            for (var i = 0; i < data.Items.length; i++) {
+                addItem(data.Items[i].ItemGuid, 
+                        data.Items[i].Column, 
+                        data.Items[i].Autor, 
+                        data.Items[i].Text
+                );
+            }
+        });
+        
+        // Add Item to list
+        function addItem(itemGuid, column, autor, text) {          
+            if (column == 'Start')
+                listId = "list_start";
+            else if (column == 'Stop')
+                listId = "list_stop";
+            else 
+                listId = "list_continue";
+
+            $('#' + listId).prepend(
+                $('<li class="list-group-item well well-primary clearfix">').append(
+                    $('<div>' + column + ' by ' + autor + '</div>' +
+                      '<div>' + text + '</div>'
+            )));            
+        };
+
+    });
+</script>
+}
+
+<body>
+    <div class="container">
+        <h2 class="text-center">Retrospective Detail</h2>
+        <div class="well">
+            <div class="row">
+                <div class="col-sm-12 text-center">
+                    <h3 id="div_name"></h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 text-center">
+                    <div>Date Planned</div>
+                    <div id="div_datePlanned"></div>
+                </div>
+                <div class="col-sm-4 text-center">
+                    <div>Date Started</div>
+                    <div id="div_dateStarted"></div>
+                </div>
+                <div class="col-sm-4 text-center">
+                    <div>Date Finished</div>
+                    <div id="div_dateFinished"></div>
+                </div>
+            </div>
+            <br>
+            <div class="col-sm-12 text-center">
+                <div id="div_comment"></div>
+            </div>
+        </div>
+        <!-- Columns Start, Continue, Stop -->
+        <div class="row">
+            <div class="col-sm-4 text-center">
+                <div class="title-marketing"><h3>Start</h3></div>
+                <ul class="list-group" id="list_start"></ul>
+            </div>
+            <div class="col-sm-4 text-center">
+                <div class="title-marketing"><h3>Stop</h3></div>
+                <ul class="list-group" id="list_stop"></ul>
+            </div>
+            <div class="col-sm-4 text-center">
+                <div class="title-marketing"><h3>Continue</h3></div>
+                <ul class="list-group" id="list_continue"></ul>
+            </div>
+        </div><!-- /Columns Start, Continue, Stop -->
+    </div>
+</body>
 

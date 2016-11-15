@@ -6,6 +6,8 @@
     
 @section scripts{
 <link href="~/Content/GoAgileContent/table.css" rel="stylesheet" />
+<link href="~/Content/GoAgileContent/modals.css" rel="stylesheet" />
+<link href="~/Content/GoAgileContent/well.css" rel="stylesheet" />
 
 <script>
     $(function () {
@@ -39,15 +41,23 @@
                        '<td class="text-left">' + model.DatePlanned + '</td>'+
                        '<td class="text-left">' + model.DateStarted + '</td>'+
                        '<td class="text-left">' + model.DateFinished + '</td>'+
+                       '<td><button type="button" class="btn btn-danger delete">Left</button></td>'+
                    '</tr>'
                );
         };
+
+
+        $(document).on('click', '.delete', function (event) {
+            event.stopPropagation();
+            $('#deleteRow').modal('show');
+        });
         
         // in TableAll Row is clicked
-        $('#myTableAll').on('click', '.clickable-row', function(event) {
+        $('#myTableAll').on('click', '.clickable-row', function(event) {     
+
             var guidId = $(this).attr("name");
             var state = $(this).attr("state");
-
+            
             rowClicked(guidId, state);
         });
 
@@ -94,7 +104,24 @@
 
 
 <body>
-    <div id="exTab1" class="container">
+    <div class="modal fade" id="deleteRow" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-primary text-center">
+                    <h1>Deleting Event</h1>
+                </div>
+                <div class="modal-body">
+                    Are you sure?? TODO:
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
+                    <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="container">
         <h3>Your Events</h3>
         <ul class="nav nav-tabs">
             <li class="active">
@@ -122,6 +149,7 @@
                             <th class="text-left">Planned</th>
                             <th class="text-left">Started</th>
                             <th class="text-left">Finished</th>
+                            <th class="text-left">Delete</th>
                         </tr>
                     </thead>
                     <tbody class="table-hover" id="tableBodyAll"></tbody>

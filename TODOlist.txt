@@ -34,6 +34,10 @@ Views
 	- add glyphcons
  - Events
 	- bottom page is running a litle bit  - cause of last row
+	- event propagation
+	- delete button
+ - Retrospective Detail
+	- output to csv, pdf, +++
 
 Data && Migrations
  - add init values

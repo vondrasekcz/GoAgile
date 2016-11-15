@@ -40,7 +40,7 @@ namespace GoAgile.Controllers
                 return HttpNotFound();
 
             var retrospectiveItemsModel = _retrospectiveMan.GetAllSharedItems(id);
-            var model = new FullRetrospectiveModel() { Model = retrospectiveModel, Items = retrospectiveItemsModel };
+            var model = new FullRetrospectiveModel() { ModelItem = retrospectiveModel, Items = retrospectiveItemsModel };
 
             return View(model);
         }
@@ -49,12 +49,12 @@ namespace GoAgile.Controllers
         // GET Retrospecive/Retrospective{Id}
         public ActionResult Retrospective(string id)
         {
-            var eventInfo = _retrospectiveMan.GetModel(id);
+            var initModel = _retrospectiveMan.GetInitModel(id);
 
-            if (eventInfo == null)
+            if (initModel == null)
                 return HttpNotFound();
             else
-                return View(new RetrospectiveInitModel { GuidId = id, State = eventInfo.State});
+                return View(initModel);
         }
 
         //
@@ -62,15 +62,15 @@ namespace GoAgile.Controllers
         [Authorize]
         public ActionResult ManageRetrospective(string id)
         {
-            var eventInfo = _retrospectiveMan.GetModel(id);
+            var initModel = _retrospectiveMan.GetInitModel(id);
 
-            if (eventInfo == null)
+            if (initModel == null)
                 return HttpNotFound();
             
-            if (User.Identity.Name == eventInfo.Owner)
+            if (User.Identity.Name == initModel.Owner)
             {
-                string url = Url.Action("Retrospective/" + id, "Retrospective", null, Request.Url.Scheme);
-                return View(new RetrospectiveInitModel { Url = url, State = eventInfo.State, GuidId = id });
+                initModel.Url = Url.Action("Retrospective/" + id, "Retrospective", null, Request.Url.Scheme);
+                return View(initModel);
             }                
             else
                 return RedirectToAction("ManageRetrospective/" + id, "Retrospective");
@@ -80,22 +80,15 @@ namespace GoAgile.Controllers
         // POST Retrospective/CreateRerospective
         [HttpPost]
         [Authorize]
-        public ActionResult CreateRetrospective(CreateRetrospectiveViewModel model)
+        public ActionResult CreateRetrospective(CreateRetrospectiveViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                var retModel = new RetrospectiveModel();
-                retModel.Comment = model.Comment;
-                retModel.Owner = User.Identity.Name;
-                retModel.Project = model.Project;
-                retModel.RetrospectiveName = model.RetrospectiveName;
-                retModel.DatePlanned = model.DatePlanned;
-
-                var guidId = _retrospectiveMan.AddModel(retModel);
+                var guidId = _retrospectiveMan.AddModel(model: viewModel, user: User.Identity.Name);
                 
                 return RedirectToAction("ManageRetrospective/" + guidId, "Retrospective");
             }
-            return View(model);
+            return View(viewModel);
         }
 
 

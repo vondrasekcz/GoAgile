@@ -5,15 +5,13 @@
     ViewBag.Title = "ManageRetrospective";
 }
 
-<h2>ManageRetrospective</h2>
-
-
 @section scripts{
     <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
     <script type="text/javascript" src="~/signalr/hubs"></script>
     <link href="~/Content/GoAgileContent/modals.css" rel="stylesheet" />
     <link href="~/Content/GoAgileContent/text.css" rel="stylesheet" />
     <link href="~/Content/GoAgileContent/well.css" rel="stylesheet" />
+    <link href="~/Content/GoAgileContent/sidebar.css" rel="stylesheet" />
     <script>
         $(function () {
             // Retrospective URL
@@ -211,21 +209,19 @@
                 $('#btn_stop_addItem').prop('disabled', state);
             };
 
-
-            retHub.client.updateUsersOnlineCount = function (count) {
-                $('#online_users').text('count: ' + count);
-            };
-
+            // update Online Users
             retHub.client.recieveOnlineUsers = function (data) {
                 var items = $.parseJSON(data);
+                var i;
 
                 $('#list_users').empty();
 
-                for (var i = 0; i < items.length; i++) {
+                for (i = 0; i < items.length; i++) {
                     $('#list_users').append(
-                        '<li class"list-group-item users">' + items[i] + '</li>'
+                        '<li><i class="glyphicon glyphicon-user"></i> ' + items[i] + '</li>'
                     );
                 }
+                $('#div_onlineUsers').text('Online Users: ' + i);
             };
 
         });
@@ -255,70 +251,72 @@
 
  <!-- Page -->
 <div class="container">      
-        <div class="row">
-            <!-- Online USers panel-->
-            <div class="col-md-2">
-                <div class="title-marketing"><h3>Online Users</h3></div>
-                <div id="online_users"></div>
-                <div class="title-marketing"><h3>Users:</h3></div>
-                <ul class="list-group" name="users" id="list_users"></ul>
-            </div> <!-- /Online USers panel -->
+
            
-            <div class="col-md-10">
-                <!-- Top well URL -->
-                <div class="well"> 
-                    <div class="row text-center">
-                        <div class="col-sm-12 text-center">
-                            <h3>Send this URL to your team</h3>
-                            <font size="4"><div class="breake-word" id="div_url"></div></font>
-                        </div>
-                    </div>
-                    <!-- Running State Manager -->
-                    <div class="row" hidden id="manage_running">
-                        <div class="col-md-6 text-center">
+    <!-- Online USers panel-->
+    <div id="mySidenav" class="sidenav">
+        <h5 id="div_onlineUsers"></h5>
+        <ul class="list-group" id="list_users">
+  
+        </ul>
+    </div> <!-- /Online USers panel -->
 
-                        </div>
-                        <div class="col-md-6 text-center">                            
-                            <div class="btn-group btn-group-lg pull-right" role="group">
-                                <button type="button" id="btn_start_running" class="btn btn-primary text-center">Start</button>
-                                <button type="button" id="btn_stop_running" class="btn btn-danger text-center">Stop</button>
-                            </div>
-                        </div>
-                        
-                    </div> <!-- /Running State Manager -->
-                    <!-- Presenting State Manager -->
-                    <div class="row" hidden id="manage_presenting">
-                        <h3>Presenting Phase</h3>
-                        <div class="col-md-6 text-center">
-
-                        </div>
-                        <div class="col-md-6 text-center">                            
-                            <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
-                                <button type="button" id="btn_stop_presenting" class="btn btn-danger text-center">Finish Retrospective</button>
-                            </div>
-                        </div>
-                        
-                    </div> <!-- /Presenting State Manager -->
-                </div> <!-- /Top well URL -->
-                <!-- Columns Start, Continue, Stop -->
-                <div class="row">
-                    <div class="col-sm-4 text-center">
-                        <div class="title-marketing"><h3>Start</h3></div>
-                        <ul class="list-group" name="Start" id="list_start"></ul>
-                        <button type="button" id="btn_start_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
-                    </div>
-                    <div class="col-sm-4 text-center">
-                        <div class="title-marketing"><h3>Stop</h3></div>
-                        <ul class="list-group" name="Stop" id="list_stop"></ul>
-                        <button type="button" id="btn_stop_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
-                    </div>
-                    <div class="col-sm-4 text-center">
-                        <div class="title-marketing"><h3>Continue</h3></div>
-                        <ul class="list-group" name="Continue" id="list_continue"></ul>
-                        <button type="button" id="btn_continue_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
-                    </div>
-                </div><!-- /Columns Start, Continue, Stop -->
+     
+    <div id="main">
+        <h2>Retrospective Manager</h2>
+        <!-- Top well URL -->
+        <div class="well">
+            <div class="row text-center">
+                <div class="col-sm-12 text-center">
+                    <h3>Send this URL to your team</h3>
+                    <font size="4"><div class="breake-word" id="div_url"></div></font>
+                </div>
             </div>
-        </div>
+            <!-- Running State Manager -->
+            <div class="row" hidden id="manage_running">
+                <div class="col-md-6 text-center">
+
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="btn-group btn-group-lg pull-right" role="group">
+                        <button type="button" id="btn_start_running" class="btn btn-primary text-center">Start</button>
+                        <button type="button" id="btn_stop_running" class="btn btn-danger text-center">Stop</button>
+                    </div>
+                </div>
+
+            </div> <!-- /Running State Manager -->
+            <!-- Presenting State Manager -->
+            <div class="row" hidden id="manage_presenting">
+                <h3>Presenting Phase</h3>
+                <div class="col-md-6 text-center">
+
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
+                        <button type="button" id="btn_stop_presenting" class="btn btn-danger text-center">Finish Retrospective</button>
+                    </div>
+                </div>
+
+            </div> <!-- /Presenting State Manager -->
+        </div> <!-- /Top well URL -->
+        <!-- Columns Start, Continue, Stop -->
+        <div class="row">
+            <div class="col-sm-4 text-center">
+                <div class="title-marketing"><h3>Start</h3></div>
+                <ul class="list-group" name="Start" id="list_start"></ul>
+                <button type="button" id="btn_start_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+            </div>
+            <div class="col-sm-4 text-center">
+                <div class="title-marketing"><h3>Stop</h3></div>
+                <ul class="list-group" name="Stop" id="list_stop"></ul>
+                <button type="button" id="btn_stop_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+            </div>
+            <div class="col-sm-4 text-center">
+                <div class="title-marketing"><h3>Continue</h3></div>
+                <ul class="list-group" name="Continue" id="list_continue"></ul>
+                <button type="button" id="btn_continue_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+            </div>
+        </div><!-- /Columns Start, Continue, Stop -->
+    </div>      
 </div>
 
