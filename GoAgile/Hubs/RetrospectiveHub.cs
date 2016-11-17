@@ -54,6 +54,10 @@ namespace GoAgile.Hubs
         /// <param name="user"></param>
         public void sendSharedItem(string listId, string column, string text, string user, string eventGuid)
         {
+            // TODO: throw exception, handle it at client
+            if (string.IsNullOrWhiteSpace(listId) || string.IsNullOrWhiteSpace(column) || string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(eventGuid))
+                return;
+
             var itemModel = new RetrospectiveItemModel { Column = column, Text = text, Autor = user, ListId = listId };
             itemModel.ItemGuid = _retrospectiveMan.AddRetrospectiveItem(itemModel, retrospectiveGuidId: eventGuid);
             
@@ -122,49 +126,8 @@ namespace GoAgile.Hubs
 
 
 
-        //*****************Counter Things***************************************************************************
+       
 
-
-        public static List<string> Users = new List<string>();
-
-
-        public void Send(int count)
-        {
-            // Call the addNewMessageToPage method to update clients.
-            var context = GlobalHost.ConnectionManager.GetHubContext<RetrospectiveHub>();
-            context.Clients.All.updateUsersOnlineCount(count);
-        }
-
-
-        public override System.Threading.Tasks.Task OnConnected()
-        {
-            string clientId = GetClientId();
-
-            if (Users.IndexOf(clientId) == -1)
-            {
-                Users.Add(clientId);
-            }
-
-            // Send the current count of users
-            Send(Users.Count);
-
-            return base.OnConnected();
-        }
-
-
-        public override System.Threading.Tasks.Task OnReconnected()
-        {
-            string clientId = GetClientId();
-            if (Users.IndexOf(clientId) == -1)
-            {
-                Users.Add(clientId);
-            }
-
-            // Send the current count of users
-            Send(Users.Count);
-
-            return base.OnReconnected();
-        }
 
 
         public void logPm(string guidId)
@@ -182,9 +145,7 @@ namespace GoAgile.Hubs
         public void UsersChanged(string guidId)
         {
             var list = _store.GetAllUsers(guidId);
-
             string ret = JsonConvert.SerializeObject(list);
-
             var recievers = _store.GetAllConnectionIds(guidId);
 
             Clients.Clients(recievers).recieveOnlineUsers(ret);
@@ -197,20 +158,10 @@ namespace GoAgile.Hubs
             if (ret != null)
                 UsersChanged(ret);
 
-            string clientId = GetClientId();
-
-            if (Users.IndexOf(clientId) > -1)
-            {
-                Users.Remove(clientId);
-            }
-
-            // Send the current count of users
-            Send(Users.Count);
-
             return base.OnDisconnected(aaa);
         }
 
-
+        // Get user connectID
         private string GetClientId()
         {
             string clientId = "";
@@ -239,9 +190,6 @@ namespace GoAgile.Hubs
 
 
 
-
-
-        //********************************************************************
 
         /// <summary>
         /// Validate email

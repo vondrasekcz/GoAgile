@@ -5,11 +5,12 @@ Scripts
  - own files
 
  GoAgile
-  - CLIENT - !!!!! some state structure for easy reading code !!!!!!!!!!!!!!!!!
-  - Application Name and logo
-  - SignalR - browser limits now 5 connections
+ - CLIENT - !!!!! some state structure for easy reading code !!!!!!!!!!!!!!!!!
+ - Application Name and logo
+ - SignalR - browser limits now 5 connections
 	- https://www.future-processing.pl/blog/signalr-handling-browser-connection-limits/ 
  - @ 2016 - GoAgile move to pages from layout
+ - footer problem
 
 Start to do
  - comments (aim: Self-documenting code)
@@ -21,12 +22,10 @@ Views
 	- glyphcons - datepicker
  - Retrospective
 	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
-	- title and some description
 	- resize textarea only vertical
 	- binary search and insert at position - sortedIdList in ManageRetrospective too
 	- after connect in presenting show all shared items in right order in ManageRetrospective too
  - ManageRetrospective
-	- control panels, titles
 	- timer
 	- if connected at running or presenting share pending items
 	- if send or crete any item, share to others ProjectManagers devices
@@ -34,6 +33,7 @@ Views
 	- add glyphcons
  - Events
 	- bottom page is running a litle bit  - cause of last row
+	- delete ajax - return value on success
  - Retrospective Detail
 	- output to csv, pdf, +++
 

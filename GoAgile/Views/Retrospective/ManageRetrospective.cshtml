@@ -60,109 +60,129 @@
                         $('#modalFinished').modal('show');
                         break;
                 }
-            });
 
-            // Inicialize hub connection
-            var retHub = $.connection.retrospectiveHub;
+                // Inicialize hub connection
+                var retHub = $.connection.retrospectiveHub;
 
-            $.connection.hub.start().done(function () {
-                if (state == "presenting")
-                    retHub.server.sendAllSharedItems(guidId);
-
-                retHub.server.logPm(guidId);
-            });
-
-
-            // Start Retrospective running
-            $('#btn_start_running').click(function () {
-                retHub.server.startRetrospectiveRunning(guidId);
-            });
-
-            // Start Retrospective presenting
-            $('#btn_stop_running').click(function () {
-                retHub.server.startRetrospectivePresenting(guidId);
-            });
-
-            // Finish Retrospective
-            $('#btn_stop_presenting').click(function () {
-                retHub.server.retrospectiveComplete(guidId);
-            });
-
-            // Navigate to Retrospective History
-            $('#btn_history').click(function () {
-                var url = '@Url.Action("RetrospectiveDetail", "Retrospective")' + "/" + guidId;
-                window.location.href = url;
-            });
-
-            // Navigate to Home page
-            $('#btn_home').click(function () {
-                var url = '@Url.Action("GoAgile", "Home")';
-                window.location.href = url;
-            });
-
-            // Share Item
-            $(document).on('click', '.share', function () {
-
-                listId = $(this).parent().parent().parent().attr('id');
-                column = $(this).parent().parent().parent().attr('name');
-                text = $(this).parent().parent().find('.itemPending').val();
-
-                $(this).parent().parent().remove();
-
-                retHub.server.sendSharedItem(listId, column, text, user, guidId);
-            });
-
-            // Retrospective started running
-            retHub.client.startRunningMode = function () {
-                state = "running";
-                $('#btn_start_running').prop('disabled', true);
-                $('#btn_stop_running').prop('disabled', false);
-                disableListButtons(false);
-            }
-
-            // Retrospective started presenting
-            retHub.client.startPresentingMode = function () {
-                state = "presenting";
-                $("#manage_running").hide();
-                $("#manage_presenting").show();
-                $('.share').prop('disabled', false);
-                $('.itemPending').prop('disabled', true);
-                disableListButtons(true);
-            }
-
-            // Retrospective is finished
-            retHub.client.retrospectiveFinished = function () {
-                state = "finished";
-                $('#modalFinished').modal('show');
-            }
-
-            // Recieve shared Item
-            retHub.client.recieveSharedItem = function (item) {
-                addSharedItem(item.ItemGuid, item.ListId, item.Column, item.Autor, item.Text);
-            }
-
-            // Recieve all shared Items
-            retHub.client.recieveAllSharedItems = function (data) {
-                var item = $.parseJSON(data);
-
-                for (var i = 0; i < item.length; i++) {
-                    addSharedItem(item[i].ItemGuid, item[i].ListId, item[i].Column, item[i].Autor, item[i].Text);
+                // Retrospective started running
+                retHub.client.startRunningMode = function () {
+                    state = "running";
+                    $('#btn_start_running').prop('disabled', true);
+                    $('#btn_stop_running').prop('disabled', false);
+                    disableListButtons(false);
                 }
-            }
 
-            // Start column Add
-            $('#btn_start_addItem').click(function () {
-                addListItem("list_start", "start");
-            });
+                // Retrospective started presenting
+                retHub.client.startPresentingMode = function () {
+                    state = "presenting";
+                    $("#manage_running").hide();
+                    $("#manage_presenting").show();
+                    $('.share').prop('disabled', false);
+                    $('.itemPending').prop('disabled', true);
+                    disableListButtons(true);
+                }
 
-            // Continue column Add
-            $('#btn_continue_addItem').click(function () {
-                addListItem("list_continue", "Continue");
-            });
+                // Retrospective is finished
+                retHub.client.retrospectiveFinished = function () {
+                    state = "finished";
+                    $('#modalFinished').modal('show');
+                }
 
-            // Stop column Add
-            $('#btn_stop_addItem').click(function () {
-                addListItem("list_stop", "Stop");
+                // Recieve shared Item
+                retHub.client.recieveSharedItem = function (item) {
+                    addSharedItem(item.ItemGuid, item.ListId, item.Column, item.Autor, item.Text);
+                }
+
+                // Recieve all shared Items
+                retHub.client.recieveAllSharedItems = function (data) {
+                    var item = $.parseJSON(data);
+
+                    for (var i = 0; i < item.length; i++) {
+                        addSharedItem(item[i].ItemGuid, item[i].ListId, item[i].Column, item[i].Autor, item[i].Text);
+                    }
+                }
+
+                // update Online Users
+                retHub.client.recieveOnlineUsers = function (data) {
+                    var items = $.parseJSON(data);
+                    var i;
+
+                    $('#list_users').empty();
+
+                    for (i = 0; i < items.length; i++) {
+                        $('#list_users').append(
+                            '<li><i class="glyphicon glyphicon-user"></i> ' + items[i] + '</li>'
+                        );
+                    }
+                    $('#div_onlineUsers').text('Online Users: ' + i);
+                };
+
+                // Connected to Hub
+                $.connection.hub.start().done(function () {
+                    if (state == "presenting")
+                        retHub.server.sendAllSharedItems(guidId);
+
+                    retHub.server.logPm(guidId);
+                });
+
+                // Share Item
+                $(document).on("click", '.share', function () {
+                    listId = $(this).parent().parent().parent().attr('id');
+                    column = $(this).parent().parent().parent().attr('name');
+                    text = $(this).parent().parent().find('.itemPending').val();
+
+                    $(this).parent().parent().remove();
+
+                    retHub.server.sendSharedItem(listId, column, text, user, guidId);
+                });
+
+                // Delete Item from columns
+                $(document).on('click', '.delete', function () {
+                    $(this).parent().parent().remove();
+                });
+
+                // Start Retrospective running
+                $('#btn_start_running').click(function () {
+                    retHub.server.startRetrospectiveRunning(guidId);
+                });
+
+                // Start Retrospective presenting
+                $('#btn_stop_running').click(function () {
+                    retHub.server.startRetrospectivePresenting(guidId);
+                });
+
+                // Finish Retrospective
+                $('#btn_stop_presenting').click(function () {
+                    retHub.server.retrospectiveComplete(guidId);
+                });
+
+                // Navigate to Retrospective History
+                $('#btn_history').click(function () {
+                    var url = '@Url.Action("RetrospectiveDetail", "Retrospective")' + "/" + guidId;
+                    window.location.href = url;
+                });
+
+                // Navigate to Home page
+                $('#btn_home').click(function () {
+                    var url = '@Url.Action("GoAgile", "Home")';
+                    window.location.href = url;
+                });
+
+                // Start column Add
+                $('#btn_start_addItem').click(function () {
+                    addListItem("list_start", "start");
+                });
+
+                // Continue column Add
+                $('#btn_continue_addItem').click(function () {
+                    addListItem("list_continue", "Continue");
+                });
+
+                // Stop column Add
+                $('#btn_stop_addItem').click(function () {
+                    addListItem("list_stop", "Stop");
+                });
+
             });
 
             // Add list item to list
@@ -195,34 +215,14 @@
                               '<textarea type="textarea" class="form-control itemPending" disabled rows="3">' + text + '</textarea>'
                     )));
                 }
-            };
-
-            // Delete Item from columns
-            $(document).on('click', '.delete', function () {
-                $(this).parent().parent().remove();
-            });
+            };            
 
             // Disable list add (+) buttons
             function disableListButtons(state) {
                 $('#btn_start_addItem').prop('disabled', state);
                 $('#btn_continue_addItem').prop('disabled', state);
                 $('#btn_stop_addItem').prop('disabled', state);
-            };
-
-            // update Online Users
-            retHub.client.recieveOnlineUsers = function (data) {
-                var items = $.parseJSON(data);
-                var i;
-
-                $('#list_users').empty();
-
-                for (i = 0; i < items.length; i++) {
-                    $('#list_users').append(
-                        '<li><i class="glyphicon glyphicon-user"></i> ' + items[i] + '</li>'
-                    );
-                }
-                $('#div_onlineUsers').text('Online Users: ' + i);
-            };
+            };           
 
         });
     </script>
@@ -260,7 +260,6 @@
   
         </ul>
     </div> <!-- /Online USers panel -->
-
      
     <div id="main">
         <h2>Retrospective Manager</h2>
@@ -269,7 +268,7 @@
             <div class="row text-center">
                 <div class="col-sm-12 text-center">
                     <h3>Send this URL to your team</h3>
-                    <font size="4"><div class="breake-word" id="div_url"></div></font>
+                    <font size="4"><div class="break-word" id="div_url"></div></font>
                 </div>
             </div>
             <!-- Running State Manager -->
@@ -280,7 +279,7 @@
                 <div class="col-md-6 text-center">
                     <div class="btn-group btn-group-lg pull-right" role="group">
                         <button type="button" id="btn_start_running" class="btn btn-primary text-center">Start</button>
-                        <button type="button" id="btn_stop_running" class="btn btn-danger text-center">Stop</button>
+                        <button type="button" id="btn_stop_running" class="btn btn-success text-center">Presenting Mode</button>
                     </div>
                 </div>
 
@@ -304,17 +303,17 @@
             <div class="col-sm-4 text-center">
                 <div class="title-marketing"><h3>Start</h3></div>
                 <ul class="list-group" name="Start" id="list_start"></ul>
-                <button type="button" id="btn_start_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                <button type="button" id="btn_start_addItem" disabled class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
             </div>
             <div class="col-sm-4 text-center">
                 <div class="title-marketing"><h3>Stop</h3></div>
                 <ul class="list-group" name="Stop" id="list_stop"></ul>
-                <button type="button" id="btn_stop_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                <button type="button" id="btn_stop_addItem" disabled class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
             </div>
             <div class="col-sm-4 text-center">
                 <div class="title-marketing"><h3>Continue</h3></div>
                 <ul class="list-group" name="Continue" id="list_continue"></ul>
-                <button type="button" id="btn_continue_addItem" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
+                <button type="button" id="btn_continue_addItem" disabled class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></button>
             </div>
         </div><!-- /Columns Start, Continue, Stop -->
     </div>      
