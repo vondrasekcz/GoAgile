@@ -91,7 +91,14 @@ namespace GoAgile.Controllers
             return View(viewModel);
         }
 
-
+        [Authorize]
+        public ActionResult DeleteRetrospective(string id)
+        {
+            if (_retrospectiveMan.DeleteModel(id))
+                return Json(new { success = true });
+            else
+                return Json(new { success = false });
+        }
 
 
     }

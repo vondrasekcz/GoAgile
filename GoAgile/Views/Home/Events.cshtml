@@ -4,17 +4,18 @@
     ViewBag.Title = "My Events";
 }
     
-@section scripts{
 <link href="~/Content/GoAgileContent/table.css" rel="stylesheet" />
 <link href="~/Content/GoAgileContent/modals.css" rel="stylesheet" />
 <link href="~/Content/GoAgileContent/well.css" rel="stylesheet" />
-
+<link href="~/Content/GoAgileContent/loading.css" rel="stylesheet" />
+@section scripts{
 <script>
     $(function () {
 
         // Add rows into table
         $(document).ready(function () {
             var data = @Html.Raw(Json.Encode(Model));
+            var itemToDelete = null;
 
             for (var i = 0; i < data.length; i++) {
                 if (data[i].State == "finished") {
@@ -28,63 +29,83 @@
                 }
                 addRow('tableBodyAll', data[i]);
             }
+
+            // Row is clicked
+            $('.clickable-row').click(function(event) {    
+                var guidId = $(this).attr("name");
+                var state = $(this).attr("state");
+           
+                rowClicked(guidId, state);
+            });
+
+            // Delete Event
+            $('.delete').click( function (event) {
+                event.stopPropagation();
+                var state = $(this).parent().parent().attr("state");
+
+                if (state == "finished") {
+                    itemToDelete = $(this).parent().parent().attr("name"); 
+                    $('#modal_delete').modal('show');
+                }                    
+                else
+                    $('#modal_invalidDelete').modal('show');
+            });
+
+            // Hide Invalid Event delete
+            $('#btn_invalidDeleteOk').click(function(event) {
+                $('#modal_invalidDelete').modal('hide');
+            });
+
+            // Canceled Event Delete
+            $('#btn_deleteCancel').click(function(event) {
+                $('#modal_delete').modal('hide');
+                $('#div_text').show();
+                $('#div_failed').hide();
+                itemToDelete = null;
+            });            
+
+            // Event Delete
+            $('#btn_deleteDelete').click(function(event) {
+                
+                $('#div_text').hide();
+                $('#div_loader').show();
+                $('#btn_deleteDelete').prop('disabled', true);
+                $('#btn_deleteCancel').prop('disabled', true);
+
+                $.ajax({
+                        type: "POST",
+                        url: '@(Url.Action("DeleteRetrospective", "Retrospective"))' + "/" + itemToDelete,
+                    success: function (data) {
+                        var url = '@Url.Action("Events", "Home")';
+                        window.location.href = url;
+                    },
+                    error: function (error) {
+                        $('#div_failed').show();
+                        $('#div_loader').hide();
+                        $('#btn_deleteDelete').prop('disabled', false);
+                        $('#btn_deleteCancel').prop('disabled', false);
+                    }
+                });
+            });
+
         });
 
         // Add Row to table
         function addRow(table, model) {
             $('#' + table).append(
-                   '<tr class="clickable-row" name="' + model.IdGuid + '" state="' + model.State + '">'+
-                       '<td class="text-left">' + model.Name + '</td>'+
-                       '<td class="text-left">' + model.Project + '</td>'+
-                       '<td class="text-left">' + model.State + '</td>'+
-                       '<td class="text-left">' + model.Comment + '</td>'+
-                       '<td class="text-left">' + model.DatePlanned + '</td>'+
-                       '<td class="text-left">' + model.DateStarted + '</td>'+
-                       '<td class="text-left">' + model.DateFinished + '</td>'+
-                       '<td><button type="button" class="btn btn-danger delete">Left</button></td>'+
+                   '<tr class="clickable-row" name="' + model.IdGuid + '" state="' + model.State + '">' +
+                       '<td class="text-left">' + model.Name + '</td>' +
+                       '<td class="text-left">' + model.Project + '</td>' +
+                       '<td class="text-left">' + model.State + '</td>' +
+                       '<td class="text-left">' + model.Comment + '</td>' +
+                       '<td class="text-left">' + model.DatePlanned + '</td>' +
+                       '<td class="text-left">' + model.DateStarted + '</td>' +
+                       '<td class="text-left">' + model.DateFinished + '</td>' +
+                       '<td><button type="button" class="btn-xs btn-danger delete">Delete</button></td>' +
                    '</tr>'
                );
         };
-
-
-        $(document).on('click', '.delete', function (event) {
-            event.stopPropagation();
-            $('#deleteRow').modal('show');
-        });
         
-        // in TableAll Row is clicked
-        $('#myTableAll').on('click', '.clickable-row', function(event) {     
-
-            var guidId = $(this).attr("name");
-            var state = $(this).attr("state");
-            
-            rowClicked(guidId, state);
-        });
-
-        // in TableWaiting Row is clicked
-        $('#myTableWaiting').on('click', '.clickable-row', function(event) {
-            var guidId = $(this).attr("name");
-            var state = $(this).attr("state");
-
-            rowClicked(guidId, state);
-        });
-
-        // in TableinProgress Row is clicked
-        $('#myTableInProgress').on('click', '.clickable-row', function(event) {
-            var guidId = $(this).attr("name");
-            var state = $(this).attr("state");
-
-            rowClicked(guidId, state);
-        });
-
-        // in TableFinished Row is clicked
-        $('#myTableFinished').on('click', '.clickable-row', function(event) {
-            var guidId = $(this).attr("name");
-            var state = $(this).attr("state");
-
-            rowClicked(guidId, state);
-        });
-
         // Redirect to Event's detail page or Event
         function rowClicked(guidId, state)
         {
@@ -102,24 +123,44 @@
 </script>
 }
 
-
 <body>
-    <div class="modal fade" id="deleteRow" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <!-- modal Invalid Delete-->
+    <div class="modal modal-sm fade" id="modal_invalidDelete" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-primary text-center">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h1>Cannot Delete</h1>
+                </div>
+                <div class="modal-body">
+                    Finish Event before deleting.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn_invalidDeleteOk" class="btn btn-primary text-center">Ok</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal Invalid Delete-->
+
+    <!-- modal Delete-->
+    <div class="modal fade" id="modal_delete" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header modal-header-primary text-center">
                     <h1>Deleting Event</h1>
                 </div>
                 <div class="modal-body">
-                    Are you sure?? TODO:
+                    <div id="div_text">Are you sure?</div>
+                    <div id="div_loader" class="loader" hidden></div>
+                    <div id="div_failed" hidden>Failed to delete Event.</div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
-                    <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
+                    <button type="button" id="btn_deleteDelete" class="btn btn-danger text-center">Delete</button>
+                    <button type="button" id="btn_deleteCancel" class="btn btn-primary text-center">Cancel</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    </div><!-- /.modal Delete-->
 
     <div class="container">
         <h3>Your Events</h3>
@@ -149,7 +190,7 @@
                             <th class="text-left">Planned</th>
                             <th class="text-left">Started</th>
                             <th class="text-left">Finished</th>
-                            <th class="text-left">Delete</th>
+                            <th class="text-left"></th>
                         </tr>
                     </thead>
                     <tbody class="table-hover" id="tableBodyAll"></tbody>
@@ -166,6 +207,7 @@
                             <th class="text-left">Planned</th>
                             <th class="text-left">Started</th>
                             <th class="text-left">Finished</th>
+                            <th class="text-left"></th>
                         </tr>
                     </thead>
                     <tbody class="table-hover" id="tableBodyWaiting"></tbody>
@@ -182,6 +224,7 @@
                             <th class="text-left">Planned</th>
                             <th class="text-left">Started</th>
                             <th class="text-left">Finished</th>
+                            <th class="text-left"></th>
                         </tr>
                     </thead>
                     <tbody class="table-hover" id="tableBodyInProgress"></tbody>
@@ -198,6 +241,7 @@
                             <th class="text-left">Planned</th>
                             <th class="text-left">Started</th>
                             <th class="text-left">Finished</th>
+                            <th class="text-left"></th>
                         </tr>
                     </thead>
                     <tbody class="table-hover" id="tableBodyFinished"></tbody>

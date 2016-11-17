@@ -16,6 +16,13 @@ namespace GoAgile.Dal
         string AddModel(CreateRetrospectiveViewModel model, string user);
 
         /// <summary>
+        /// Delete retrospective
+        /// </summary>
+        /// <param name="guidId">Retrospective GuidId</param>
+        /// <returns>True if success, else False</returns>
+        bool DeleteModel(string guidId);
+
+        /// <summary>
         /// Find Retrospective
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>

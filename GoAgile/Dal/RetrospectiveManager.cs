@@ -33,6 +33,34 @@ namespace GoAgile.Dal
         }
 
         /// <inheritdoc />
+        bool IRetrospectiveManager.DeleteModel(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                try
+                {
+                    var model = db.Retrospectives
+                        .Single(s => s.Id == guidId);
+
+                    var items = db.RetrospectiveItems
+                        .Where(w => w.Retrospective == guidId);
+
+                    foreach (var item in items)
+                        db.RetrospectiveItems.Remove(item);
+
+                    db.Retrospectives.Remove(model);
+                    db.SaveChanges();
+
+                    return true;
+                }
+                catch(Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <inheritdoc />
         RetrospectiveModel IRetrospectiveManager.GetModel(string guidId)
         {
             using (var db = AgileDb.Create())

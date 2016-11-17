@@ -9,6 +9,7 @@ Scripts
   - Application Name and logo
   - SignalR - browser limits now 5 connections
 	- https://www.future-processing.pl/blog/signalr-handling-browser-connection-limits/ 
+ - @ 2016 - GoAgile move to pages from layout
 
 Start to do
  - comments (aim: Self-documenting code)
@@ -17,7 +18,6 @@ Views
  - if disabled textrea dont change it to grey color
  - restructure hidding, first hide, then show
  - CreateRetrospective
-	- better size well and maybe centre it
 	- glyphcons - datepicker
  - Retrospective
 	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
@@ -34,8 +34,6 @@ Views
 	- add glyphcons
  - Events
 	- bottom page is running a litle bit  - cause of last row
-	- event propagation
-	- delete button
  - Retrospective Detail
 	- output to csv, pdf, +++
 
