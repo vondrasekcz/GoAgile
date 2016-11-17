@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Mail;
 using Microsoft.AspNet.SignalR;
 using GoAgile.Helpers.Logic;
@@ -38,10 +37,8 @@ namespace GoAgile.Hubs
                 // TODO: Return object with valdiation messages
                 Clients.Caller.invalidLoginInput();
             else
-            {
-                
+            {                
                 Clients.Caller.userLogged(name);
-
             }
         }
 
@@ -60,9 +57,11 @@ namespace GoAgile.Hubs
 
             var itemModel = new RetrospectiveItemModel { Column = column, Text = text, Autor = user, ListId = listId };
             itemModel.ItemGuid = _retrospectiveMan.AddRetrospectiveItem(itemModel, retrospectiveGuidId: eventGuid);
-            
+
+            var recievers = _store.GetAllConnectionIds(eventGuid);
+
             // TODO: only to specific group by eventGuid
-            Clients.All.recieveSharedItem(itemModel);
+            Clients.Clients(recievers).recieveSharedItem(itemModel);
         }
 
         /// <summary>
@@ -85,9 +84,9 @@ namespace GoAgile.Hubs
         public void startRetrospectiveRunning(string eventGuid)
         {
             _retrospectiveMan.ChangeRetrospectiveToRunning(eventGuid);
+            var recievers = _store.GetAllConnectionIds(eventGuid);
 
-            // TODO: only to specific group by eventGuid
-            Clients.All.startRunningMode();
+            Clients.Clients(recievers).startRunningMode();
         }
 
         /// <summary>
@@ -98,9 +97,9 @@ namespace GoAgile.Hubs
         public void startRetrospectivePresenting(string eventGuid)
         {
             _retrospectiveMan.ChangeRetrospectiveToPresenting(eventGuid);
+            var recievers = _store.GetAllConnectionIds(eventGuid);
 
-            // TODO: only to specific group by eventGuid
-            Clients.All.startPresentingMode();
+            Clients.Clients(recievers).startPresentingMode();
         }
 
         /// <summary>
@@ -111,9 +110,9 @@ namespace GoAgile.Hubs
         public void retrospectiveComplete(string eventGuid)
         {
             _retrospectiveMan.ChangeToRetrospectiveToFinished(eventGuid);
+            var recievers = _store.GetAllConnectionIds(eventGuid);
 
-            // TODO: only to specific group by eventGuid
-            Clients.All.retrospectiveFinished();
+            Clients.Clients(recievers).retrospectiveFinished();
         }
 
 
@@ -219,17 +218,11 @@ namespace GoAgile.Hubs
         private bool IsUserLoginInputValid(string email, string name, string eventGuid)
         {
             // TODO: return error and validation messages
-
-            //var validationObj = new InvalidLoginUserMessage();
-
             if (string.IsNullOrWhiteSpace(name))
                 return false;
 
             if (!string.IsNullOrWhiteSpace(email) && !IsValidEmail(email))
                 return false;
-
-            /*if (_eventStorage.ExistUser(eventGuid: eventGuid, userName: name))
-                return false;*/
 
             return true;
         }

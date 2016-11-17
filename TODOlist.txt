@@ -9,8 +9,6 @@ Scripts
  - Application Name and logo
  - SignalR - browser limits now 5 connections
 	- https://www.future-processing.pl/blog/signalr-handling-browser-connection-limits/ 
- - @ 2016 - GoAgile move to pages from layout
- - footer problem
 
 Start to do
  - comments (aim: Self-documenting code)
@@ -32,7 +30,6 @@ Views
  - Layout 
 	- add glyphcons
  - Events
-	- bottom page is running a litle bit  - cause of last row
 	- delete ajax - return value on success
  - Retrospective Detail
 	- output to csv, pdf, +++
