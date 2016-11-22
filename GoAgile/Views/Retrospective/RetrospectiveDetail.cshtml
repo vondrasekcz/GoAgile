@@ -29,17 +29,30 @@
         
         // Add Item to list
         function addItem(itemGuid, column, autor, text) {          
+            var listId;
+            var well;
+
             if (column == 'Start')
+            {
+                well = "well-warning"
                 listId = "list_start";
+            }                
             else if (column == 'Stop')
+            {
+                well = "well-danger"
                 listId = "list_stop";
+            }               
             else 
+            {
+                well = "well-success"
                 listId = "list_continue";
+            }
+                
 
             $('#' + listId).prepend(
-                $('<li class="list-group-item well well-primary clearfix">').append(
-                    $('<div>' + column + ' by ' + autor + '</div>' +
-                      '<div>' + text + '</div>'
+                $('<li class="list-group-item well well-sm ' + well + ' clearfix">').append(
+                    $('<h5>' + text + '</h5>' +
+                      '<h6 class="text-right">' + autor + '</h6>'
             )));            
         };
 

@@ -4,6 +4,17 @@
         color: #ffffff;
 }
 
+.well-warning {
+        background-color: #f0ad4e;        
+        border-color: #eea236;
+}
+
+.well-danger {
+        background-color: #d9534f;        
+        border-color: #d43f3a;
+        color: #ffffff;
+}
+
 .well-success {
         background-color: #5cb85c;        
         border-color: #4cae4c;

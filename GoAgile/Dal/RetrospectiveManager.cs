@@ -75,7 +75,7 @@ namespace GoAgile.Dal
                         RetrospectiveName = model.RetrospectiveName,
                         Project = model.Project,
                         Owner = model.Owner,
-                        Comment = model.Comment,
+                        Comment = model.Comment == null ? "-" : model.Comment,
                         DatePlanned = model.DatePlanned == null ? "-"
                                       : model.DatePlanned.Value.Day.ToString() + "." +
                                       model.DatePlanned.Value.Month.ToString() + "." +
