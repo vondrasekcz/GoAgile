@@ -5,6 +5,7 @@
         waiting,
         running,
         presenting,
+        voting,
         finished
     }
 }

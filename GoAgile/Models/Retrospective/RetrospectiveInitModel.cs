@@ -9,5 +9,9 @@
         public string State { get; set; }
 
         public string Owner { get; set; }
+
+        public bool EnableVoting { get; set; }
+
+        public int Votes { get; set; }
     }
 }

@@ -55,7 +55,7 @@ namespace GoAgile.Hubs
             if (string.IsNullOrWhiteSpace(listId) || string.IsNullOrWhiteSpace(column) || string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(eventGuid))
                 return;
 
-            var itemModel = new RetrospectiveItemModel { Column = column, Text = text, Autor = user, ListId = listId };
+            var itemModel = new RetrospectiveItemModel { Column = column, Text = text, Autor = user, ListId = listId, Votes = 0 };
             itemModel.ItemGuid = _retrospectiveMan.AddRetrospectiveItem(itemModel, retrospectiveGuidId: eventGuid);
 
             var recievers = _store.GetAllConnectionIds(eventGuid);
@@ -74,6 +74,24 @@ namespace GoAgile.Hubs
             string ret = JsonConvert.SerializeObject(list);
 
             Clients.Caller.recieveAllSharedItems(ret);
+        }
+
+        /// <summary>
+        /// Save and Send Votes of shared Item
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="sharedItemGuid"></param>
+        public void sharedItemVoted(string column, string sharedItemGuid, string eventGuid)
+        {
+            int totalVotes;
+            if ((totalVotes = _retrospectiveMan.AddVotesToItem(sharedItemGuid)) < 0)
+                return;
+                
+            var model = new VotingModel() { Column = column, SharedItemGuid = sharedItemGuid, VotesTotal = totalVotes };
+            var ret = JsonConvert.SerializeObject(model);
+            var recievers = _store.GetAllConnectionIds(eventGuid);
+
+            Clients.Clients(recievers).addVotesToSharedItem(ret);
         }
 
         /// <summary>
@@ -100,6 +118,19 @@ namespace GoAgile.Hubs
             var recievers = _store.GetAllConnectionIds(eventGuid);
 
             Clients.Clients(recievers).startPresentingMode();
+        }
+
+        /// <summary>
+        /// Retrospective voting starts, change state to 'voting'
+        /// </summary>
+        /// <param name="eventGuid"></param>
+        [Authorize]
+        public void startRetrospectiveVoting(string eventGuid)
+        {
+            _retrospectiveMan.ChangeToRetrospectiveToVoting(eventGuid);
+            var recievers = _store.GetAllConnectionIds(eventGuid);
+
+            Clients.Clients(recievers).startVotingMode();
         }
 
         /// <summary>

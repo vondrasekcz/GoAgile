@@ -64,9 +64,22 @@ namespace GoAgile.Dal
         void ChangeRetrospectiveToPresenting(string guidId);
 
         /// <summary>
+        /// Change Retrospective state to "voting"
+        /// </summary>
+        /// <param name="guidId">Retrospective GuidId</param>
+        void ChangeToRetrospectiveToVoting(string guidId);
+
+        /// <summary>
         /// Change Retrospective state to "finished"
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>
         void ChangeToRetrospectiveToFinished(string guidId);
+
+        /// <summary>
+        /// Increase number of votes in RetrospectiveItem
+        /// </summary>
+        /// <param name="voteModel"></param>
+        /// <returns>Votes total</returns>
+        int AddVotesToItem(string itemGuid);
     }
 }

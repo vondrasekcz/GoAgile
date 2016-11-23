@@ -6,6 +6,7 @@
 
 @section scripts{
     <link href="~/Content/GoAgileContent/well.css" rel="stylesheet" />
+    <link href="~/Content/GoAgileContent/text.css" rel="stylesheet" />
 <script>
     $(function () {
 
@@ -51,7 +52,7 @@
 
             $('#' + listId).prepend(
                 $('<li class="list-group-item well well-sm ' + well + ' clearfix">').append(
-                    $('<h5>' + text + '</h5>' +
+                    $('<h5 class="break-word">' + text + '</h5>' +
                       '<h6 class="text-right">' + autor + '</h6>'
             )));            
         };

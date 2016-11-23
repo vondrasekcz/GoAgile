@@ -227,6 +227,14 @@
     <Compile Include="DataContexts\AgileDbMigrations\201611102304332_RetrospectiveRepairsNulls.Designer.cs">
       <DependentUpon>201611102304332_RetrospectiveRepairsNulls.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataContexts\AgileDbMigrations\201611222321078_AddedVotes.cs" />
+    <Compile Include="DataContexts\AgileDbMigrations\201611222321078_AddedVotes.Designer.cs">
+      <DependentUpon>201611222321078_AddedVotes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataContexts\AgileDbMigrations\201611231855564_AddEnableVoting.cs" />
+    <Compile Include="DataContexts\AgileDbMigrations\201611231855564_AddEnableVoting.Designer.cs">
+      <DependentUpon>201611231855564_AddEnableVoting.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataContexts\AgileDbMigrations\Configuration.cs" />
     <Compile Include="DataContexts\IdentityDb.cs" />
     <Compile Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.cs" />
@@ -248,6 +256,7 @@
     <Compile Include="Models\DB\EventState.cs" />
     <Compile Include="Models\DB\RetrospectiveItem.cs" />
     <Compile Include="Dal\RetrospectiveManager.cs" />
+    <Compile Include="Models\Retrospective\VotingModel.cs" />
     <Compile Include="Models\ViewModels\AccountViewModels.cs" />
     <Compile Include="Models\Identity\IdentityModels.cs" />
     <Compile Include="Models\ViewModels\ManageViewModels.cs" />
@@ -433,6 +442,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611102304332_RetrospectiveRepairsNulls.resx">
       <DependentUpon>201611102304332_RetrospectiveRepairsNulls.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611222321078_AddedVotes.resx">
+      <DependentUpon>201611222321078_AddedVotes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611231855564_AddEnableVoting.resx">
+      <DependentUpon>201611231855564_AddEnableVoting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.resx">
       <DependentUpon>201611032226556_InitialCreate.cs</DependentUpon>

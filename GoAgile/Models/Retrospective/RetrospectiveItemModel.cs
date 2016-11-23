@@ -10,6 +10,8 @@
 
         public string Text { get; set; }
 
-        public string Autor { get; set; }        
+        public string Autor { get; set; }   
+        
+        public int Votes { get; set; }     
     }
 }

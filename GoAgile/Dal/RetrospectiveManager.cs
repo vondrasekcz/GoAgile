@@ -24,6 +24,16 @@ namespace GoAgile.Dal
                 dbItem.DatePlanned = model.DatePlanned;
                 dbItem.State = EventState.waiting;
                 dbItem.Owner = user;
+                if (model.EnableVotes == false)
+                {
+                    dbItem.Votes = 0;
+                    dbItem.EnableVoting = false;
+                }                    
+                else
+                {
+                    dbItem.Votes = model.MaxVotes;
+                    dbItem.EnableVoting = true;
+                }                    
 
                 db.Retrospectives.Add(dbItem);
                 db.SaveChanges();
@@ -104,17 +114,19 @@ namespace GoAgile.Dal
         {
             using (var db = AgileDb.Create())
             {
-                var model = db
+                var dbItem = db
                     .Retrospectives.SingleOrDefault(s => s.Id == guidId);
 
-                if (model == null)
+                if (dbItem == null)
                     return null;
 
                 var ret = new RetrospectiveInitModel()
                 {
-                   GuidId = model.Id,
-                   State = Enum.GetName(typeof(EventState), model.State),
-                   Owner = model.Owner
+                   GuidId = dbItem.Id,
+                   State = Enum.GetName(typeof(EventState), dbItem.State),
+                   Owner = dbItem.Owner,
+                   Votes = dbItem.Votes,
+                   EnableVoting = dbItem.EnableVoting
                 };
 
                 return ret;
@@ -133,6 +145,7 @@ namespace GoAgile.Dal
                 dbItem.Section = modelItem.Column;
                 dbItem.UserName = modelItem.Autor;
                 dbItem.Text = modelItem.Text;
+                dbItem.Votes = 0;
 
                 db.RetrospectiveItems.Add(dbItem);
                 db.SaveChanges();
@@ -154,6 +167,7 @@ namespace GoAgile.Dal
                         Column = s.Section,
                         Text = s.Text,
                         ItemGuid = s.Id,
+                        Votes = s.Votes,
                         ListId = s.Section == "Start" ? "list_start" : (s.Section == "Stop" ? "list_stop" : "list_continue")
                     }).ToList();
 
@@ -191,6 +205,20 @@ namespace GoAgile.Dal
         }
 
         /// <inheritdoc />
+        void IRetrospectiveManager.ChangeToRetrospectiveToVoting(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var dbItem = db.Retrospectives
+                    .Single(s => s.Id == guidId);
+
+                dbItem.State = EventState.voting;
+
+                db.SaveChanges();
+            }
+        }
+
+        /// <inheritdoc />
         void IRetrospectiveManager.ChangeToRetrospectiveToFinished(string guidId)
         {
             using (var db = AgileDb.Create())
@@ -203,7 +231,29 @@ namespace GoAgile.Dal
 
                 db.SaveChanges();
             }
-        }       
+        }
+
+        /// <inheritdoc />
+        int IRetrospectiveManager.AddVotesToItem(string itemGuid)
+        {
+            using (var db = AgileDb.Create())
+            {
+                try
+                {
+                    var dbItem = db.RetrospectiveItems
+                        .Single(s => s.Id == itemGuid);
+
+                    dbItem.Votes++;
+                    db.SaveChanges();
+
+                    return dbItem.Votes;
+                }
+                catch (Exception)
+                {
+                    return -1;
+                }
+            }
+        }
 
     }
 }

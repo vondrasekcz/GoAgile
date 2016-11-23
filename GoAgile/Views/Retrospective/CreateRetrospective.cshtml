@@ -32,6 +32,16 @@
                 @Html.TextBoxFor(m => m.DatePlanned, new { @class = "form-control", @placeholder = "dd/MM/yyyy", @id = "date" })
                 @Html.ValidationMessageFor(m => m.DatePlanned, "", new { @class = "text-danger" })
             </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.EnableVotes, new { @class = "control-label" })
+                @Html.CheckBoxFor(x => x.EnableVotes)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.MaxVotes, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.MaxVotes, new { @class = "form-control", @placeholder = "Number of Votes" })
+                @Html.ValidationMessageFor(m => m.MaxVotes, "", new { @class = "text-danger" })
+            </div>
+
             <input type="submit" value="Create" class="btn btn-primary" />
         </div>
     </div>

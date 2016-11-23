@@ -30,5 +30,11 @@ namespace GoAgile.Models.DB
         public string Comment { get; set; }
 
         public EventState State { get; set; }
+
+        [Required]
+        public bool EnableVoting { get; set; }
+
+        [Required]
+        public int Votes { get; set; }
     }
 }

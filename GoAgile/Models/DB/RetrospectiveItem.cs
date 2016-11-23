@@ -22,5 +22,8 @@ namespace GoAgile.Models.DB
         [Required]
         [StringLength(255)]
         public string Text { get; set; }
+
+        [Required]
+        public int Votes { get; set; }
     }   
 }

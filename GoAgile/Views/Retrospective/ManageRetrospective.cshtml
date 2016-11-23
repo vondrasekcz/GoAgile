@@ -17,7 +17,7 @@
             // Retrospective URL
             var ret_url;
 
-            //  state: "waiting", "running", "presenting", "finished"
+            //  state: "waiting", "running", "presenting", "voting","finished"
             var state;
 
             // Retrospective Guid
@@ -30,34 +30,45 @@
             // TODO: binary search and inser at position
             var itemIdList = [];
 
+            // Enabled voting
+            var enableVoting;
+
+            // number of Votes
+            var votes;
+
             // Page loaded
             $(document).ready(function () {
 
                 ret_url = '@Model.Url';
                 state = '@Model.State';
                 guidId = '@Model.GuidId';
+                votes = '@Model.Votes';
+                enableVoting = '@Model.EnableVoting';
+                
+                if (enableVoting == "False")
+                    $('#btn_startVoting').hide();
+                $('#div_avaibleVotes').text(votes);
+
                 user = "Project Manager";
 
                 $('#div_url').text(ret_url);
 
                 switch (state) {
                     case "waiting":
-                        disableListButtons(true);
-                        $('#manage_running').show();
-                        $('#btn_stop_running').prop('disabled', true);
+                        modeWaiting();
                         break;
                     case "running":
-                        $("#manage_running").show();
-                        $('#btn_start_running').prop('disabled', true);
-                        disableListButtons(false);
+                        modeRunning();
                         break;
                     case "presenting":
-                        $('#manage_presenting').show();
-                        disableListButtons(true);
+                        modePresenting();
                         // TODO: get all itemPending from ither PMs with enabled share button
                         break;
+                    case "voting":
+                        modeVoting();
+                        break;
                     case "finished":
-                        $('#modalFinished').modal('show');
+                        modeFinished();
                         break;
                 }
 
@@ -67,30 +78,30 @@
                 // Retrospective started running
                 retHub.client.startRunningMode = function () {
                     state = "running";
-                    $('#btn_start_running').prop('disabled', true);
-                    $('#btn_stop_running').prop('disabled', false);
-                    disableListButtons(false);
+                    modeRunning();
                 }
 
                 // Retrospective started presenting
                 retHub.client.startPresentingMode = function () {
                     state = "presenting";
-                    $("#manage_running").hide();
-                    $("#manage_presenting").show();
-                    $('.share').prop('disabled', false);
-                    $('.itemPending').prop('disabled', true);
-                    disableListButtons(true);
+                    modePresenting();
+                }
+
+                // Retrospective started voting
+                retHub.client.startVotingMode = function () {
+                    state = "voting";
+                    modeVoting();
                 }
 
                 // Retrospective is finished
                 retHub.client.retrospectiveFinished = function () {
                     state = "finished";
-                    $('#modalFinished').modal('show');
+                    modeFinished();
                 }
 
                 // Recieve shared Item
                 retHub.client.recieveSharedItem = function (item) {
-                    addSharedItem(item.ItemGuid, item.ListId, item.Column, item.Autor, item.Text);
+                    addSharedItem(item.ItemGuid, item.ListId, item.Column, item.Autor, item.Text, item.Votes);
                 }
 
                 // Recieve all shared Items
@@ -98,7 +109,7 @@
                     var item = $.parseJSON(data);
 
                     for (var i = 0; i < item.length; i++) {
-                        addSharedItem(item[i].ItemGuid, item[i].ListId, item[i].Column, item[i].Autor, item[i].Text);
+                        addSharedItem(item[i].ItemGuid, item[i].ListId, item[i].Column, item[i].Autor, item[i].Text, item[i].Votes);
                     }
                 }
 
@@ -117,9 +128,35 @@
                     $('#div_onlineUsers').text('Online Users: ' + i);
                 };
 
+
+
+
+                retHub.client.addVotesToSharedItem = function (data) {
+
+                    var item = $.parseJSON(data);
+
+                    sharedItemListId = item.Column;
+                    sharedItemGuid = item.SharedItemGuid;
+                    sharedItemVotes = item.VotesTotal;
+
+                    $('#' + sharedItemListId + ' li').each(function (index) {
+                        if ($(this).attr('name') == sharedItemGuid)
+                        {
+                            var element = $(this).find('.sharedItem_votes');
+                            if (element.attr('votes') < sharedItemVotes)
+                            {
+                                element.text('Votes: ' + sharedItemVotes);
+                                element.attr('votes', sharedItemVotes);
+                            }                                
+                        }                            
+                    });
+
+                };
+
+
                 // Connected to Hub
                 $.connection.hub.start().done(function () {
-                    if (state == "presenting")
+                    if (state == "presenting" || state == "voting" || state == "finished")
                         retHub.server.sendAllSharedItems(guidId);
 
                     retHub.server.logPm(guidId);
@@ -141,6 +178,28 @@
                     $(this).parent().parent().remove();
                 });
 
+
+
+
+                $(document).on('click', '.btn_shareVote', function () {
+                    $(this).prop('disabled', true);
+
+                    votes--;
+                    $('#div_avaibleVotes').text(votes);
+                    if (votes <= 0)
+                        $('.btn_shareVote').prop('disabled', true);                    
+
+                    var sharedIdGuid = $(this).parent().parent().parent().parent().parent().attr('name');
+                    var sharedColumn =  $(this).parent().parent().parent().parent().parent().attr('column');
+                    
+                    retHub.server.sharedItemVoted(sharedColumn, sharedIdGuid, guidId);
+                });
+
+
+
+
+
+
                 // Start Retrospective running
                 $('#btn_start_running').click(function () {
                     retHub.server.startRetrospectiveRunning(guidId);
@@ -151,8 +210,14 @@
                     retHub.server.startRetrospectivePresenting(guidId);
                 });
 
+                // Start Retrospective voting
+                $('#btn_startVoting')
+                .click(function () {
+                    retHub.server.startRetrospectiveVoting(guidId);
+                });
+
                 // Finish Retrospective
-                $('#btn_stop_presenting').click(function () {
+                $(document).on('click', '.finishRetrospective', function () {
                     retHub.server.retrospectiveComplete(guidId);
                 });
 
@@ -188,7 +253,7 @@
             // Add list item to list
             function addListItem(list, placeholder) {
                 $('#' + list).append(
-                   $('<li class="list-group-item well clearfix listBlock">').append(
+                   $('<li class="list-group-item well clearfix">').append(
                        $('<textarea type="textarea" class="form-control itemPending" rows="3" placeholder="' + placeholder + '"></textarea>' +
                          '<div class="btn-group" role="group">' +
                          '<input type="button" class="btn btn-success share" disabled value="Share"/>' +
@@ -198,8 +263,15 @@
             };
 
             // Add shared Item to list
-            function addSharedItem(itemGuid, listId, column, autor, text) {
+            function addSharedItem(itemGuid, listId, column, autor, text, totalVotes) {
                 var exist = false;
+                var hidden = "hidden";
+
+                if (enableVoting == "True" || (state == "finished" && enableVoting == "True"))
+                {
+                    hidden = "";
+                }
+                    
 
                 for (var i = 0; i < itemIdList.length; i++) {
                     if (itemGuid == itemIdList[i])
@@ -210,19 +282,71 @@
                     itemIdList.push(itemGuid);
 
                     $('#' + listId).prepend(
-                        $('<li class="list-group-item well well-success  clearfix listBlock">').append(
-                            $('<h4>' + column + '</h4><h5>by ' + autor + '</h5>' +
-                              '<textarea type="textarea" class="form-control itemPending" disabled rows="3">' + text + '</textarea>'
+                        $('<li class="list-group-item well well-sm well-successs clearfix" name="' + itemGuid + '" column="' + listId + '">').append(
+                            $('<div class="text-center">' + text + '<div>' +
+                                '<div class="row sharedItem_votingPanel"' + hidden + '>' +
+                                    '<div class="col-md-6 text-left">' +
+                                        '<div class="sharedItem_votes" votes="' + totalVotes + '">Votes: ' + totalVotes + '</div>' +
+                                    '</div>' +
+                                    '<div class="col-md-6 text-right">' +
+                                        '<input type="button" class="btn btn-xs btn-success btn_shareVote" value="Vote"/>' +
+                                    '</div>' +
+                                '</div>'
                     )));
                 }
-            };            
+            };
 
             // Disable list add (+) buttons
             function disableListButtons(state) {
                 $('#btn_start_addItem').prop('disabled', state);
                 $('#btn_continue_addItem').prop('disabled', state);
                 $('#btn_stop_addItem').prop('disabled', state);
-            };           
+            };
+
+            function modeWaiting() {
+                disableListButtons(true);
+                $('#manage_waiting').show();
+            };
+
+            function modeRunning() {
+                $('#manage_waiting').hide();
+                $('#manage_running').show();
+                disableListButtons(false);
+            };
+
+            function modePresenting() {
+                $('#manage_waiting').hide();
+                $('#manage_running').hide();
+                $('#manage_presenting').show();
+                $('.itemPending').prop('disabled', true);
+                disableListButtons(true);
+
+                $('.share').prop('disabled', false);
+            };
+
+            function modeVoting() {
+                $('.itemPending').hide();
+
+                $('#manage_waiting').hide();
+                $('#manage_running').hide();
+                $('#manage_presenting').hide();
+                $("#manage_voting").show();
+                disableListButtons(true);                
+                $('.sharedItem_votingPanel').show(); 
+            };
+
+            function modeFinished() {
+                $('.itemPending').hide();
+                $('.btn_shareVote').hide();
+
+                $('#manage_waiting').hide();
+                $('#manage_running').hide();
+                $('#manage_presenting').hide();
+                $("#manage_voting").hide();
+                $("#manage_finished").show();
+                disableListButtons(true);
+            };
+
 
         });
     </script>
@@ -240,8 +364,7 @@
                 Go to home page or see retrospective data
             </div>
             <div class="modal-footer">
-                <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
-                <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
+
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -262,7 +385,6 @@
     </div> <!-- /Online USers panel -->
      
     <div id="main">
-        <h2>Retrospective Manager</h2>
         <!-- Top well URL -->
         <div class="well">
             <div class="row text-center">
@@ -271,6 +393,17 @@
                     <font size="4"><div class="break-word" id="div_url"></div></font>
                 </div>
             </div>
+            <!-- Waiting State Manager -->
+            <div class="row" hidden id="manage_waiting">
+                <div class="col-md-6 text-center">
+
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="btn-group btn-group-lg pull-right" role="group">
+                        <button type="button" id="btn_start_running" class="btn btn-primary text-center">Start</button>
+                    </div>
+                </div>
+            </div> <!-- /Waiting State Manager -->
             <!-- Running State Manager -->
             <div class="row" hidden id="manage_running">
                 <div class="col-md-6 text-center">
@@ -278,25 +411,46 @@
                 </div>
                 <div class="col-md-6 text-center">
                     <div class="btn-group btn-group-lg pull-right" role="group">
-                        <button type="button" id="btn_start_running" class="btn btn-primary text-center">Start</button>
-                        <button type="button" id="btn_stop_running" class="btn btn-success text-center">Presenting Mode</button>
+                        <button type="button" id="btn_stop_running" class="btn btn-success text-center">Presenting</button>
                     </div>
                 </div>
-
             </div> <!-- /Running State Manager -->
             <!-- Presenting State Manager -->
             <div class="row" hidden id="manage_presenting">
-                <h3>Presenting Phase</h3>
+
                 <div class="col-md-6 text-center">
 
                 </div>
                 <div class="col-md-6 text-center">
                     <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
-                        <button type="button" id="btn_stop_presenting" class="btn btn-danger text-center">Finish Retrospective</button>
+                        <button type="button" id="btn_startVoting" class="btn btn-success text-center">Voting</button>
+                        <button type="button" class="btn btn-danger text-center finishRetrospective">Finish</button>
                     </div>
                 </div>
-
             </div> <!-- /Presenting State Manager -->
+            <!-- Voting State Manager -->
+            <div class="row" hidden id="manage_voting">
+                <div class="col-md-6 text-center">
+                    <div id="div_avaibleVotes"></div>
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
+                        <button type="button" class="btn btn-danger text-center finishRetrospective">Finish</button>
+                    </div>
+                </div>
+            </div> <!-- /Voting State Manager -->
+            <!-- Finished State Manager -->
+            <div class="row" hidden id="manage_finished">
+                <div class="col-md-6 text-center">
+
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
+                        <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
+                        <button type="button" id="btn_history" class="btn btn-primary text-center">See Detail</button>
+                    </div>
+                </div>
+            </div> <!-- /Finished State Manager -->
         </div> <!-- /Top well URL -->
         <!-- Columns Start, Continue, Stop -->
         <div class="row">
