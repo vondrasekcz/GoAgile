@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
+using System.Security.AccessControl;
 
 namespace GoAgile.Helpers.Logic
 {
@@ -77,13 +79,25 @@ namespace GoAgile.Helpers.Logic
 
             return retros.GetAllConnectionsIds();
         }
+
+        public bool AddVote(string retrospectiveGuidId, string connectionId, string voteId)
+        {
+            EventStore retros;
+            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
+            if (retros == null)
+                return false;
+
+            return retros.AddVote(connectionId: connectionId, voteId: voteId);
+        }
     }
 
     public class EventStore
     {
-        private  HashSet<string> _projectManager = new HashSet<string>();
+        private HashSet<string> _projectManager = new HashSet<string>();
 
-        private  Dictionary<string, string> _users = new Dictionary<string, string>();
+        private HashSet<string> _voted = new HashSet<string>();
+
+        private Dictionary<string, User> _users = new Dictionary<string, User>();
 
         public void AddPm(string connectionId)
         {
@@ -92,7 +106,9 @@ namespace GoAgile.Helpers.Logic
 
         public void AddUser(string name, string connectionId)
         {
-            _users.Add(key: connectionId, value: name);
+            var user = new User() {UserName = name, Voted = new HashSet<string>()};
+
+            _users.Add(key: connectionId, value: user);
         }
 
         // rewrite
@@ -116,7 +132,7 @@ namespace GoAgile.Helpers.Logic
             
             foreach (var item in _users)
             {
-                ret.Add(item.Value);
+                ret.Add(item.Value.UserName);
             }
             return ret;
         }
@@ -137,5 +153,41 @@ namespace GoAgile.Helpers.Logic
 
             return ret;
         }
+
+        public bool AddVote(string connectionId, string voteId)
+        {
+            if (_projectManager.Contains(connectionId))
+            {
+                if (_voted.Contains(voteId))
+                    return false;
+                else
+                {
+                    _voted.Add(voteId);
+                    return true;
+                }
+            }
+            else
+            {
+                User user;
+                var ret = _users.TryGetValue(connectionId, out user);
+                if (ret == false)
+                    return false;
+                if (user.Voted.Contains(voteId))
+                    return false;
+                else
+                {
+                    user.Voted.Add(voteId);
+                    return true;
+                }
+            }
+
+        }
+    }
+
+    public class User
+    {
+        public string UserName { get; set; }
+
+        public HashSet<string> Voted = new HashSet<string>();
     }
 }

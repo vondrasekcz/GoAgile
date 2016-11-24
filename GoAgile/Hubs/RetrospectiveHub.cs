@@ -60,7 +60,6 @@ namespace GoAgile.Hubs
 
             var recievers = _store.GetAllConnectionIds(eventGuid);
 
-            // TODO: only to specific group by eventGuid
             Clients.Clients(recievers).recieveSharedItem(itemModel);
         }
 
@@ -76,13 +75,15 @@ namespace GoAgile.Hubs
             Clients.Caller.recieveAllSharedItems(ret);
         }
 
-        /// <summary>
-        /// Save and Send Votes of shared Item
-        /// </summary>
-        /// <param name="column"></param>
-        /// <param name="sharedItemGuid"></param>
+
+
+
         public void sharedItemVoted(string column, string sharedItemGuid, string eventGuid)
         {
+
+            if (!_store.AddVote(eventGuid, GetClientId(), sharedItemGuid))
+                return;
+
             int totalVotes;
             if ((totalVotes = _retrospectiveMan.AddVotesToItem(sharedItemGuid)) < 0)
                 return;
@@ -140,6 +141,8 @@ namespace GoAgile.Hubs
         [Authorize]
         public void retrospectiveComplete(string eventGuid)
         {
+            // TODO delete retrospective in _store
+
             _retrospectiveMan.ChangeToRetrospectiveToFinished(eventGuid);
             var recievers = _store.GetAllConnectionIds(eventGuid);
 
