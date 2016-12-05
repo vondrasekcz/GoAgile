@@ -238,22 +238,30 @@ namespace GoAgile.Dal
         {
             using (var db = AgileDb.Create())
             {
-                try
-                {
-                    var dbItem = db.RetrospectiveItems
-                        .Single(s => s.Id == itemGuid);
+                var dbItem = db.RetrospectiveItems
+                    .Single(s => s.Id == itemGuid);
 
-                    dbItem.Votes++;
-                    db.SaveChanges();
+                dbItem.Votes++;
+                db.SaveChanges();
 
-                    return dbItem.Votes;
-                }
-                catch (Exception)
-                {
-                    return -1;
-                }
+                return dbItem.Votes;
             }
         }
 
+        int IRetrospectiveManager.GetMaxVotes(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var retrospective = db.Retrospectives
+                    .Single(s => s.Id == guidId);
+
+                if (retrospective.State != EventState.voting)
+                    return -1;
+                else if(!retrospective.EnableVoting)
+                    return 0;
+                else
+                    return retrospective.Votes;
+            }
+        }
     }
 }

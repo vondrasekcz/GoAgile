@@ -81,5 +81,12 @@ namespace GoAgile.Dal
         /// <param name="voteModel"></param>
         /// <returns>Votes total</returns>
         int AddVotesToItem(string itemGuid);
+
+        /// <summary>
+        /// Determinate if voting is enables, and return max votes
+        /// </summary>
+        /// <param name="guidId"></param>
+        /// <returns>0 - disabled voding, less than 0 - invalid phase, more than 0 - max votes</returns>
+        int GetMaxVotes(string guidId);
     }
 }

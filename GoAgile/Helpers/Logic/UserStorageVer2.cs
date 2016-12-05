@@ -91,6 +91,13 @@ namespace GoAgile.Helpers.Logic
         }
     }
 
+
+
+
+
+
+
+
     public class EventStore
     {
         private HashSet<string> _projectManager = new HashSet<string>();
@@ -98,6 +105,9 @@ namespace GoAgile.Helpers.Logic
         private HashSet<string> _voted = new HashSet<string>();
 
         private Dictionary<string, User> _users = new Dictionary<string, User>();
+
+        private int _maxVotes;
+
 
         public void AddPm(string connectionId)
         {
@@ -107,7 +117,6 @@ namespace GoAgile.Helpers.Logic
         public void AddUser(string name, string connectionId)
         {
             var user = new User() {UserName = name, Voted = new HashSet<string>()};
-
             _users.Add(key: connectionId, value: user);
         }
 
@@ -184,10 +193,11 @@ namespace GoAgile.Helpers.Logic
         }
     }
 
-    public class User
-    {
-        public string UserName { get; set; }
 
-        public HashSet<string> Voted = new HashSet<string>();
-    }
+
+
+
+
+
+
 }

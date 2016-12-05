@@ -1,0 +1,253 @@
+﻿using System.Collections.Generic;
+
+namespace GoAgile.Helpers.Logic
+{
+    public sealed class StoreRet
+    {
+        private static readonly StoreRet _instance = new StoreRet();
+
+        private Dictionary<string, EventRet> _retrospectives = new Dictionary<string, EventRet>();
+
+        private Dictionary<string, string> _connectionIds = new Dictionary<string, string>();
+
+        private StoreRet()
+        {
+        }
+
+        public static StoreRet GetInstance
+        {
+            get
+            {
+                return _instance;
+            }
+        }
+
+        // maybe delete this method
+        public void AddRet(string GuidId)
+        {
+            if (!_retrospectives.ContainsKey(GuidId))
+                _retrospectives.Add(GuidId, new EventRet());
+        }
+
+        public void DeleteRet(string GuidId)
+        {
+            var ConnectionIds = GetAllConnectionIds(GuidId);
+
+            foreach (var conId in ConnectionIds)
+                _connectionIds.Remove(conId);
+
+            _retrospectives.Remove(GuidId);
+        }
+
+        public bool AddPm(string connectionId, string retrospectiveGuidId)
+        {
+            if (!_retrospectives.ContainsKey(retrospectiveGuidId))
+                AddRet(retrospectiveGuidId);
+
+            EventRet ret;
+            _retrospectives.TryGetValue(retrospectiveGuidId, out ret);
+
+            if (ret != null)
+                ret.AddPm(connectionId);
+
+            _connectionIds.Add(connectionId, retrospectiveGuidId);
+
+            return true;
+        }
+
+        public bool AddUser(string name, string connectionId, string retrospectiveGuidId)
+        {
+            if (!_retrospectives.ContainsKey(retrospectiveGuidId))
+                AddRet(retrospectiveGuidId);
+
+            EventRet ret;
+            _retrospectives.TryGetValue(retrospectiveGuidId, out ret);
+
+            if (ret != null)
+                ret.AddUser(name: name, connectionId: connectionId);
+            else
+                return false;
+
+            _connectionIds.Add(connectionId, retrospectiveGuidId);
+
+            return true;
+        }
+
+        public string DeleteUser(string connectionId)
+        {
+            if (!_connectionIds.ContainsKey(connectionId))
+                return null;
+
+            string retroId;
+            _connectionIds.TryGetValue(connectionId, out retroId);
+            if (retroId != null)
+                _connectionIds.Remove(connectionId);
+
+            EventRet retros;
+            _retrospectives.TryGetValue(retroId, out retros);
+            if (retros != null)
+                retros.DeleteUser(connectionId);
+
+            return retroId;
+        }
+
+        public List<string> GetAllUsers(string retrospectiveGuidId)
+        {
+            EventRet retros;
+            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
+            if (retros == null)
+                return null;
+
+            return retros.GetAllUsers();
+        }
+
+        public List<string> GetAllConnectionIds(string retrospectiveGuidId)
+        {
+            EventRet retros;
+            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
+            if (retros == null)
+                return null;
+
+            return retros.GetAllConnectionsIds();
+        }
+
+        public bool AddVote(string retrospectiveGuidId, string connectionId, string voteId)
+        {
+            EventRet retros;
+            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
+            if (retros == null)
+                return false;
+
+            return retros.AddVote(connectionId: connectionId, voteId: voteId);
+        }
+
+        public List<string> GetRemainingVotes(string retrospectiveGuidId)
+        {
+            EventRet retros;
+            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
+            if (retros == null)
+                return null;
+
+            return retros.GetRemainingVotes();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    public class EventRet
+    {
+        private HashSet<string> _projectManager;
+        private HashSet<string> _votedPm;
+        private Dictionary<string, User> _users;
+        private string _pmName;
+
+        public EventRet()
+        {
+            _projectManager = new HashSet<string>();
+            _votedPm = new HashSet<string>();
+            _users = new Dictionary<string, User>();
+            _pmName = "Project Manager";
+        }
+
+        public void AddPm(string connectionId)
+        {
+            _projectManager.Add(connectionId);
+        }
+
+        public void AddUser(string name, string connectionId)
+        {
+            var user = new User() { UserName = name, Voted = new HashSet<string>() };
+            _users.Add(key: connectionId, value: user);
+        }
+
+        public void DeleteUser(string connectionId)
+        {
+            _projectManager.Remove(connectionId);
+            _users.Remove(connectionId);
+        }
+
+        public List<string> GetAllUsers()
+        {
+            List<string> ret = new List<string>();
+
+            if ((_projectManager.Count) > 0)
+                ret.Add(_pmName);
+            
+            foreach (var item in _users)
+                ret.Add(item.Value.UserName);
+            
+            return ret;
+        }
+
+        public List<string> GetAllConnectionsIds()
+        {
+            List<string> ret = new List<string>();
+
+            foreach (var item in _projectManager)
+                ret.Add(item);
+
+            foreach (var item in _users)
+                ret.Add(item.Key);
+
+            return ret;
+        }
+
+        public bool AddVote(string connectionId, string voteId)
+        {
+            if (_projectManager.Contains(connectionId))
+            {
+                if (_votedPm.Contains(voteId))
+                    return false;
+                else
+                {
+                    _votedPm.Add(voteId);
+                    return true;
+                }
+            }
+            else
+            {
+                User user;
+                var ret = _users.TryGetValue(connectionId, out user);
+                if (ret == false)
+                    return false;
+                if (user.Voted.Contains(voteId))
+                    return false;
+                else
+                {
+                    user.Voted.Add(voteId);
+                    return true;
+                }
+            }
+
+        }
+
+        public List<string> GetRemainingVotes()
+        {
+            List<string> ret = new List<string>();
+
+            // TODO
+
+            return ret;
+        }
+    }
+
+
+
+
+
+
+
+    public class User
+    {
+        public string UserName { get; set; }
+
+        public HashSet<string> Voted = new HashSet<string>();
+    }
+}

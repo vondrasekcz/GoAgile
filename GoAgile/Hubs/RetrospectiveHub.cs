@@ -10,7 +10,7 @@ namespace GoAgile.Hubs
 {
     public class RetrospectiveHub : Hub
     {
-        private static UserStorageVer2 _store = new UserStorageVer2();
+        private static StoreRet _store;
 
         private static readonly object Locker = new object();
 
@@ -22,6 +22,7 @@ namespace GoAgile.Hubs
         public RetrospectiveHub()
         {
             _retrospectiveMan = new RetrospectiveManager();
+            _store = StoreRet.GetInstance;
         }
 
 
@@ -33,7 +34,7 @@ namespace GoAgile.Hubs
         /// <param name="eventGuid"></param>
         public void loginUser(string name, string email, string eventGuid)
         {
-            if (!IsUserLoginInputValid(email: email, name: name, eventGuid: eventGuid))
+            if (!IsUserLoginInputValid(name: name))
                 // TODO: Return object with valdiation messages
                 Clients.Caller.invalidLoginInput();
             else
@@ -80,6 +81,9 @@ namespace GoAgile.Hubs
 
         public void sharedItemVoted(string column, string sharedItemGuid, string eventGuid)
         {
+            var maxVotes = _retrospectiveMan.GetMaxVotes(eventGuid);
+            if (maxVotes < 1)
+                return;
 
             if (!_store.AddVote(eventGuid, GetClientId(), sharedItemGuid))
                 return;
@@ -88,6 +92,9 @@ namespace GoAgile.Hubs
             if ((totalVotes = _retrospectiveMan.AddVotesToItem(sharedItemGuid)) < 0)
                 return;
                 
+            // musim si nechat vratit uyivatelovo conID a zbivajici pocet hlasu
+            // potom vratim ten objekt jak mam a k tomu pridam kolik hlasu uzivatel jeste ma
+
             var model = new VotingModel() { Column = column, SharedItemGuid = sharedItemGuid, VotesTotal = totalVotes };
             var ret = JsonConvert.SerializeObject(model);
             var recievers = _store.GetAllConnectionIds(eventGuid);
@@ -147,6 +154,8 @@ namespace GoAgile.Hubs
             var recievers = _store.GetAllConnectionIds(eventGuid);
 
             Clients.Clients(recievers).retrospectiveFinished();
+
+            _store.DeleteRet(eventGuid);
         }
 
 
@@ -159,12 +168,14 @@ namespace GoAgile.Hubs
 
 
 
-       
 
 
 
+        [Authorize]
         public void logPm(string guidId)
         {
+            
+
             lock (_store) { _store.AddPm(connectionId: GetClientId(), retrospectiveGuidId: guidId); }
             UsersChanged(guidId);
         }
@@ -187,7 +198,7 @@ namespace GoAgile.Hubs
         public override System.Threading.Tasks.Task OnDisconnected(bool aaa)
         {
             string ret;
-            lock (_store) { ret = _store.Delete(GetClientId()); }
+            lock (_store) { ret = _store.DeleteUser(GetClientId()); }
             if (ret != null)
                 UsersChanged(ret);
 
@@ -245,17 +256,12 @@ namespace GoAgile.Hubs
         /// <summary>
         /// Valdiate User Login Input
         /// </summary>
-        /// <param name="email"></param>
         /// <param name="name"></param>
-        /// <param name="eventGuid"></param>
         /// <returns>InvalidLoginUserMessage with ivalid inputs</returns>
-        private bool IsUserLoginInputValid(string email, string name, string eventGuid)
+        private bool IsUserLoginInputValid(string name)
         {
             // TODO: return error and validation messages
             if (string.IsNullOrWhiteSpace(name))
-                return false;
-
-            if (!string.IsNullOrWhiteSpace(email) && !IsValidEmail(email))
                 return false;
 
             return true;
