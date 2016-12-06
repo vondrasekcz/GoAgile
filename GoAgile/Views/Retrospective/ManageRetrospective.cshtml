@@ -19,10 +19,7 @@
 
             //  state: "waiting", "running", "presenting", "voting","finished"
             var state;
-
-            // Retrospective Guid
-            var guidId;
-
+             
             // User Name
             var user;
 
@@ -41,13 +38,12 @@
 
                 ret_url = '@Model.Url';
                 state = '@Model.State';
-                guidId = '@Model.GuidId';
                 votes = '@Model.Votes';
                 enableVoting = '@Model.EnableVoting';
-                
+
                 if (enableVoting == "False")
                     $('#btn_startVoting').hide();
-                $('#div_avaibleVotes').text(votes);
+                $('#div_avaibleVotes').text("Remaining votes " + votes);
 
                 user = "Project Manager";
 
@@ -102,24 +98,20 @@
                 // Recieve shared Item
                 retHub.client.recieveSharedItem = function (data) {
                     var item = $.parseJSON(data);
-                    var listId;
-                    if (item.Column == "Start")
-                        listId = "list_start";
-                    else if (item.Column == "Stop")
-                        listId = "list_stop";
-                    else
-                        listId = "list_continue";
 
-                    addSharedItem(item.ItemGuid, listId, item.Column, item.Autor, item.Text, item.Votes);
+                    addSharedItem(item.ItemGuid, item.Column, item.Autor, item.Text, item.Votes, item.CanVote);
                 }
 
                 // Recieve all shared Items
                 retHub.client.recieveAllSharedItems = function (data) {
                     var item = $.parseJSON(data);
+                    var votes = item.remainingVotes;
+                    if (votes < 0)
+                        votes = 0;
+                    $('#div_avaibleVotes').text("Remaining votes " + votes);
 
-                    for (var i = 0; i < item.length; i++) {
-                        addSharedItem(item[i].ItemGuid, item[i].ListId, item[i].Column, item[i].Autor, item[i].Text, item[i].Votes);
-                    }
+                    for (var i = 0; i < item.items.length; i++)
+                        addSharedItem(item.items[i].ItemGuid, item.items[i].Column, item.items[i].Autor, item.items[i].Text, item.items[i].Votes, item.items[i].CanVote);
                 }
 
                 // update Online Users
@@ -150,7 +142,7 @@
                     sharedItemRemainingVotes = item.RemainnigVotes;
                     sharedItemEnableVoting = item.EnableThisItemVoting;
 
-                    $('#div_avaibleVotes').text(sharedItemRemainingVotes);
+                    $('#div_avaibleVotes').text("Remaining votes " + sharedItemRemainingVotes);
                     if (sharedItemRemainingVotes <= 0)
                         $('.btn_shareVote').prop('disabled', true);
 
@@ -169,8 +161,8 @@
                             {
                                 element.text('Votes: ' + sharedItemVotes);
                                 element.attr('votes', sharedItemVotes);
-                            }                                
-                        }                            
+                            }
+                        }
                     });
 
                 };
@@ -178,10 +170,7 @@
 
                 // Connected to Hub
                 $.connection.hub.start().done(function () {
-                    if (state == "presenting" || state == "voting" || state == "finished")
-                        retHub.server.sendAllSharedItems(guidId);
-
-                    retHub.server.logPm(guidId);
+                    retHub.server.logPm('@Model.GuidId');
                 });
 
                 // Share Item
@@ -205,7 +194,7 @@
                 $(document).on('click', '.btn_shareVote', function () {
                     var sharedIdGuid = $(this).parent().parent().parent().parent().parent().attr('name');
                     var sharedColumn =  $(this).parent().parent().parent().parent().parent().attr('column');
-                    
+
                     retHub.server.sharedItemVoted(sharedColumn, sharedIdGuid);
                 });
 
@@ -237,7 +226,7 @@
 
                 // Navigate to Retrospective History
                 $('#btn_history').click(function () {
-                    var url = '@Url.Action("RetrospectiveDetail", "Retrospective")' + "/" + guidId;
+                    var url = '@Url.Action("RetrospectiveDetail", "Retrospective")' + "/" + '@Model.GuidId';
                     window.location.href = url;
                 });
 
@@ -277,15 +266,27 @@
             };
 
             // Add shared Item to list
-            function addSharedItem(itemGuid, listId, column, autor, text, totalVotes) {
+            function addSharedItem(itemGuid, column, autor, text, totalVotes, canVote) {
                 var exist = false;
                 var hidden = "hidden";
+                var disabled = "";
+                var listId;
 
-                if (enableVoting == "True" || (state == "finished" && enableVoting == "True"))
-                {
+                if (column == "Start")
+                    listId = "list_start";
+                else if (column == "Stop")
+                    listId = "list_stop";
+                else
+                    listId = "list_continue";
+
+                if (enableVoting == "True" && state == "voting" )
                     hidden = "";
-                }
-                    
+
+                console.log(canVote);
+                if (canVote == false)
+                    disabled = "disabled";
+                
+                      
 
                 for (var i = 0; i < itemIdList.length; i++) {
                     if (itemGuid == itemIdList[i])
@@ -303,7 +304,7 @@
                                         '<div class="sharedItem_votes" votes="' + totalVotes + '">Votes: ' + totalVotes + '</div>' +
                                     '</div>' +
                                     '<div class="col-md-6 text-right">' +
-                                        '<input type="button" class="btn btn-xs btn-success btn_shareVote" value="Vote"/>' +
+                                        '<input type="button" class="btn btn-xs btn-success btn_shareVote" ' + disabled + ' value="Vote"/>' +
                                     '</div>' +
                                 '</div>'
                     )));
@@ -345,8 +346,8 @@
                 $('#manage_running').hide();
                 $('#manage_presenting').hide();
                 $("#manage_voting").show();
-                disableListButtons(true);                
-                $('.sharedItem_votingPanel').show(); 
+                disableListButtons(true);
+                $('.sharedItem_votingPanel').show();
             };
 
             function modeFinished() {
@@ -387,7 +388,7 @@
 
 
  <!-- Page -->
-<div class="container">      
+<div class="container-fluid">      
 
            
     <!-- Online USers panel-->

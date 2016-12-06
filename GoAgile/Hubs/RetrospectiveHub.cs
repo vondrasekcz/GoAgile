@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNet.SignalR;
 using GoAgile.Helpers.Logic;
+using GoAgile.Models.DB;
 using GoAgile.Models.Retrospective;
 using GoAgile.Helpers.StoreModels;
 using GoAgile.Dal;
@@ -64,24 +65,30 @@ namespace GoAgile.Hubs
             Clients.Clients(recievers).recieveSharedItem(item);
         }
 
-
-
         /// <summary>
         /// Send all shared items
         /// </summary>
         /// <param name="eventGuid"></param>
-        public void sendAllSharedItems(string eventGuid)
+        public void sendAllSharedItems()
         {
+            var connectionId = GetClientId();
+            var eventGuid = _store.GetUsersEventId(connectionId);
+
+            // Retrospective doesn't exist or isn't in 'presenting', 'voting' or 'finished' phase
+            var phase = _retrospectiveMan.GetRetrospectivePhase(eventGuid);
+            if (phase == EventState.waiting.ToString() || phase == EventState.running.ToString())
+                return;
+
+            // pridat pro ktere uz nemuze hlasovat
+
             var list = _retrospectiveMan.GetAllSharedItems(eventGuid);
             string ret = JsonConvert.SerializeObject(list);
 
             Clients.Caller.recieveAllSharedItems(ret);
         }
 
-
-
         /// <summary>
-        /// Add vote do Retrospective Item
+        /// Add vote to Retrospective Item
         /// </summary>
         /// <param name="column"></param>
         /// <param name="sharedItemGuid"></param>
@@ -95,7 +102,7 @@ namespace GoAgile.Hubs
                 return;
 
             // Retrospective isn't in 'voting' phase or voding is disabled       
-            var maxVotes = _retrospectiveMan.GetMaxVotes(eventGuid);
+            var maxVotes = _retrospectiveMan.GetMaxVotesAndValidataVoting(eventGuid);
             if (maxVotes < 1)
                 return;
 
@@ -257,30 +264,50 @@ namespace GoAgile.Hubs
 
             Clients.Clients(recievers).recieveOnlineUsers(item);
         }
-
-
-
-
-
-
-
-
-
+        
         /// <summary>
         /// Add moderator to user store
         /// </summary>
         /// <param name="guidId"></param>
         [Authorize]
-        public void logPm(string guidId)
+        public void logPm(string eventGuid)
         {
+            var connectionId = GetClientId();
             var name = Context.User.Identity.Name;
-            if (!_retrospectiveMan.ValidateOwner(guidId, name))
+            if (!_retrospectiveMan.ValidateOwner(eventGuid, name))
                 // TODO: return error message
                 return;
+                       
+            _store.AddPm(connectionId: connectionId, retrospectiveGuidId: eventGuid);
+            UsersChanged(eventGuid);
 
-            _store.AddPm(connectionId: GetClientId(), retrospectiveGuidId: guidId);
-            UsersChanged(guidId);
+            // Retrospective doesn't exist or isn't in 'presenting', 'voting' or 'finished' phase
+            var phase = _retrospectiveMan.GetRetrospectivePhase(eventGuid);
+            if (phase == EventState.waiting.ToString() || phase == EventState.running.ToString())
+                return;        
+
+            var list = _retrospectiveMan.GetAllSharedItems(eventGuid);
+            var allItems = new AllSaredItemsModel() { items = list, remainingVotes = 0 };
+            var maxVotes = _retrospectiveMan.GetMaxVotes(eventGuid);
+
+            if (maxVotes > 0)
+            {
+                allItems.remainingVotes = maxVotes;
+                if (phase == EventState.voting.ToString())
+                    _store.AddUserVotes(eventGuid, connectionId, allItems);
+            }
+
+            string item = JsonConvert.SerializeObject(allItems);
+
+            Clients.Caller.recieveAllSharedItems(item);
         }
+
+
+
+
+
+
+
 
         public void logUser(string name, string guidId)
         {
@@ -305,6 +332,9 @@ namespace GoAgile.Hubs
             else
                 Clients.Caller.userLogged(name);
         }
+
+
+
 
         /// <summary>
         /// Valdiate User Login Input

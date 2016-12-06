@@ -49,7 +49,7 @@ namespace GoAgile.Dal
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>
         /// <returns>IList of Retrospective shared Items</returns>
-        IList<RetrospectiveItemModel> GetAllSharedItems(string guidId);
+        List<RetrospectiveItemModel> GetAllSharedItems(string guidId);
 
         /// <summary>
         /// Change Retrospective state to "running"
@@ -109,7 +109,7 @@ namespace GoAgile.Dal
         /// </summary>
         /// <param name="guidId"></param>
         /// <returns>0 - disabled voding, less than 0 - invalid phase, more than 0 - max votes</returns>
-        int GetMaxVotes(string guidId);
+        int GetMaxVotesAndValidataVoting(string guidId);
 
         /// <summary>
         /// Validate owner
@@ -125,5 +125,12 @@ namespace GoAgile.Dal
         /// <param name="guidId"></param>
         /// <returns></returns>
         bool ExistRetrospective(string guidId);
+
+        /// <summary>
+        /// Get max votes
+        /// </summary>
+        /// <param name="guidId"></param>
+        /// <returns></returns>
+        int GetMaxVotes(string guidId);
     }
 }

@@ -152,11 +152,12 @@ namespace GoAgile.Dal
 
                 modelItem.ItemGuid = dbItem.Id;
                 modelItem.Votes = 0;
+                modelItem.CanVote = true;
             }
         }
 
         /// <inheritdoc />
-        IList<RetrospectiveItemModel> IRetrospectiveManager.GetAllSharedItems(string guidId)
+        List<RetrospectiveItemModel> IRetrospectiveManager.GetAllSharedItems(string guidId)
         {
             using (var db = AgileDb.Create())
             {
@@ -168,7 +169,8 @@ namespace GoAgile.Dal
                         Column = s.Section,
                         Text = s.Text,
                         ItemGuid = s.Id,
-                        Votes = s.Votes
+                        Votes = s.Votes,
+                        CanVote = true
                     }).ToList();
 
                 return ret;
@@ -299,7 +301,7 @@ namespace GoAgile.Dal
         }
 
         /// <inheritdoc />
-        int IRetrospectiveManager.GetMaxVotes(string guidId)
+        int IRetrospectiveManager.GetMaxVotesAndValidataVoting(string guidId)
         {
             using (var db = AgileDb.Create())
             {
@@ -341,6 +343,23 @@ namespace GoAgile.Dal
                 if (dbItem != null)
                     return true;
                 return false;
+            }
+        }
+
+        /// <inheritdoc />
+        int IRetrospectiveManager.GetMaxVotes(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var dbItem = db.Retrospectives
+                    .SingleOrDefault(s => s.Id == guidId);
+
+                if (dbItem == null)
+                    return -1;
+                else if (dbItem.EnableVoting == false)
+                    return 0;
+                else
+                    return dbItem.Votes;                
             }
         }
     }

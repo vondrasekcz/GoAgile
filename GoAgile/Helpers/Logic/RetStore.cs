@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GoAgile.Helpers.StoreModels;
+using GoAgile.Models.Retrospective;
 
 namespace GoAgile.Helpers.Logic
 {
@@ -136,6 +137,15 @@ namespace GoAgile.Helpers.Logic
 
             return retros.GetUsersAndVotes(sharedItemGuid);
         }
+
+        public AllSaredItemsModel AddUserVotes(string retrospectiveGuidId, string connectionId, AllSaredItemsModel allItems)
+        {
+            EventRet retros;
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
+                return allItems;
+
+            return retros.AddUserVotes(allItems, connectionId);
+        }
     }
 
 
@@ -248,6 +258,21 @@ namespace GoAgile.Helpers.Logic
                 ret.Add(new UsersVotes { ConnectionId = user.Key, Voted = user.Value.Voted.Count, EnableVotingForItem = !_votedPm.Contains(sharedItemGuid) });
 
             return ret;
+        }
+
+        public AllSaredItemsModel AddUserVotes(AllSaredItemsModel allItems, string connectionId)
+        {
+            if (!_projectManager.Contains(connectionId))
+                return allItems;
+
+            foreach (var item in allItems.items)
+            {
+                if (_votedPm.Contains(item.ItemGuid))
+                    item.CanVote = false;
+            }
+            allItems.remainingVotes -= _votedPm.Count;
+
+            return allItems;
         }
     }
 

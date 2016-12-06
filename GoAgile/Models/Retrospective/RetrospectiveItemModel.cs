@@ -11,5 +11,7 @@
         public string Autor { get; set; }   
         
         public int Votes { get; set; }     
+
+        public bool CanVote { get; set; }
     }
 }

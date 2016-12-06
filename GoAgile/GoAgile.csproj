@@ -247,6 +247,7 @@
     </Compile>
     <Compile Include="Helpers\Logic\RetStore.cs" />
     <Compile Include="Helpers\StoreModels\UsersVotes.cs" />
+    <Compile Include="Models\Retrospective\AllSaredItemsModel.cs" />
     <Compile Include="Models\Retrospective\EventModel.cs" />
     <Compile Include="Models\Retrospective\FullRetrospectiveModel.cs" />
     <Compile Include="Models\Retrospective\RetrospectiveInitModel.cs" />
