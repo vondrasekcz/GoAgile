@@ -5,6 +5,8 @@ Scripts
  - own files
 
  GoAgile
+ - enable connect to retorpsective when is finished? reconnect to detail?
+	- retrospective complete disconnect all from signalR
  - CLIENT - !!!!! some state structure for easy reading code !!!!!!!!!!!!!!!!!
  - Application Name and logo
  - SignalR - browser limits now 5 connections
@@ -45,7 +47,5 @@ README.md
 
  Hubs:
   - RetrospectiveHub
-	- online users - send to specific groups only
-    - when state is finished, dont store online users
 	- maybe recieve object? instead of string, string, ...
-	- Disble log name as Project Manager
+	- log all changes connection and discconection

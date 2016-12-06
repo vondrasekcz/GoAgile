@@ -7,5 +7,9 @@
         public string SharedItemGuid { get; set; }
 
         public int VotesTotal { get; set; }
+
+        public int RemainnigVotes { get; set; }
+
+        public bool EnableThisItemVoting { get; set; }
     }
 }

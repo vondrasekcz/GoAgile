@@ -100,8 +100,17 @@
                 }
 
                 // Recieve shared Item
-                retHub.client.recieveSharedItem = function (item) {
-                    addSharedItem(item.ItemGuid, item.ListId, item.Column, item.Autor, item.Text, item.Votes);
+                retHub.client.recieveSharedItem = function (data) {
+                    var item = $.parseJSON(data);
+                    var listId;
+                    if (item.Column == "Start")
+                        listId = "list_start";
+                    else if (item.Column == "Stop")
+                        listId = "list_stop";
+                    else
+                        listId = "list_continue";
+
+                    addSharedItem(item.ItemGuid, listId, item.Column, item.Autor, item.Text, item.Votes);
                 }
 
                 // Recieve all shared Items
@@ -138,10 +147,23 @@
                     sharedItemListId = item.Column;
                     sharedItemGuid = item.SharedItemGuid;
                     sharedItemVotes = item.VotesTotal;
+                    sharedItemRemainingVotes = item.RemainnigVotes;
+                    sharedItemEnableVoting = item.EnableThisItemVoting;
+
+                    $('#div_avaibleVotes').text(sharedItemRemainingVotes);
+                    if (sharedItemRemainingVotes <= 0)
+                        $('.btn_shareVote').prop('disabled', true);
+
+
+
+
 
                     $('#' + sharedItemListId + ' li').each(function (index) {
                         if ($(this).attr('name') == sharedItemGuid)
                         {
+                            if (sharedItemEnableVoting = "false")
+                                $(this).find('.btn_shareVote').prop('disabled', true);
+
                             var element = $(this).find('.sharedItem_votes');
                             if (element.attr('votes') < sharedItemVotes)
                             {
@@ -164,13 +186,12 @@
 
                 // Share Item
                 $(document).on("click", '.share', function () {
-                    listId = $(this).parent().parent().parent().attr('id');
                     column = $(this).parent().parent().parent().attr('name');
                     text = $(this).parent().parent().find('.itemPending').val();
 
                     $(this).parent().parent().remove();
 
-                    retHub.server.sendSharedItem(listId, column, text, user, guidId);
+                    retHub.server.sendSharedItem(column, text, user);
                 });
 
                 // Delete Item from columns
@@ -182,17 +203,10 @@
 
 
                 $(document).on('click', '.btn_shareVote', function () {
-                    //$(this).prop('disabled', true);
-
-                    votes--;
-                    $('#div_avaibleVotes').text(votes);
-                    if (votes <= 0)
-                        $('.btn_shareVote').prop('disabled', true);                    
-
                     var sharedIdGuid = $(this).parent().parent().parent().parent().parent().attr('name');
                     var sharedColumn =  $(this).parent().parent().parent().parent().parent().attr('column');
                     
-                    retHub.server.sharedItemVoted(sharedColumn, sharedIdGuid, guidId);
+                    retHub.server.sharedItemVoted(sharedColumn, sharedIdGuid);
                 });
 
 
@@ -202,23 +216,23 @@
 
                 // Start Retrospective running
                 $('#btn_start_running').click(function () {
-                    retHub.server.startRetrospectiveRunning(guidId);
+                    retHub.server.startRetrospectiveRunning();
                 });
 
                 // Start Retrospective presenting
                 $('#btn_stop_running').click(function () {
-                    retHub.server.startRetrospectivePresenting(guidId);
+                    retHub.server.startRetrospectivePresenting();
                 });
 
                 // Start Retrospective voting
                 $('#btn_startVoting')
                 .click(function () {
-                    retHub.server.startRetrospectiveVoting(guidId);
+                    retHub.server.startRetrospectiveVoting();
                 });
 
                 // Finish Retrospective
                 $(document).on('click', '.finishRetrospective', function () {
-                    retHub.server.retrospectiveComplete(guidId);
+                    retHub.server.retrospectiveComplete();
                 });
 
                 // Navigate to Retrospective History

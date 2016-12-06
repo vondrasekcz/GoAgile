@@ -42,7 +42,7 @@ namespace GoAgile.Dal
         /// <param name="model">RetrospectiveItemModel</param>
         /// <param name="retrospectiveGuidId">Retrospective GuidId</param>
         /// <returns>RetrospectiveItem GuidId</returns>
-        string AddRetrospectiveItem(RetrospectiveItemModel modelItem, string retrospectiveGuidId);
+        void AddRetrospectiveItem(RetrospectiveItemModel modelItem, string retrospectiveGuidId);
 
         /// <summary>
         /// Get all shared Retrospective Items
@@ -55,25 +55,47 @@ namespace GoAgile.Dal
         /// Change Retrospective state to "running"
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>
-        void ChangeRetrospectiveToRunning(string guidId);
+        /// <param name="moderator">Owner name to check</param>
+        /// <returns>False if moderator isn't owner</returns>
+        bool ChangeRetrospectiveToRunning(string guidId, string moderator);
 
         /// <summary>
         /// Change Retrospective state to "presenting"
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>
-        void ChangeRetrospectiveToPresenting(string guidId);
+        /// <param name="moderator">Owner name to check</param>
+        /// <returns>False if moderator isn't owner</returns>
+        bool ChangeRetrospectiveToPresenting(string guidId, string moderator);
 
         /// <summary>
         /// Change Retrospective state to "voting"
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>
-        void ChangeToRetrospectiveToVoting(string guidId);
+        /// <param name="moderator">Owner name to check</param>
+        /// <returns>False if moderator isn't owner</returns>
+        bool ChangeToRetrospectiveToVoting(string guidId, string moderator);
 
         /// <summary>
         /// Change Retrospective state to "finished"
         /// </summary>
         /// <param name="guidId">Retrospective GuidId</param>
-        void ChangeToRetrospectiveToFinished(string guidId);
+        /// <param name="moderator">Owner name to check</param>
+        /// <returns>False if moderator isn't owner</returns>
+        bool ChangeToRetrospectiveToFinished(string guidId, string moderator);
+
+        /// <summary>
+        /// Get Retospective phase
+        /// </summary>
+        /// <param name="guidId"></param>
+        /// <returns></returns>
+        string GetRetrospectivePhase(string guidId);
+
+        /// <summary>
+        /// Determine if retrospectiveItem exist
+        /// </summary>
+        /// <param name="guidId"></param>
+        /// <returns></returns>
+        bool ExistRetrospectiveItem(string itemGuidId, string eventGuidId);
 
         /// <summary>
         /// Increase number of votes in RetrospectiveItem
@@ -88,5 +110,20 @@ namespace GoAgile.Dal
         /// <param name="guidId"></param>
         /// <returns>0 - disabled voding, less than 0 - invalid phase, more than 0 - max votes</returns>
         int GetMaxVotes(string guidId);
+
+        /// <summary>
+        /// Validate owner
+        /// </summary>
+        /// <param name="guidId"></param>
+        /// <param name="name">moderator name</param>
+        /// <returns></returns>
+        bool ValidateOwner(string guidId, string name);
+
+        /// <summary>
+        /// Exist this retrospective
+        /// </summary>
+        /// <param name="guidId"></param>
+        /// <returns></returns>
+        bool ExistRetrospective(string guidId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GoAgile.Helpers.StoreModels;
 
 namespace GoAgile.Helpers.Logic
 {
@@ -9,6 +10,12 @@ namespace GoAgile.Helpers.Logic
         private Dictionary<string, EventRet> _retrospectives = new Dictionary<string, EventRet>();
 
         private Dictionary<string, string> _connectionIds = new Dictionary<string, string>();
+
+
+        // TODO:
+        private static readonly object Locker = new object();
+
+
 
         private StoreRet()
         {
@@ -45,10 +52,10 @@ namespace GoAgile.Helpers.Logic
                 AddRet(retrospectiveGuidId);
 
             EventRet ret;
-            _retrospectives.TryGetValue(retrospectiveGuidId, out ret);
-
-            if (ret != null)
+            if (_retrospectives.TryGetValue(retrospectiveGuidId, out ret))
                 ret.AddPm(connectionId);
+            else
+                return false;                
 
             _connectionIds.Add(connectionId, retrospectiveGuidId);
 
@@ -61,9 +68,7 @@ namespace GoAgile.Helpers.Logic
                 AddRet(retrospectiveGuidId);
 
             EventRet ret;
-            _retrospectives.TryGetValue(retrospectiveGuidId, out ret);
-
-            if (ret != null)
+            if (_retrospectives.TryGetValue(retrospectiveGuidId, out ret))
                 ret.AddUser(name: name, connectionId: connectionId);
             else
                 return false;
@@ -73,19 +78,24 @@ namespace GoAgile.Helpers.Logic
             return true;
         }
 
+        public string GetUsersEventId(string connectionId)
+        {
+            string eventGuid;
+            if (_connectionIds.TryGetValue(connectionId, out eventGuid))
+                return eventGuid;
+            return null;
+        }
+
         public string DeleteUser(string connectionId)
         {
-            if (!_connectionIds.ContainsKey(connectionId))
+            string retroId;
+            if (_connectionIds.TryGetValue(connectionId, out retroId))
+                _connectionIds.Remove(connectionId);
+            else
                 return null;
 
-            string retroId;
-            _connectionIds.TryGetValue(connectionId, out retroId);
-            if (retroId != null)
-                _connectionIds.Remove(connectionId);
-
             EventRet retros;
-            _retrospectives.TryGetValue(retroId, out retros);
-            if (retros != null)
+            if (_retrospectives.TryGetValue(retroId, out retros))
                 retros.DeleteUser(connectionId);
 
             return retroId;
@@ -94,41 +104,37 @@ namespace GoAgile.Helpers.Logic
         public List<string> GetAllUsers(string retrospectiveGuidId)
         {
             EventRet retros;
-            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
-            if (retros == null)
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
                 return null;
-
+        
             return retros.GetAllUsers();
         }
 
         public List<string> GetAllConnectionIds(string retrospectiveGuidId)
         {
             EventRet retros;
-            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
-            if (retros == null)
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
                 return null;
 
             return retros.GetAllConnectionsIds();
         }
 
-        public bool AddVote(string retrospectiveGuidId, string connectionId, string voteId)
+        public bool Vote(string retrospectiveGuidId, string connectionId, string voteId, int maxVotes)
         {
             EventRet retros;
-            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
-            if (retros == null)
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
                 return false;
 
-            return retros.AddVote(connectionId: connectionId, voteId: voteId);
+            return retros.Vote(connectionId: connectionId, voteId: voteId, maxVotes: maxVotes);
         }
 
-        public List<string> GetRemainingVotes(string retrospectiveGuidId)
+        public List<UsersVotes> GetUsersAndVotes(string retrospectiveGuidId, string sharedItemGuid)
         {
             EventRet retros;
-            _retrospectives.TryGetValue(retrospectiveGuidId, out retros);
-            if (retros == null)
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
                 return null;
 
-            return retros.GetRemainingVotes();
+            return retros.GetUsersAndVotes(sharedItemGuid);
         }
     }
 
@@ -199,7 +205,7 @@ namespace GoAgile.Helpers.Logic
             return ret;
         }
 
-        public bool AddVote(string connectionId, string voteId)
+        public bool Vote(string connectionId, string voteId, int maxVotes)
         {
             if (_projectManager.Contains(connectionId))
             {
@@ -207,32 +213,39 @@ namespace GoAgile.Helpers.Logic
                     return false;
                 else
                 {
-                    _votedPm.Add(voteId);
-                    return true;
+                    if (_votedPm.Count < maxVotes)
+                        _votedPm.Add(voteId);
+                    else
+                        return false;
                 }
             }
             else
             {
                 User user;
-                var ret = _users.TryGetValue(connectionId, out user);
-                if (ret == false)
+                if (!_users.TryGetValue(connectionId, out user))
                     return false;
                 if (user.Voted.Contains(voteId))
                     return false;
                 else
                 {
-                    user.Voted.Add(voteId);
-                    return true;
-                }
+                    if (user.Voted.Count < maxVotes)
+                        user.Voted.Add(voteId);
+                    else
+                        return false;
+                }   
             }
-
+            return true;               
         }
 
-        public List<string> GetRemainingVotes()
+        public List<UsersVotes> GetUsersAndVotes(string sharedItemGuid)
         {
-            List<string> ret = new List<string>();
+            var ret = new List<UsersVotes>();
 
-            // TODO
+            int pmVoted = _votedPm.Count;
+            foreach (var pm in _projectManager)
+                ret.Add(new UsersVotes { ConnectionId = pm, Voted = pmVoted, EnableVotingForItem = !_votedPm.Contains(sharedItemGuid) });
+            foreach (var user in _users)
+                ret.Add(new UsersVotes { ConnectionId = user.Key, Voted = user.Value.Voted.Count, EnableVotingForItem = !_votedPm.Contains(sharedItemGuid) });
 
             return ret;
         }

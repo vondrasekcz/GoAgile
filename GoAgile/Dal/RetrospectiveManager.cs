@@ -1,10 +1,10 @@
-﻿using GoAgile.DataContexts;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using GoAgile.DataContexts;
 using GoAgile.Models;
 using GoAgile.Models.DB;
-using System;
-using System.Linq;
 using GoAgile.Models.Retrospective;
-using System.Collections.Generic;
 
 namespace GoAgile.Dal
 {
@@ -134,7 +134,7 @@ namespace GoAgile.Dal
         }
 
         /// <inheritdoc />
-        string IRetrospectiveManager.AddRetrospectiveItem(RetrospectiveItemModel modelItem, string retrospectiveGuidId)
+        void IRetrospectiveManager.AddRetrospectiveItem(RetrospectiveItemModel modelItem, string retrospectiveGuidId)
         {
             using (var db = AgileDb.Create())
             {
@@ -150,7 +150,8 @@ namespace GoAgile.Dal
                 db.RetrospectiveItems.Add(dbItem);
                 db.SaveChanges();
 
-                return dbItem.Id;
+                modelItem.ItemGuid = dbItem.Id;
+                modelItem.Votes = 0;
             }
         }
 
@@ -167,8 +168,7 @@ namespace GoAgile.Dal
                         Column = s.Section,
                         Text = s.Text,
                         ItemGuid = s.Id,
-                        Votes = s.Votes,
-                        ListId = s.Section == "Start" ? "list_start" : (s.Section == "Stop" ? "list_stop" : "list_continue")
+                        Votes = s.Votes
                     }).ToList();
 
                 return ret;
@@ -176,60 +176,110 @@ namespace GoAgile.Dal
         }
 
         /// <inheritdoc />
-        void IRetrospectiveManager.ChangeRetrospectiveToRunning(string guidId)
+        bool IRetrospectiveManager.ChangeRetrospectiveToRunning(string guidId, string moderator)
         {
             using (var db = AgileDb.Create())
             {
                 var dbItem = db.Retrospectives
                     .Single(s => s.Id == guidId);
 
-                dbItem.State = EventState.running;
-                dbItem.DateStared = DateTime.Now;
+                if (moderator == dbItem.Owner
+                    && dbItem.State == EventState.waiting)
+                {
+                    dbItem.State = EventState.running;
+                    dbItem.DateStared = DateTime.Now;
 
-                db.SaveChanges();
+                    db.SaveChanges();
+                    return true;
+                }
+                return false;
             }
         }
 
         /// <inheritdoc />
-        void IRetrospectiveManager.ChangeRetrospectiveToPresenting(string guidId)
+        bool IRetrospectiveManager.ChangeRetrospectiveToPresenting(string guidId, string moderator)
         {
             using (var db = AgileDb.Create())
             {
                 var dbItem = db.Retrospectives
                     .Single(s => s.Id == guidId);
 
-                dbItem.State = EventState.presenting;
+                if (moderator == dbItem.Owner
+                    && dbItem.State == EventState.running)
+                {
+                    dbItem.State = EventState.presenting;
 
-                db.SaveChanges();
+                    db.SaveChanges();
+                    return true;
+                }
+                return false;
             }
         }
 
         /// <inheritdoc />
-        void IRetrospectiveManager.ChangeToRetrospectiveToVoting(string guidId)
+        bool IRetrospectiveManager.ChangeToRetrospectiveToVoting(string guidId, string moderator)
         {
             using (var db = AgileDb.Create())
             {
                 var dbItem = db.Retrospectives
                     .Single(s => s.Id == guidId);
 
-                dbItem.State = EventState.voting;
+                if (moderator == dbItem.Owner
+                    && dbItem.State == EventState.presenting)
+                {
+                    dbItem.State = EventState.voting;
 
-                db.SaveChanges();
+                    db.SaveChanges();
+                    return true;
+                }
+                return false;
             }
         }
 
         /// <inheritdoc />
-        void IRetrospectiveManager.ChangeToRetrospectiveToFinished(string guidId)
+        bool IRetrospectiveManager.ChangeToRetrospectiveToFinished(string guidId, string moderator)
         {
             using (var db = AgileDb.Create())
             {
                 var dbItem = db.Retrospectives
                     .Single(s => s.Id == guidId);
 
-                dbItem.State = EventState.finished;
-                dbItem.DateFinished = DateTime.Now;
+                if (moderator == dbItem.Owner
+                    && (dbItem.State == EventState.presenting
+                     || dbItem.State == EventState.voting) )
+                {
+                    dbItem.State = EventState.finished;
+                    dbItem.DateFinished = DateTime.Now;
 
-                db.SaveChanges();
+                    db.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        string IRetrospectiveManager.GetRetrospectivePhase(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var dbItem = db.Retrospectives
+                    .SingleOrDefault(s => s.Id == guidId);
+
+                return (dbItem == null) ? null : Enum.GetName(typeof(EventState), dbItem.State);
+            }
+        }
+
+        /// <inheritdoc />
+        bool IRetrospectiveManager.ExistRetrospectiveItem(string itemGuidId, string eventGuidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var ret = db.RetrospectiveItems
+                    .Any(s => s.Id == itemGuidId
+                              && s.Retrospective == eventGuidId);
+
+                return ret;
             }
         }
 
@@ -248,19 +298,49 @@ namespace GoAgile.Dal
             }
         }
 
+        /// <inheritdoc />
         int IRetrospectiveManager.GetMaxVotes(string guidId)
         {
             using (var db = AgileDb.Create())
             {
-                var retrospective = db.Retrospectives
+                var dbItem = db.Retrospectives
                     .Single(s => s.Id == guidId);
 
-                if (retrospective.State != EventState.voting)
+                if (dbItem.State != EventState.voting)
                     return -1;
-                else if(!retrospective.EnableVoting)
+                else if(!dbItem.EnableVoting)
                     return 0;
                 else
-                    return retrospective.Votes;
+                    return dbItem.Votes;
+            }
+        }
+
+        /// <inheritdoc />
+        bool IRetrospectiveManager.ValidateOwner(string guidId, string name)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var dbItem = db.Retrospectives
+                    .SingleOrDefault(s => s.Id == guidId);
+
+                if (dbItem != null
+                    && dbItem.Owner == name)
+                    return true;
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        bool IRetrospectiveManager.ExistRetrospective(string guidId)
+        {
+            using (var db = AgileDb.Create())
+            {
+                var dbItem = db.Retrospectives
+                    .SingleOrDefault(s => s.Id == guidId);
+
+                if (dbItem != null)
+                    return true;
+                return false;
             }
         }
     }
