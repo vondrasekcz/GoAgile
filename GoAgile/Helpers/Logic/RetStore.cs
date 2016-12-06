@@ -79,6 +79,15 @@ namespace GoAgile.Helpers.Logic
             return true;
         }
 
+        public string GetUserName(string connectionId, string retrospectiveGuidId)
+        {
+            EventRet retros;
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
+                return null;
+
+            return retros.GetUserName(connectionId);
+        }
+
         public string GetUsersEventId(string connectionId)
         {
             string eventGuid;
@@ -183,6 +192,18 @@ namespace GoAgile.Helpers.Logic
             _users.Add(key: connectionId, value: user);
         }
 
+        public string GetUserName(string connectionId)
+        {
+
+            if (_projectManager.Contains(connectionId))
+                return "Project Manager";
+
+            User user;
+            if (!_users.TryGetValue(connectionId, out user))
+                return null;
+            return user.UserName;
+        }
+
         public void DeleteUser(string connectionId)
         {
             _projectManager.Remove(connectionId);
@@ -265,12 +286,12 @@ namespace GoAgile.Helpers.Logic
             if (!_projectManager.Contains(connectionId))
                 return allItems;
 
-            foreach (var item in allItems.items)
+            foreach (var item in allItems.Items)
             {
                 if (_votedPm.Contains(item.ItemGuid))
                     item.CanVote = false;
             }
-            allItems.remainingVotes -= _votedPm.Count;
+            allItems.RemainingVotes -= _votedPm.Count;
 
             return allItems;
         }

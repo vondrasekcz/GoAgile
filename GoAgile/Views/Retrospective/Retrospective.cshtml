@@ -34,10 +34,8 @@
             $(document).ready(function () {
                 state = '@Model.State';
                 guidId = '@Model.GuidId';
-                if (state == "finished")
-                    $('#modalFinished').modal('show');
-                else
-                    $('#modalLogin').modal('show');
+
+                $('#modalLogin').modal('show');
 
                 // Inicialize hub connection
                 var retHub = $.connection.retrospectiveHub;
@@ -45,12 +43,12 @@
                 // Invalid input Login modal
                 // TODO: valdiate message
                 retHub.client.invalidLoginInput = function () {
+
                     $('#testInValidInput').text("invalid input");
                 };
 
                 // User is logged
                 retHub.client.userLogged = function (nickName) {
-                    retHub.server.logUser(nickName, guidId);
 
                     user = nickName;
                     switch (state) {
@@ -128,8 +126,6 @@
 
                 // Connected to Hub
                 $.connection.hub.start().done(function () {
-                    if (state == "presenting")
-                        retHub.server.sendAllSharedItems(guidId);
                 });
 
                 // Share Item
@@ -226,8 +222,6 @@
 }
 
 
-
-
 <!-- Modal LogIn-->
 <div class="modal fade" id="modalLogin" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog" role="document">
@@ -238,52 +232,20 @@
             <div class="modal-body">
                 <form id="logInForm">
                     <div class="form-group">
+                        <div id="testInValidInput"></div>
                         <label class="control-label">NickName:</label>
                         <input type="text" class="form-control" id="modalNickName" name="modalNickName" placeholder="Enter Nick Name">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <!-- remove after implementation of valdiation messages --> <div id="testInValidInput"></div>
                 <button type="button" id="modalLogInButton" class="btn btn-primary text-center">Enter</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-<!-- Modal Waiting-->
-<div class="modal fade" id="modalWaiting" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary text-center">
-                <h1>Waiting for the Start</h1>
-            </div>
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                Please Wait until Retrospective starts.
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<!-- Modal Finished-->
-<div class="modal fade" id="modalFinished" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary text-center">
-                <h1>Retrospective is Done</h1>
-            </div>
-            <div class="modal-body">
-                Go to home page or see retrospective data
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
-                <button type="button" id="btn_history" class="btn btn-primary text-center">Data</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 
 
-<br>
 <div class="container-fluid">
     <!-- Online USers panel-->
     <div id="mySidenav" class="sidenav">
@@ -292,6 +254,33 @@
     </div> <!-- /Online USers panel -->
     <!-- Columns Start, Continue, Stop -->
     <div id="main">
+        <!-- Top well -->
+        <div class="well">
+            <!-- Waiting State Manager -->
+            <div class="row text-center" hidden id="manage_waiting">
+                <div class="loader"></div>
+                Please Wait until Retrospective starts.
+            </div> <!-- /Waiting State Manager -->
+            <!-- Running State Manager -->
+            <div class="row text-center" hidden id="manage_running">
+
+            </div> <!-- /Running State Manager -->
+            <!-- Presenting State Manager -->
+            <div class="row text-center" hidden id="manage_presenting">
+
+            </div> <!-- /Presenting State Manager -->
+            <!-- Voting State Manager -->
+            <div class="row text-center" hidden id="manage_voting">
+                <div id="div_avaibleVotes"></div>
+            </div> <!-- /Voting State Manager -->
+            <!-- Finished State Manager -->
+            <div class="row" hidden id="manage_finished">
+                <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
+                    <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
+                    <button type="button" id="btn_history" class="btn btn-primary text-center">See Detail</button>
+                </div>
+            </div> <!-- /Finished State Manager -->
+        </div> <!-- /Top well -->
         <div class="row">
             <div class="col-sm-4 text-center">
                 <div class="title-marketing"><h3>Start</h3></div>

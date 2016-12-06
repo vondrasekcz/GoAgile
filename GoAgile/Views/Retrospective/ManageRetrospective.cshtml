@@ -19,7 +19,7 @@
 
             //  state: "waiting", "running", "presenting", "voting","finished"
             var state;
-             
+
             // User Name
             var user;
 
@@ -58,7 +58,6 @@
                         break;
                     case "presenting":
                         modePresenting();
-                        // TODO: get all itemPending from ither PMs with enabled share button
                         break;
                     case "voting":
                         modeVoting();
@@ -103,15 +102,18 @@
                 }
 
                 // Recieve all shared Items
-                retHub.client.recieveAllSharedItems = function (data) {
+                retHub.client.recieveAllSharedItemsMng = function (data) {
                     var item = $.parseJSON(data);
-                    var votes = item.remainingVotes;
+                    var votes = item.RemainingVotes;
                     if (votes < 0)
                         votes = 0;
                     $('#div_avaibleVotes').text("Remaining votes " + votes);
 
-                    for (var i = 0; i < item.items.length; i++)
-                        addSharedItem(item.items[i].ItemGuid, item.items[i].Column, item.items[i].Autor, item.items[i].Text, item.items[i].Votes, item.items[i].CanVote);
+                    for (var i = 0; i < item.Items.length; i++)
+                        addSharedItem(item.Items[i].ItemGuid, item.Items[i].Column, item.Items[i].Autor, item.Items[i].Text, item.Items[i].Votes, item.Items[i].CanVote);
+
+                    if (item.Phase != state)
+                        retHub.server.GetState();                    
                 }
 
                 // update Online Users
@@ -180,7 +182,7 @@
 
                     $(this).parent().parent().remove();
 
-                    retHub.server.sendSharedItem(column, text, user);
+                    retHub.server.sendSharedItem(column, text);
                 });
 
                 // Delete Item from columns
@@ -285,8 +287,8 @@
                 console.log(canVote);
                 if (canVote == false)
                     disabled = "disabled";
-                
-                      
+
+
 
                 for (var i = 0; i < itemIdList.length; i++) {
                     if (itemGuid == itemIdList[i])
@@ -366,25 +368,6 @@
         });
     </script>
 }
-
-
-<!-- Modal Finished-->
-<div class="modal fade" id="modalFinished" hidden tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary text-center">
-                <h1>Retrospective is Done</h1>
-            </div>
-            <div class="modal-body">
-                Go to home page or see retrospective data
-            </div>
-            <div class="modal-footer">
-
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
 
 
  <!-- Page -->

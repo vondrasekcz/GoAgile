@@ -4,8 +4,10 @@ namespace GoAgile.Models.Retrospective
 {
     public class AllSaredItemsModel
     {
-        public List<RetrospectiveItemModel> items { get; set; }
+        public List<RetrospectiveItemModel> Items { get; set; }
 
-        public int remainingVotes;
+        public int RemainingVotes { get; set; }
+
+        public string Phase { get; set; }
     }
 }
