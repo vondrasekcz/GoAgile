@@ -107,39 +107,6 @@ namespace GoAgile.Hubs
                 Clients.Client(user.ConnectionId).addVotesToSharedItem(item);
             }
         }
-        
-        /// <summary>
-        /// Change state to caller
-        /// </summary>
-        public void GetState()
-        {
-            var connectionId = GetClientId();
-            var eventGuid = _store.GetUsersEventId(connectionId);
-
-            // Cant find user connectionId
-            if (eventGuid == null)
-                return;
-
-            var phase = _retrospectiveMan.GetRetrospectivePhase(eventGuid);
-            switch (phase)
-            {
-                case "waiting":
-                    break;
-                case "running":
-                    Clients.Caller.startRunningMode();
-                    break;
-                case "presenting":
-                    Clients.Caller.startPresentingMode();
-                    break;
-                case "voting":
-                    Clients.Caller.startVotingMode();
-                    break;
-                case "finished":
-                    Clients.Caller.retrospectiveFinished();
-                    break;
-
-            }
-        }
 
         /// <summary>
         /// Retrospective starts, change state to 'running'
@@ -249,6 +216,117 @@ namespace GoAgile.Hubs
 
             return base.OnDisconnected(stopCalled);
         }
+                        
+        /// <summary>
+        /// Add moderator to user store
+        /// </summary>
+        /// <param name="guidId"></param>
+        [Authorize]
+        public void logPm(string eventGuid)
+        {
+            var connectionId = GetClientId();
+            var name = Context.User.Identity.Name;
+            if (!_retrospectiveMan.ValidateOwner(eventGuid, name))
+                // TODO: return error message
+                return;
+                       
+            _store.AddPm(connectionId: connectionId, retrospectiveGuidId: eventGuid);
+            UsersChanged(eventGuid);
+
+            // Retrospective doesn't exist or isn't in 'presenting', 'voting' or 'finished' phase
+            var phase = _retrospectiveMan.GetRetrospectivePhase(eventGuid);
+            switch (phase)
+            {
+                case "waiting":
+                    return;
+                case "running":
+                    Clients.Caller.startRunningMode();
+                    return;
+                case "presenting":
+                    Clients.Caller.startPresentingMode();
+                    break;
+                case "voting":
+                    Clients.Caller.startVotingMode();
+                    break;
+                case "finished":
+                    Clients.Caller.retrospectiveFinished();
+                    break;
+                default:
+                    return;
+            }
+
+            SendAllSharedItems(eventGuid, connectionId, phase);
+        }  
+
+        /// <summary>
+        /// Recieve login user request from client
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="eventGuid"></param>
+        public void loginUser(string name, string eventGuid)
+        {
+            var connectionId = GetClientId();
+            if (!_retrospectiveMan.ExistRetrospective(eventGuid))
+                return;
+
+            var message = IsUserLoginInputValid(name);
+            if (message != null)
+            {
+                Clients.Caller.invalidLoginInput(message);
+                return;
+            }
+            _store.AddUser(name: name, connectionId: GetClientId(), retrospectiveGuidId: eventGuid);
+            UsersChanged(eventGuid);
+            Clients.Caller.userLogged(name);
+
+            // Retrospective doesn't exist or isn't in 'presenting', 'voting' or 'finished' phase
+            var phase = _retrospectiveMan.GetRetrospectivePhase(eventGuid);
+            switch (phase)
+            {
+                case "waiting":
+                    return;
+                case "running":
+                    Clients.Caller.startRunningMode();
+                    return;
+                case "presenting":
+                    Clients.Caller.startPresentingMode();
+                    break;
+                case "voting":
+                    Clients.Caller.startVotingMode();
+                    break;
+                case "finished":
+                    Clients.Caller.retrospectiveFinished();
+                    break;
+                default:
+                    return;
+            }
+
+            SendAllSharedItems(eventGuid, connectionId, phase);
+        }
+
+        /// <summary>
+        /// Send All shared Items to caller
+        /// </summary>
+        /// <param name="eventGuid"></param>
+        /// <param name="connectionId"></param>
+        /// <param name="phase"></param>
+        private void SendAllSharedItems(string eventGuid, string connectionId, string phase)
+        {
+            var list = _retrospectiveMan.GetAllSharedItems(eventGuid);
+            var allItems = new AllSaredItemsModel() { Items = list, RemainingVotes = 0, Phase = phase };
+            var maxVotes = _retrospectiveMan.GetMaxVotes(eventGuid);
+
+            if (maxVotes > 0)
+            {
+                allItems.RemainingVotes = maxVotes;
+                if (phase == EventState.voting.ToString())
+                    _store.AddUserVotes(eventGuid, connectionId, allItems);
+            }
+
+            string item = JsonConvert.SerializeObject(allItems);
+
+            Clients.Caller.recieveAllSharedItemsMng(item);
+        }
 
         /// <summary>
         /// Get user connectID
@@ -278,77 +356,6 @@ namespace GoAgile.Hubs
 
             Clients.Clients(recievers).recieveOnlineUsers(item);
         }
-        
-        /// <summary>
-        /// Add moderator to user store
-        /// </summary>
-        /// <param name="guidId"></param>
-        [Authorize]
-        public void logPm(string eventGuid)
-        {
-            var connectionId = GetClientId();
-            var name = Context.User.Identity.Name;
-            if (!_retrospectiveMan.ValidateOwner(eventGuid, name))
-                // TODO: return error message
-                return;
-                       
-            _store.AddPm(connectionId: connectionId, retrospectiveGuidId: eventGuid);
-            UsersChanged(eventGuid);
-
-            // Retrospective doesn't exist or isn't in 'presenting', 'voting' or 'finished' phase
-            var phase = _retrospectiveMan.GetRetrospectivePhase(eventGuid);
-            if (phase == EventState.waiting.ToString() || phase == EventState.running.ToString() ||phase == null)
-                return;     
-
-            var list = _retrospectiveMan.GetAllSharedItems(eventGuid);
-            var allItems = new AllSaredItemsModel() { Items = list, RemainingVotes = 0, Phase = phase };
-            var maxVotes = _retrospectiveMan.GetMaxVotes(eventGuid);
-
-            if (maxVotes > 0)
-            {
-                allItems.RemainingVotes = maxVotes;
-                if (phase == EventState.voting.ToString())
-                    _store.AddUserVotes(eventGuid, connectionId, allItems);
-            }
-
-            string item = JsonConvert.SerializeObject(allItems);
-
-            Clients.Caller.recieveAllSharedItemsMng(item);
-        }
-
-        /// <summary>
-        /// Recieve login user request from client
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="eventGuid"></param>
-        public void loginUser(string name, string eventGuid)
-        {
-            var connectionId = GetClientId();
-            if (!_retrospectiveMan.ExistRetrospective(eventGuid))
-                return;
-
-            var validation = new LoginValidation();
-            validation = IsUserLoginInputValid(name, validation);
-            if (!validation.Valid)
-            {
-                string valItem = JsonConvert.SerializeObject(validation);
-                Clients.Caller.invalidLoginInput(valItem);
-                return;
-            }
-            _store.AddUser(name: name, connectionId: GetClientId(), retrospectiveGuidId: eventGuid);
-            UsersChanged(eventGuid);
-            Clients.Caller.userLogged(name);
-
-            // Retrospective doesn't exist or isn't in 'presenting', 'voting' or 'finished' phase
-            var phase = _retrospectiveMan.GetRetrospectivePhase(eventGuid);
-            if (phase == EventState.waiting.ToString() || phase == EventState.running.ToString() || phase == null)
-                return;
-
-            var list = _retrospectiveMan.GetAllSharedItems(eventGuid);
-            string item = JsonConvert.SerializeObject(list);
-
-            Clients.Caller.recieveAllSharedItems(item);
-        }
 
         /// <summary>
         /// Validate User login input
@@ -356,14 +363,13 @@ namespace GoAgile.Hubs
         /// <param name="name">User name</param>
         /// <param name="validation">Validation object</param>
         /// <returns></returns>
-        private LoginValidation IsUserLoginInputValid(string name, LoginValidation validation)
+        private string IsUserLoginInputValid(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                validation.Valid = false;
-                validation.Message.Add("Your name cannot be empty.");
+                return "Your name cannot be empty.";
             }
-            return validation;
+            return null;
         }
 
 

@@ -17,9 +17,9 @@ Start to do
 
 Views
  - if disabled textrea dont change it to grey color
- - restructure hidding, first hide, then show
  - CreateRetrospective
 	- glyphcons - datepicker
+	- remake
  - Retrospective
 	- textarea auto-expand: http://www.jacklmoore.com/autosize/ in ManageRetrospective too
 	- resize textarea only vertical
@@ -28,7 +28,7 @@ Views
  - ManageRetrospective
 	- timer
 	- if connected at running or presenting share pending items
-	- if send or crete any item, share to others ProjectManagers devices
+		- or any other solution? maybe buton to share pending items
  - Layout 
 	- add glyphcons
  - Events
@@ -38,6 +38,7 @@ Views
 
 Data && Migrations
  - add init values
+ - maybe don't use migrations
 
 Managers
  - try async
@@ -49,3 +50,4 @@ README.md
   - RetrospectiveHub
 	- maybe recieve object? instead of string, string, ...
 	- log all changes connection and discconection
+	- handle errors

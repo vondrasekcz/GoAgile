@@ -104,9 +104,10 @@
                 // Recieve all shared Items
                 retHub.client.recieveAllSharedItemsMng = function (data) {
                     var item = $.parseJSON(data);
-                    var votes = item.RemainingVotes;
-                    if (votes < 0)
+                    votes = item.RemainingVotes;
+                    if (votes <= 0)
                         votes = 0;
+                        
                     $('#div_avaibleVotes').text("Remaining votes " + votes);
 
                     for (var i = 0; i < item.Items.length; i++)
@@ -131,11 +132,8 @@
                     $('#div_onlineUsers').text('Online Users: ' + i);
                 };
 
-
-
-
+                // Add Vote
                 retHub.client.addVotesToSharedItem = function (data) {
-
                     var item = $.parseJSON(data);
 
                     sharedItemListId = item.Column;
@@ -148,14 +146,10 @@
                     if (sharedItemRemainingVotes <= 0)
                         $('.btn_shareVote').prop('disabled', true);
 
-
-
-
-
                     $('#' + sharedItemListId + ' li').each(function (index) {
                         if ($(this).attr('name') == sharedItemGuid)
                         {
-                            if (sharedItemEnableVoting = "false")
+                            if (sharedItemEnableVoting == false)
                                 $(this).find('.btn_shareVote').prop('disabled', true);
 
                             var element = $(this).find('.sharedItem_votes');
@@ -166,9 +160,7 @@
                             }
                         }
                     });
-
                 };
-
 
                 // Connected to Hub
                 $.connection.hub.start().done(function () {
@@ -190,20 +182,13 @@
                     $(this).parent().parent().remove();
                 });
 
-
-
-
+                // Voting
                 $(document).on('click', '.btn_shareVote', function () {
                     var sharedIdGuid = $(this).parent().parent().parent().parent().parent().attr('name');
                     var sharedColumn =  $(this).parent().parent().parent().parent().parent().attr('column');
 
                     retHub.server.sharedItemVoted(sharedColumn, sharedIdGuid);
                 });
-
-
-
-
-
 
                 // Start Retrospective running
                 $('#btn_start_running').click(function () {
@@ -284,11 +269,8 @@
                 if (enableVoting == "True" && state == "voting" )
                     hidden = "";
 
-                console.log(canVote);
-                if (canVote == false)
+                if (canVote == false || votes <= 0)
                     disabled = "disabled";
-
-
 
                 for (var i = 0; i < itemIdList.length; i++) {
                     if (itemGuid == itemIdList[i])

@@ -274,9 +274,9 @@ namespace GoAgile.Helpers.Logic
 
             int pmVoted = _votedPm.Count;
             foreach (var pm in _projectManager)
-                ret.Add(new UsersVotes { ConnectionId = pm, Voted = pmVoted, EnableVotingForItem = !_votedPm.Contains(sharedItemGuid) });
+                ret.Add(new UsersVotes { ConnectionId = pm, Voted = pmVoted, EnableVotingForItem = (_votedPm.Contains(sharedItemGuid) == true ) ? false : true });
             foreach (var user in _users)
-                ret.Add(new UsersVotes { ConnectionId = user.Key, Voted = user.Value.Voted.Count, EnableVotingForItem = !_votedPm.Contains(sharedItemGuid) });
+                ret.Add(new UsersVotes { ConnectionId = user.Key, Voted = user.Value.Voted.Count, EnableVotingForItem = (user.Value.Voted.Contains(sharedItemGuid) == true) ? false : true  });
 
             return ret;
         }

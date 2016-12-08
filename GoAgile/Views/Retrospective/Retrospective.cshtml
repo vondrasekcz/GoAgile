@@ -13,7 +13,6 @@
     <link href="~/Content/GoAgileContent/loading.css" rel="stylesheet" />
     <link href="~/Content/GoAgileContent/sidebar.css" rel="stylesheet" />
     <script>
-        // TODO: own script file
 
         $(function () {
             //  state: "waiting", "running", "presenting", "finished"
@@ -29,50 +28,97 @@
             // TODO: binary search and inser at position
             var itemIdList = [];
 
-
             // Page Loaded -> show login modal
             $(document).ready(function () {
                 state = '@Model.State';
                 guidId = '@Model.GuidId';
+                votes = '@Model.Votes';
+                enableVoting = '@Model.EnableVoting';
 
-                $('#modalLogin').modal('show');
+                $('#div_avaibleVotes').text("Remaining votes " + votes);
+                $('#modalLogin').modal('show');            
+
+                switch (state) {
+                    case "waiting":
+                        modeWaiting();
+                        break;
+                    case "running":
+                        modeRunning();
+                        break;
+                    case "presenting":
+                        modePresenting();
+                        break;
+                    case "voting":
+                        modeVoting();
+                        break;
+                    case "finished":
+                        modeFinished();
+                        break;
+                }
 
                 // Inicialize hub connection
                 var retHub = $.connection.retrospectiveHub;
 
                 // Invalid input Login modal
-                // TODO: valdiate message
-                retHub.client.invalidLoginInput = function () {
-
-                    $('#testInValidInput').text("invalid input");
+                retHub.client.invalidLoginInput = function (message) {
+                    $('#testInValidInput').show();
+                    $('#testInValidInput').text(message);
                 };
 
                 // User is logged
-                retHub.client.userLogged = function (nickName) {
+                retHub.client.userLogged = function (msgName) {
+                    user = msgName;
 
-                    user = nickName;
-                    switch (state) {
-                        case "waiting":
-                            disableListButtons(true);
-                            $('#modalLogin').modal('hide');
-                            $('#modalWaiting').modal('show');
-                            break;
-                        case "running":
-                            disableListButtons(false);
-                            $('#modalLogin').modal('hide');
-                            break;
-                        case "presenting":
-                            disableListButtons(true);
-                            $('.share').prop('disabled', false);
-                            $('#modalLogin').modal('hide');
-                            break;
-                        case "finished":
-                            $('#modalFinished').modal('show');
-                            $('#modalLogin').modal('hide');
-                            break;
-                    }
+                    $('#modalLogin').modal('hide');                    
                 };
 
+                // Retrospective started running
+                retHub.client.startRunningMode = function () {
+                    state = "running";
+                    modeRunning();
+                }
+
+                // Retrospective started presenting
+                retHub.client.startPresentingMode = function () {
+                    state = "presenting";
+                    modePresenting();
+                }
+
+                // Retrospective started voting
+                retHub.client.startVotingMode = function () {
+                    state = "voting";
+                    modeVoting();
+                }
+
+                // Retrospective is finished
+                retHub.client.retrospectiveFinished = function () {
+                    state = "finished";
+                    modeFinished();
+                }                         
+
+                // Recieve shared Item
+                retHub.client.recieveSharedItem = function (data) {
+                    var item = $.parseJSON(data);
+
+                    addSharedItem(item.ItemGuid, item.Column, item.Autor, item.Text, item.Votes, item.CanVote);
+                }
+
+                // Recieve all shared Items
+                retHub.client.recieveAllSharedItemsMng = function (data) {
+                    var item = $.parseJSON(data);
+                    votes = item.RemainingVotes;
+                    if (votes <= 0)
+                        votes = 0;
+
+                    $('#div_avaibleVotes').text("Remaining votes " + votes);
+
+                    for (var i = 0; i < item.Items.length; i++)
+                        addSharedItem(item.Items[i].ItemGuid, item.Items[i].Column, item.Items[i].Autor, item.Items[i].Text, item.Items[i].Votes, item.Items[i].CanVote);
+
+                    if (item.Phase != state)
+                        retHub.server.GetState();
+                }
+                
                 // update Online Users
                 retHub.client.recieveOnlineUsers = function (data) {
                     var items = $.parseJSON(data);
@@ -88,41 +134,33 @@
                     $('#div_onlineUsers').text('Online Users: ' + i);
                 };
 
-                // Retrospective started running
-                retHub.client.startRunningMode = function () {
-                    state = "running";
-                    $('#modalWaiting').modal('hide');
-                    disableListButtons(false);
-                }
-
-                // Retrospective started presenting
-                retHub.client.startPresentingMode = function () {
-                    state = "presenting";
-                    $('#modalWaiting').modal('hide');
-                    $('.share').prop('disabled', false);
-                    $('.itemPending').prop('disabled', true);
-                    disableListButtons(true);
-                }
-
-                // Retrospective is finished
-                retHub.client.retrospectiveFinished = function () {
-                    state = "finished";
-                    $('#modalFinished').modal('show');
-                }
-
-                // Recieve shared Item
-                retHub.client.recieveSharedItem = function (item) {
-                    addSharedItem(item.ItemGuid, item.ListId, item.Column, item.Autor, item.Text);
-                }
-
-                // Recieve all shared Items
-                retHub.client.recieveAllSharedItems = function (data) {
+                // Add Vote
+                retHub.client.addVotesToSharedItem = function (data) {
                     var item = $.parseJSON(data);
 
-                    for (var i = 0; i < item.length; i++) {
-                        addSharedItem(item[i].ItemGuid, item[i].ListId, item[i].Column, item[i].Autor, item[i].Text);
-                    }
-                }
+                    sharedItemListId = item.Column;
+                    sharedItemGuid = item.SharedItemGuid;
+                    sharedItemVotes = item.VotesTotal;
+                    sharedItemRemainingVotes = item.RemainnigVotes;
+                    sharedItemEnableVoting = item.EnableThisItemVoting;
+
+                    $('#div_avaibleVotes').text("Remaining votes " + sharedItemRemainingVotes);
+                    if (sharedItemRemainingVotes <= 0)
+                        $('.btn_shareVote').prop('disabled', true);
+
+                    $('#' + sharedItemListId + ' li').each(function (index) {
+                        if ($(this).attr('name') == sharedItemGuid) {
+                            if (sharedItemEnableVoting == false)
+                                $(this).find('.btn_shareVote').prop('disabled', true);
+
+                            var element = $(this).find('.sharedItem_votes');
+                            if (element.attr('votes') < sharedItemVotes) {
+                                element.text('Votes: ' + sharedItemVotes);
+                                element.attr('votes', sharedItemVotes);
+                            }
+                        }
+                    });
+                };
 
                 // Connected to Hub
                 $.connection.hub.start().done(function () {
@@ -130,14 +168,12 @@
 
                 // Share Item
                 $(document).on('click', '.share', function () {
-
-                    listId = $(this).parent().parent().parent().attr('id');
                     column = $(this).parent().parent().parent().attr('name');
                     text = $(this).parent().parent().find('.itemPending').val();
 
                     $(this).parent().parent().remove();
 
-                    retHub.server.sendSharedItem(listId, column, text, user, guidId);
+                    retHub.server.sendSharedItem(column, text);
                 });
 
                 // Delete Item from columns
@@ -145,9 +181,18 @@
                     $(this).parent().parent().remove();
                 });
 
+                // Voting
+                $(document).on('click', '.btn_shareVote', function () {
+                    var sharedIdGuid = $(this).parent().parent().parent().parent().parent().attr('name');
+                    var sharedColumn = $(this).parent().parent().parent().parent().parent().attr('column');
+
+                    retHub.server.sharedItemVoted(sharedColumn, sharedIdGuid);
+                });
+
                 // Login user
                 $('#modalLogInButton').click(function () {
-                    retHub.server.loginUser($('#modalNickName').val(), $('#modalEmail').val(), guidId);
+                    $('#testInValidInput').hide();
+                    retHub.server.loginUser($('#modalNickName').val(), guidId);
                 });
 
                 // Navigate to Retrospective History
@@ -179,7 +224,7 @@
 
             });
 
-            // Add list pending item to list
+            // Add list item to list
             function addListItem(list, placeholder) {
                 $('#' + list).append(
                    $('<li class="list-group-item well clearfix listBlock">').append(
@@ -192,8 +237,24 @@
             };
 
             // Add shared Item to list
-            function addSharedItem(itemGuid, listId, column, autor, text) {
+            function addSharedItem(itemGuid, column, autor, text, totalVotes, canVote) {
                 var exist = false;
+                var hidden = "hidden";
+                var disabled = "";
+                var listId;
+
+                if (column == "Start")
+                    listId = "list_start";
+                else if (column == "Stop")
+                    listId = "list_stop";
+                else
+                    listId = "list_continue";
+
+                if (enableVoting == "True" && state == "voting")
+                    hidden = "";
+
+                if (canVote == false || votes <= 0)
+                    disabled = "disabled";
 
                 for (var i = 0; i < itemIdList.length; i++) {
                     if (itemGuid == itemIdList[i])
@@ -204,9 +265,16 @@
                     itemIdList.push(itemGuid);
 
                     $('#' + listId).prepend(
-                        $('<li class="list-group-item well well-success  clearfix listBlock">').append(
-                            $('<h4>' + column + '</h4><h5>by ' + autor + '</h5>' +
-                              '<textarea type="textarea" class="form-control itemPending" disabled rows="3">' + text + '</textarea>'
+                        $('<li class="list-group-item well well-sm well-successs clearfix" name="' + itemGuid + '" column="' + listId + '">').append(
+                            $('<div class="text-center">' + text + '<div>' +
+                                '<div class="row sharedItem_votingPanel"' + hidden + '>' +
+                                    '<div class="col-md-6 text-left">' +
+                                        '<div class="sharedItem_votes" votes="' + totalVotes + '">Votes: ' + totalVotes + '</div>' +
+                                    '</div>' +
+                                    '<div class="col-md-6 text-right">' +
+                                        '<input type="button" class="btn btn-xs btn-success btn_shareVote" ' + disabled + ' value="Vote"/>' +
+                                    '</div>' +
+                                '</div>'
                     )));
                 }
             };
@@ -217,6 +285,72 @@
                 $('#btn_continue_addItem').prop('disabled', state);
                 $('#btn_stop_addItem').prop('disabled', state);
             };
+
+            function modeWaiting() {
+                disableListButtons(true);
+                $('#manage_waiting').show();
+            };
+
+            function modeRunning() {
+                $('#manage_waiting').hide();
+                $('#manage_running').show();
+                disableListButtons(false);
+            };
+
+            function modePresenting() {
+                $('#manage_waiting').hide();
+                $('#manage_running').hide();
+                $('#manage_presenting').show();
+                $('.itemPending').prop('disabled', true);
+                disableListButtons(true);
+
+                $('.share').prop('disabled', false);
+            };
+
+            function modeVoting() {
+                $('.itemPending').hide();
+
+                $('#manage_waiting').hide();
+                $('#manage_running').hide();
+                $('#manage_presenting').hide();
+                $("#manage_voting").show();
+                disableListButtons(true);
+                $('.sharedItem_votingPanel').show();
+            };
+
+            function modeFinished() {
+                $('.itemPending').hide();
+                $('.btn_shareVote').hide();
+
+                $('#manage_waiting').hide();
+                $('#manage_running').hide();
+                $('#manage_presenting').hide();
+                $("#manage_voting").hide();
+                $("#manage_finished").show();
+                disableListButtons(true);
+            };
+
+            //// Retrospective started running
+            //retHub.client.startRunningMode = function () {
+            //    state = "running";
+            //    $('#modalWaiting').modal('hide');
+            //    disableListButtons(false);
+            //}
+
+            //// Retrospective started presenting
+            //retHub.client.startPresentingMode = function () {
+            //    state = "presenting";
+            //    $('#modalWaiting').modal('hide');
+            //    $('.share').prop('disabled', false);
+            //    $('.itemPending').prop('disabled', true);
+            //    disableListButtons(true);
+            //}
+
+            //// Retrospective is finished
+            //retHub.client.retrospectiveFinished = function () {
+            //    state = "finished";
+            //    $('#modalFinished').modal('show');
+            //}
         });
     </script>
 }
@@ -232,8 +366,10 @@
             <div class="modal-body">
                 <form id="logInForm">
                     <div class="form-group">
-                        <div id="testInValidInput"></div>
                         <label class="control-label">NickName:</label>
+                        <div class="validation-msg" id="testInValidInput" hidden>
+
+                        </div>
                         <input type="text" class="form-control" id="modalNickName" name="modalNickName" placeholder="Enter Nick Name">
                     </div>
                 </form>
@@ -259,7 +395,7 @@
             <!-- Waiting State Manager -->
             <div class="row text-center" hidden id="manage_waiting">
                 <div class="loader"></div>
-                Please Wait until Retrospective starts.
+                <h3>Please Wait until Retrospective starts.</h3>
             </div> <!-- /Waiting State Manager -->
             <!-- Running State Manager -->
             <div class="row text-center" hidden id="manage_running">
