@@ -64,7 +64,8 @@ namespace GoAgile.Hubs
              _retrospectiveMan.AddRetrospectiveItem(itemModel, retrospectiveGuidId: eventGuid);
             var item = JsonConvert.SerializeObject(itemModel);
 
-            var recievers = _store.GetAllConnectionIds(eventGuid);
+            List<string> recievers = new List<string>();
+            _store.GetAllConnectionIds(eventGuid, recievers);
             Clients.Clients(recievers).recieveSharedItem(item);
         }
 
@@ -96,8 +97,8 @@ namespace GoAgile.Hubs
                 return;
 
             var totalVotes = _retrospectiveMan.AddVotesToItem(sharedItemGuid);
-            List<UsersVotes> users;
-            users = _store.GetUsersAndVotes(eventGuid, sharedItemGuid);
+            List<UsersVotes> users = new List<UsersVotes>();
+            _store.GetUsersAndVotes(eventGuid, sharedItemGuid, users);
 
             foreach (var user in users)
             {
@@ -127,7 +128,8 @@ namespace GoAgile.Hubs
             if (!_retrospectiveMan.ChangeRetrospectiveToRunning(eventGuid, name))
                 return;
 
-            var recievers = _store.GetAllConnectionIds(eventGuid);
+            List<string> recievers = new List<string>();
+            _store.GetAllConnectionIds(eventGuid, recievers);
             Clients.Clients(recievers).startRunningMode();            
         }
 
@@ -150,7 +152,8 @@ namespace GoAgile.Hubs
             if (!_retrospectiveMan.ChangeRetrospectiveToPresenting(eventGuid, name))
                 return;
 
-            var recievers = _store.GetAllConnectionIds(eventGuid);
+            List<string> recievers = new List<string>();
+            _store.GetAllConnectionIds(eventGuid, recievers);
             Clients.Clients(recievers).startPresentingMode();
         }
 
@@ -173,7 +176,8 @@ namespace GoAgile.Hubs
             if (!_retrospectiveMan.ChangeToRetrospectiveToVoting(eventGuid, name))
                 return;
 
-            var recievers = _store.GetAllConnectionIds(eventGuid);
+            List<string> recievers = new List<string>();
+            _store.GetAllConnectionIds(eventGuid, recievers);
             Clients.Clients(recievers).startVotingMode();
         }
 
@@ -196,11 +200,15 @@ namespace GoAgile.Hubs
             if (!_retrospectiveMan.ChangeToRetrospectiveToFinished(eventGuid, name))
                 return;
 
-            var recievers = _store.GetAllConnectionIds(eventGuid);
+            List<string> recievers = new List<string>();
+            _store.GetAllConnectionIds(eventGuid, recievers);
             Clients.Clients(recievers).retrospectiveFinished();
 
             // delete event in store
             _store.DeleteRet(eventGuid);
+
+            string item = JsonConvert.SerializeObject(new List<string>());
+            Clients.Clients(recievers).recieveOnlineUsers(item);
         }
 
         /// <summary>
@@ -226,12 +234,17 @@ namespace GoAgile.Hubs
         {
             var connectionId = GetClientId();
             var name = Context.User.Identity.Name;
-            if (!_retrospectiveMan.ValidateOwner(eventGuid, name))
+            var loginValidation = _retrospectiveMan.ValidateOwner(eventGuid, name);
+
+            if (loginValidation < 0)
                 // TODO: return error message
                 return;
-                       
-            _store.AddPm(connectionId: connectionId, retrospectiveGuidId: eventGuid);
-            UsersChanged(eventGuid);
+            
+            if (loginValidation > 0)
+            {
+                _store.AddPm(connectionId: connectionId, retrospectiveGuidId: eventGuid);
+                UsersChanged(eventGuid);
+            }                      
 
             // Retrospective doesn't exist or isn't in 'presenting', 'voting' or 'finished' phase
             var phase = _retrospectiveMan.GetRetrospectivePhase(eventGuid);
@@ -266,7 +279,9 @@ namespace GoAgile.Hubs
         public void loginUser(string name, string eventGuid)
         {
             var connectionId = GetClientId();
-            if (!_retrospectiveMan.ExistRetrospective(eventGuid))
+            var loginValidation = _retrospectiveMan.ExistRetrospective(eventGuid);
+            if (loginValidation < 0)
+                // TODO: return error message
                 return;
 
             var message = IsUserLoginInputValid(name);
@@ -275,8 +290,12 @@ namespace GoAgile.Hubs
                 Clients.Caller.invalidLoginInput(message);
                 return;
             }
-            _store.AddUser(name: name, connectionId: GetClientId(), retrospectiveGuidId: eventGuid);
-            UsersChanged(eventGuid);
+
+            if (loginValidation > 0)
+            {
+                _store.AddUser(name: name, connectionId: GetClientId(), retrospectiveGuidId: eventGuid);
+                UsersChanged(eventGuid);
+            }                
             Clients.Caller.userLogged(name);
 
             // Retrospective doesn't exist or isn't in 'presenting', 'voting' or 'finished' phase
@@ -350,9 +369,12 @@ namespace GoAgile.Hubs
         /// <param name="guidId"></param>
         private void UsersChanged(string guidId)
         {
-            var list = _store.GetAllUsers(guidId);
+            List<string> list = new List<string>();
+            _store.GetAllUsers(guidId, list);
             string item = JsonConvert.SerializeObject(list);
-            var recievers = _store.GetAllConnectionIds(guidId);
+
+            List<string> recievers = new List<string>();
+            _store.GetAllConnectionIds(guidId, recievers);
 
             Clients.Clients(recievers).recieveOnlineUsers(item);
         }

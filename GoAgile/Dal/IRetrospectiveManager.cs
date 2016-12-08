@@ -117,14 +117,14 @@ namespace GoAgile.Dal
         /// <param name="guidId"></param>
         /// <param name="name">moderator name</param>
         /// <returns></returns>
-        bool ValidateOwner(string guidId, string name);
+        int ValidateOwner(string guidId, string name);
 
         /// <summary>
         /// Exist this retrospective
         /// </summary>
         /// <param name="guidId"></param>
         /// <returns></returns>
-        bool ExistRetrospective(string guidId);
+        int ExistRetrospective(string guidId);
 
         /// <summary>
         /// Get max votes

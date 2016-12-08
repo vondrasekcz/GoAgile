@@ -39,9 +39,10 @@ namespace GoAgile.Helpers.Logic
 
         public void DeleteRet(string GuidId)
         {
-            var ConnectionIds = GetAllConnectionIds(GuidId);
+            List<string> connectionIds = new List<string>();
+            GetAllConnectionIds(GuidId, connectionIds);
 
-            foreach (var conId in ConnectionIds)
+            foreach (var conId in connectionIds)
                 _connectionIds.Remove(conId);
 
             _retrospectives.Remove(GuidId);
@@ -111,22 +112,23 @@ namespace GoAgile.Helpers.Logic
             return retroId;
         }
 
-        public List<string> GetAllUsers(string retrospectiveGuidId)
+        public void GetAllUsers(string retrospectiveGuidId, List<string> list)
         {
             EventRet retros;
             if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
-                return null;
-        
-            return retros.GetAllUsers();
+                return;
+            retros.GetAllUsers(list);
+
+            return;
         }
 
-        public List<string> GetAllConnectionIds(string retrospectiveGuidId)
+        public void GetAllConnectionIds(string retrospectiveGuidId, List<string> recievers)
         {
             EventRet retros;
             if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
-                return null;
-
-            return retros.GetAllConnectionsIds();
+                return;
+            retros.GetAllConnectionsIds(recievers);
+            return;
         }
 
         public bool Vote(string retrospectiveGuidId, string connectionId, string voteId, int maxVotes)
@@ -138,13 +140,14 @@ namespace GoAgile.Helpers.Logic
             return retros.Vote(connectionId: connectionId, voteId: voteId, maxVotes: maxVotes);
         }
 
-        public List<UsersVotes> GetUsersAndVotes(string retrospectiveGuidId, string sharedItemGuid)
+        public void GetUsersAndVotes(string retrospectiveGuidId, string sharedItemGuid, List<UsersVotes> list)
         {
             EventRet retros;
             if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
-                return null;
+                return;
 
-            return retros.GetUsersAndVotes(sharedItemGuid);
+            retros.GetUsersAndVotes(sharedItemGuid, list);
+            return;
         }
 
         public AllSaredItemsModel AddUserVotes(string retrospectiveGuidId, string connectionId, AllSaredItemsModel allItems)
@@ -210,23 +213,17 @@ namespace GoAgile.Helpers.Logic
             _users.Remove(connectionId);
         }
 
-        public List<string> GetAllUsers()
+        public void GetAllUsers(List<string> ret)
         {
-            List<string> ret = new List<string>();
-
             if ((_projectManager.Count) > 0)
                 ret.Add(_pmName);
             
             foreach (var item in _users)
                 ret.Add(item.Value.UserName);
-            
-            return ret;
         }
 
-        public List<string> GetAllConnectionsIds()
+        public List<string> GetAllConnectionsIds(List<string> ret)
         {
-            List<string> ret = new List<string>();
-
             foreach (var item in _projectManager)
                 ret.Add(item);
 
@@ -268,17 +265,13 @@ namespace GoAgile.Helpers.Logic
             return true;               
         }
 
-        public List<UsersVotes> GetUsersAndVotes(string sharedItemGuid)
+        public void GetUsersAndVotes(string sharedItemGuid, List<UsersVotes> ret)
         {
-            var ret = new List<UsersVotes>();
-
             int pmVoted = _votedPm.Count;
             foreach (var pm in _projectManager)
                 ret.Add(new UsersVotes { ConnectionId = pm, Voted = pmVoted, EnableVotingForItem = (_votedPm.Contains(sharedItemGuid) == true ) ? false : true });
             foreach (var user in _users)
                 ret.Add(new UsersVotes { ConnectionId = user.Key, Voted = user.Value.Voted.Count, EnableVotingForItem = (user.Value.Voted.Contains(sharedItemGuid) == true) ? false : true  });
-
-            return ret;
         }
 
         public AllSaredItemsModel AddUserVotes(AllSaredItemsModel allItems, string connectionId)

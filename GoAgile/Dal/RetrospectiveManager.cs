@@ -318,31 +318,37 @@ namespace GoAgile.Dal
         }
 
         /// <inheritdoc />
-        bool IRetrospectiveManager.ValidateOwner(string guidId, string name)
+        int IRetrospectiveManager.ValidateOwner(string guidId, string name)
         {
             using (var db = AgileDb.Create())
             {
                 var dbItem = db.Retrospectives
                     .SingleOrDefault(s => s.Id == guidId);
 
-                if (dbItem != null
-                    && dbItem.Owner == name)
-                    return true;
-                return false;
+                if (dbItem == null
+                    || dbItem.Owner != name)
+                    return -1;
+                else if (dbItem.State == EventState.finished)
+                    return 0;
+                else
+                    return 1;
             }
         }
 
         /// <inheritdoc />
-        bool IRetrospectiveManager.ExistRetrospective(string guidId)
+        int IRetrospectiveManager.ExistRetrospective(string guidId)
         {
             using (var db = AgileDb.Create())
             {
                 var dbItem = db.Retrospectives
                     .SingleOrDefault(s => s.Id == guidId);
 
-                if (dbItem != null)
-                    return true;
-                return false;
+                if (dbItem == null)
+                    return -1;
+                else if (dbItem.State == EventState.finished)
+                    return 0;
+                else
+                    return 1;
             }
         }
 

@@ -329,28 +329,6 @@
                 $("#manage_finished").show();
                 disableListButtons(true);
             };
-
-            //// Retrospective started running
-            //retHub.client.startRunningMode = function () {
-            //    state = "running";
-            //    $('#modalWaiting').modal('hide');
-            //    disableListButtons(false);
-            //}
-
-            //// Retrospective started presenting
-            //retHub.client.startPresentingMode = function () {
-            //    state = "presenting";
-            //    $('#modalWaiting').modal('hide');
-            //    $('.share').prop('disabled', false);
-            //    $('.itemPending').prop('disabled', true);
-            //    disableListButtons(true);
-            //}
-
-            //// Retrospective is finished
-            //retHub.client.retrospectiveFinished = function () {
-            //    state = "finished";
-            //    $('#modalFinished').modal('show');
-            //}
         });
     </script>
 }
@@ -399,18 +377,22 @@
             </div> <!-- /Waiting State Manager -->
             <!-- Running State Manager -->
             <div class="row text-center" hidden id="manage_running">
-
+                <div>Start: What could we do differently to improve?</div>
+                <div>Stop: What went wrong during the sprint cycle?</div>
+                <div>Continue: What went well during the sprint cycle?</div>
             </div> <!-- /Running State Manager -->
             <!-- Presenting State Manager -->
             <div class="row text-center" hidden id="manage_presenting">
-
+                <h3>Share and discuss ideas.</h3>
             </div> <!-- /Presenting State Manager -->
             <!-- Voting State Manager -->
             <div class="row text-center" hidden id="manage_voting">
+                <h3>Rate the ideas.</h3>
                 <div id="div_avaibleVotes"></div>
             </div> <!-- /Voting State Manager -->
             <!-- Finished State Manager -->
-            <div class="row" hidden id="manage_finished">
+            <div class="row text-center" hidden id="manage_finished">
+                <h3>Retrospective is finished</h3>
                 <div class="btn-group btn-group-lg pull-right" role="group" aria-label="...">
                     <button type="button" id="btn_home" class="btn btn-primary text-center">Home</button>
                     <button type="button" id="btn_history" class="btn btn-primary text-center">See Detail</button>
