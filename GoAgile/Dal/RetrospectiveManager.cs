@@ -24,14 +24,17 @@ namespace GoAgile.Dal
                 dbItem.DatePlanned = model.DatePlanned;
                 dbItem.State = EventState.waiting;
                 dbItem.Owner = user;
-                if (model.EnableVotes == false)
+
+                var maxVotes = model.MaxVotes.GetValueOrDefault();
+
+                if (model.EnableVotes == false || maxVotes <= 0)
                 {
                     dbItem.Votes = 0;
                     dbItem.EnableVoting = false;
                 }                    
                 else
                 {
-                    dbItem.Votes = model.MaxVotes;
+                    dbItem.Votes = maxVotes;
                     dbItem.EnableVoting = true;
                 }                    
 

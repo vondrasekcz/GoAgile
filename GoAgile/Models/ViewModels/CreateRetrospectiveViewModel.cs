@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace GoAgile.Models
 {
-    public class CreateRetrospectiveViewModel
+    public class CreateRetrospectiveViewModel : IValidatableObject
     {
         [Required]
         [Display(Name = "Retrospective Name*")]
@@ -29,6 +30,21 @@ namespace GoAgile.Models
 
         [Display(Name = "Max Votes per person")]
         [Range(0, 20, ErrorMessage = "Votes must be between 0 and 20")]
-        public int MaxVotes { get; set; }
+        public int? MaxVotes { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var pPDate = new[] { "DatePlanned" };
+            if (DatePlanned != null && DatePlanned < DateTime.Now.AddDays(-1))
+            {
+                yield return new ValidationResult("Past Date cannot be accepted.", pPDate);
+            }
+
+            var pMaxVotes = new[] { "MaxVotes" };
+            if (EnableVotes && ( MaxVotes == null || MaxVotes <= 0 ) )
+            {
+                yield return new ValidationResult("Maximum Votes is required when Voting is enabled", pMaxVotes);
+            }
+        }
     }
 }
