@@ -36,7 +36,8 @@
                 enableVoting = '@Model.EnableVoting';
 
                 $('#div_avaibleVotes').text("Remaining votes " + votes);
-                $('#modalLogin').modal('show');            
+                $('#modalLogin').modal('show');
+                $('#modalLogin').find('input').focus();
 
                 switch (state) {
                     case "waiting":
@@ -56,6 +57,11 @@
                         break;
                 }
 
+                // focus on Modal NickName input
+                $('#modalLogin').on('shown.bs.modal', function () {
+                    $('#modalNickName').focus();
+                })
+
                 // Inicialize hub connection
                 var retHub = $.connection.retrospectiveHub;
 
@@ -63,6 +69,7 @@
                 retHub.client.invalidLoginInput = function (message) {
                     $('#testInValidInput').show();
                     $('#testInValidInput').text(message);
+                    $('#modalNickName').focus();
                 };
 
                 // User is logged
@@ -225,15 +232,17 @@
             });
 
             // Add list item to list
-            function addListItem(list, placeholder) {
-                $('#' + list).append(
+            function addListItem(list, placeholder) {                
+                var item =
                    $('<li class="list-group-item well clearfix listBlock">').append(
                        $('<textarea type="textarea" class="form-control itemPending" rows="3" placeholder="' + placeholder + '"></textarea>' +
                          '<div class="btn-group" role="group">' +
                          '<input type="button" class="btn btn-success share" disabled value="Share"/>' +
                          '<input type="button" class="btn btn-danger delete" value="Delete"/>' +
                          '</div>'
-                )));
+                ));
+                $('#' + list).append(item);
+                $(item).find('textarea').focus();
             };
 
             // Add shared Item to list
@@ -346,7 +355,6 @@
                     <div class="form-group">
                         <label class="control-label">NickName:</label>
                         <div class="validation-msg" id="testInValidInput" hidden>
-
                         </div>
                         <input type="text" class="form-control" id="modalNickName" name="modalNickName" placeholder="Enter Nick Name">
                     </div>

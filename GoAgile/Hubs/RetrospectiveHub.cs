@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json;
 using GoAgile.Helpers.Logic;
 using GoAgile.Models.DB;
 using GoAgile.Models.Retrospective;
 using GoAgile.Helpers.StoreModels;
 using GoAgile.Dal;
-using Newtonsoft.Json;
 
 namespace GoAgile.Hubs
 {
@@ -388,9 +389,11 @@ namespace GoAgile.Hubs
         private string IsUserLoginInputValid(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-            {
                 return "Your name cannot be empty.";
-            }
+
+            if (!name.All(char.IsLetterOrDigit))
+                return "Only alphanumeric characters may be used";
+
             return null;
         }
 
