@@ -30,10 +30,14 @@
     transition: none;
 }
  
-/* The navigation menu list */
 .glyphicon-user {
-    font-size: 10px;
+    /*font-size: 10px;*/
     color: #428bca;
+}
+
+.glyphicon-ok {
+    /*font-size: 10px;*/
+    color: #5cb85c;
 }
  
 /* When you mouse over the navigation links, change their color */

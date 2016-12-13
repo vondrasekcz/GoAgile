@@ -250,6 +250,7 @@
     <Compile Include="Models\Retrospective\AllSaredItemsModel.cs" />
     <Compile Include="Models\Retrospective\EventModel.cs" />
     <Compile Include="Models\Retrospective\FullRetrospectiveModel.cs" />
+    <Compile Include="Models\Retrospective\OnlineUser.cs" />
     <Compile Include="Models\Retrospective\RetrospectiveInitModel.cs" />
     <Compile Include="Models\Retrospective\RetrospectiveItemModel.cs" />
     <Compile Include="Models\Retrospective\RetrospectiveModel.cs" />

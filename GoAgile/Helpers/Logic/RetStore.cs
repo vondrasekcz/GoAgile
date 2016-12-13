@@ -112,14 +112,40 @@ namespace GoAgile.Helpers.Logic
             return retroId;
         }
 
-        public void GetAllUsers(string retrospectiveGuidId, List<string> list)
+        public void UserIsReady(string connectionId, string retrospectiveGuidId, List<string> connectionIds)
         {
             EventRet retros;
             if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
                 return;
-            retros.GetAllUsers(list);
 
-            return;
+            retros.UserIsReady(connectionId: connectionId, connectionIds: connectionIds);
+        }
+
+        public void NoOneIsReady(string retrospectiveGuidId)
+        {
+            EventRet retros;
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
+                return;
+
+            retros.NoOneIsReady();
+        }
+
+        public bool AmIReady(string connectionId, string retrospectiveGuidId)
+        {
+            EventRet retros;
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
+                return false;
+
+            return retros.AmIReady(connectionId);
+        }
+
+        public void GetAllUsers(string retrospectiveGuidId, List<OnlineUser> list)
+        {
+            EventRet retros;
+            if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
+                return;
+
+            retros.GetAllUsers(list);
         }
 
         public void GetAllConnectionIds(string retrospectiveGuidId, List<string> recievers)
@@ -127,8 +153,8 @@ namespace GoAgile.Helpers.Logic
             EventRet retros;
             if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
                 return;
+
             retros.GetAllConnectionsIds(recievers);
-            return;
         }
 
         public bool Vote(string retrospectiveGuidId, string connectionId, string voteId, int maxVotes)
@@ -147,7 +173,6 @@ namespace GoAgile.Helpers.Logic
                 return;
 
             retros.GetUsersAndVotes(sharedItemGuid, list);
-            return;
         }
 
         public AllSaredItemsModel AddUserVotes(string retrospectiveGuidId, string connectionId, AllSaredItemsModel allItems)
@@ -175,6 +200,7 @@ namespace GoAgile.Helpers.Logic
         private HashSet<string> _votedPm;
         private Dictionary<string, User> _users;
         private string _pmName;
+        private bool _pmReady;
 
         public EventRet()
         {
@@ -213,13 +239,52 @@ namespace GoAgile.Helpers.Logic
             _users.Remove(connectionId);
         }
 
-        public void GetAllUsers(List<string> ret)
+        public void UserIsReady(string connectionId, List<string> connectionIds)
+        {
+            if (_projectManager.Contains(connectionId))
+            {
+                _pmReady = true;
+                foreach (var conn in _projectManager)
+                    connectionIds.Add(conn);
+            }                
+            else
+            {
+                User user;
+                if (!_users.TryGetValue(connectionId, out user))
+                    return;
+
+                user.Ready = true;
+                connectionIds.Add(connectionId);
+            }
+        }
+
+        public void NoOneIsReady()
+        {
+            _pmReady = false;
+            foreach (var user in _users)
+                user.Value.Ready = false;
+        }
+
+        public bool AmIReady(string connectionId)
+        {
+            if (_projectManager.Contains(connectionId))
+                return _pmReady;
+            else
+            {
+                User user;
+                if (!_users.TryGetValue(connectionId, out user))
+                    return false;
+                return user.Ready;
+            }
+        }
+
+        public void GetAllUsers(List<OnlineUser> ret)
         {
             if ((_projectManager.Count) > 0)
-                ret.Add(_pmName);
-            
+                ret.Add(new OnlineUser() { Name = _pmName, Ready = _pmReady });
+                        
             foreach (var item in _users)
-                ret.Add(item.Value.UserName);
+                ret.Add(new OnlineUser() { Name = item.Value.UserName, Ready = item.Value.Ready });
         }
 
         public List<string> GetAllConnectionsIds(List<string> ret)
@@ -299,6 +364,8 @@ namespace GoAgile.Helpers.Logic
     public class User
     {
         public string UserName { get; set; }
+
+        public bool Ready { get; set; }
 
         public HashSet<string> Voted = new HashSet<string>();
     }

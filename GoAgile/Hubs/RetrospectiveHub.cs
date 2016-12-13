@@ -156,6 +156,9 @@ namespace GoAgile.Hubs
             List<string> recievers = new List<string>();
             _store.GetAllConnectionIds(eventGuid, recievers);
             Clients.Clients(recievers).startPresentingMode();
+
+            _store.NoOneIsReady(eventGuid);
+            UsersChanged(eventGuid);
         }
 
         /// <summary>
@@ -213,6 +216,35 @@ namespace GoAgile.Hubs
         }
 
         /// <summary>
+        /// user is Ready for next phase
+        /// </summary>
+        public void iamready()
+        {
+            var connectionId = GetClientId();
+            var eventGuid = _store.GetUsersEventId(connectionId);
+
+            // Cant find user connectionId
+            if (eventGuid == null)
+                return;
+
+            if (_retrospectiveMan.GetRetrospectivePhase(eventGuid) == "running")
+            {
+                List<string> connectionIds = new List<string>();
+
+                _store.UserIsReady(connectionId, eventGuid, connectionIds);
+
+                if (connectionIds.Count > 0)
+                {
+                    foreach(var user in connectionIds)
+                        Clients.Client(user).readyMode();
+
+                    UsersChanged(eventGuid);
+                }               
+            }
+            
+        }
+
+        /// <summary>
         /// On disconnect event
         /// </summary>
         /// <param name="stopCalled"></param>
@@ -255,6 +287,8 @@ namespace GoAgile.Hubs
                     return;
                 case "running":
                     Clients.Caller.startRunningMode();
+                    if (_store.AmIReady(connectionId, eventGuid))
+                        Clients.Caller.readyMode();
                     return;
                 case "presenting":
                     Clients.Caller.startPresentingMode();
@@ -370,7 +404,7 @@ namespace GoAgile.Hubs
         /// <param name="guidId"></param>
         private void UsersChanged(string guidId)
         {
-            List<string> list = new List<string>();
+            List<OnlineUser> list = new List<OnlineUser>();
             _store.GetAllUsers(guidId, list);
             string item = JsonConvert.SerializeObject(list);
 

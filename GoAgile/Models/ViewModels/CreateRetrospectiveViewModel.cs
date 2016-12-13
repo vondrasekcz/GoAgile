@@ -29,7 +29,6 @@ namespace GoAgile.Models
         public bool EnableVotes { get; set; }
 
         [Display(Name = "Max Votes per person")]
-        [Range(0, 20, ErrorMessage = "Votes must be between 0 and 20")]
         public int? MaxVotes { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -103,6 +103,11 @@
                     modeFinished();
                 }                         
 
+                // Disable Ready button
+                retHub.client.readyMode = function () {
+                    $('#btn_ready').prop('disabled', true);
+                }
+
                 // Recieve shared Item
                 retHub.client.recieveSharedItem = function (data) {
                     var item = $.parseJSON(data);
@@ -134,9 +139,16 @@
                     $('#list_users').empty();
 
                     for (i = 0; i < items.length; i++) {
-                        $('#list_users').append(
-                            '<li><i class="glyphicon glyphicon-user"></i> ' + items[i] + '</li>'
-                        );
+                        if (items[i].Ready == true) {
+                            $('#list_users').append(
+                                '<li><i class="glyphicon glyphicon-ok"></i> ' + items[i].Name + '</li>'
+                            );
+                        }
+                        else {
+                            $('#list_users').append(
+                               '<li><i class="glyphicon glyphicon-user"></i> ' + items[i].Name + '</li>'
+                           );
+                        }
                     }
                     $('#div_onlineUsers').text('Online Users: ' + i);
                 };
@@ -194,6 +206,11 @@
                     var sharedColumn = $(this).parent().parent().parent().parent().parent().attr('column');
 
                     retHub.server.sharedItemVoted(sharedColumn, sharedIdGuid);
+                });
+
+                // I am Ready button
+                $('#btn_ready').click(function () {
+                    retHub.server.iamready();
                 });
 
                 // Login user
@@ -385,9 +402,16 @@
             </div> <!-- /Waiting State Manager -->
             <!-- Running State Manager -->
             <div class="row text-center" hidden id="manage_running">
-                <div>Start: What could we do differently to improve?</div>
-                <div>Stop: What went wrong during the sprint cycle?</div>
-                <div>Continue: What went well during the sprint cycle?</div>
+            <div class="col-sm-3">
+                <div class="btn-group btn-group-lg pull-left" role="group">
+                    <button type="button" id="btn_ready" class="btn btn-primary text-center">I'am Ready</button>
+                </div>
+            </div>
+                <div class="col-sm-9">
+                    <div>Start: What could we do differently to improve?</div>
+                    <div>Stop: What went wrong during the sprint cycle?</div>
+                    <div>Continue: What went well during the sprint cycle?</div>
+                </div>
             </div> <!-- /Running State Manager -->
             <!-- Presenting State Manager -->
             <div class="row text-center" hidden id="manage_presenting">
