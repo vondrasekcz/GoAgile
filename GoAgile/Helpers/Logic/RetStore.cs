@@ -13,7 +13,7 @@ namespace GoAgile.Helpers.Logic
         private Dictionary<string, string> _connectionIds = new Dictionary<string, string>();
 
 
-        // TODO:
+        // TODO: lock it all
         private static readonly object Locker = new object();
 
 
@@ -80,13 +80,13 @@ namespace GoAgile.Helpers.Logic
             return true;
         }
 
-        public string GetUserName(string connectionId, string retrospectiveGuidId)
+        public bool  GetUserName(string connectionId, string retrospectiveGuidId, RetrospectiveItemModel model)
         {
             EventRet retros;
             if (!_retrospectives.TryGetValue(retrospectiveGuidId, out retros))
-                return null;
+                return false;
 
-            return retros.GetUserName(connectionId);
+            return retros.GetUserName(connectionId, model);
         }
 
         public string GetUsersEventId(string connectionId)
@@ -201,6 +201,8 @@ namespace GoAgile.Helpers.Logic
         private Dictionary<string, User> _users;
         private string _pmName;
         private bool _pmReady;
+        private int _pmColor;
+        private int _lastColor;
 
         public EventRet()
         {
@@ -208,29 +210,39 @@ namespace GoAgile.Helpers.Logic
             _votedPm = new HashSet<string>();
             _users = new Dictionary<string, User>();
             _pmName = "Project Manager";
+            _lastColor = 0;
         }
 
         public void AddPm(string connectionId)
         {
             _projectManager.Add(connectionId);
+            if (_projectManager.Count == 1)
+                _pmColor = AddColor();
         }
 
         public void AddUser(string name, string connectionId)
         {
-            var user = new User() { UserName = name, Voted = new HashSet<string>() };
+            var user = new User() { UserName = name, Voted = new HashSet<string>(), Color = AddColor() };
             _users.Add(key: connectionId, value: user);
         }
 
-        public string GetUserName(string connectionId)
+        public bool GetUserName(string connectionId, RetrospectiveItemModel model)
         {
-
             if (_projectManager.Contains(connectionId))
-                return "Project Manager";
-
+            {
+                model.Autor = _pmName;
+                model.Color = _pmColor;
+                return true;
+            }
+               
             User user;
-            if (!_users.TryGetValue(connectionId, out user))
-                return null;
-            return user.UserName;
+            if (_users.TryGetValue(connectionId, out user))
+            {
+                model.Autor = user.UserName;
+                model.Color = user.Color;
+                return true;
+            }
+            return false;
         }
 
         public void DeleteUser(string connectionId)
@@ -281,10 +293,10 @@ namespace GoAgile.Helpers.Logic
         public void GetAllUsers(List<OnlineUser> ret)
         {
             if ((_projectManager.Count) > 0)
-                ret.Add(new OnlineUser() { Name = _pmName, Ready = _pmReady });
+                ret.Add(new OnlineUser() { Name = _pmName, Ready = _pmReady, Color = _pmColor });
                         
             foreach (var item in _users)
-                ret.Add(new OnlineUser() { Name = item.Value.UserName, Ready = item.Value.Ready });
+                ret.Add(new OnlineUser() { Name = item.Value.UserName, Ready = item.Value.Ready, Color = item.Value.Color });
         }
 
         public List<string> GetAllConnectionsIds(List<string> ret)
@@ -353,6 +365,17 @@ namespace GoAgile.Helpers.Logic
 
             return allItems;
         }
+
+        private int AddColor()
+        {
+            if (_lastColor >= 19)
+            {
+                _lastColor = 0;
+                return _lastColor;
+            }
+            else
+                return _lastColor++;            
+        }
     }
 
 
@@ -366,6 +389,8 @@ namespace GoAgile.Helpers.Logic
         public string UserName { get; set; }
 
         public bool Ready { get; set; }
+
+        public int Color { get; set; }
 
         public HashSet<string> Voted = new HashSet<string>();
     }

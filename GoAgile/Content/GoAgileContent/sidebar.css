@@ -29,17 +29,7 @@
     display: block;
     transition: none;
 }
- 
-.glyphicon-user {
-    /*font-size: 10px;*/
-    color: #428bca;
-}
 
-.glyphicon-ok {
-    /*font-size: 10px;*/
-    color: #5cb85c;
-}
- 
 /* When you mouse over the navigation links, change their color */
 /*.sidenav a:hover, .offcanvas a:focus{
     color: #f1f1f1;

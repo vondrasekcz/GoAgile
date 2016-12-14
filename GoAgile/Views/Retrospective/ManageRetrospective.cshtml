@@ -103,7 +103,7 @@
                 retHub.client.recieveSharedItem = function (data) {
                     var item = $.parseJSON(data);
 
-                    addSharedItem(item.ItemGuid, item.Column, item.Autor, item.Text, item.Votes, item.CanVote);
+                    addSharedItem(item.ItemGuid, item.Column, item.Autor, item.Text, item.Votes, item.CanVote, item.Color);
                 }
 
                 // Recieve all shared Items
@@ -116,7 +116,7 @@
                     $('#div_avaibleVotes').text("Remaining votes " + votes);
 
                     for (var i = 0; i < item.Items.length; i++)
-                        addSharedItem(item.Items[i].ItemGuid, item.Items[i].Column, item.Items[i].Autor, item.Items[i].Text, item.Items[i].Votes, item.Items[i].CanVote);
+                        addSharedItem(item.Items[i].ItemGuid, item.Items[i].Column, item.Items[i].Autor, item.Items[i].Text, item.Items[i].Votes, item.Items[i].CanVote, item.Items[i].Color);
 
                     if (item.Phase != state)
                         retHub.server.GetState();                    
@@ -133,13 +133,13 @@
                         if (items[i].Ready == true)
                         {
                             $('#list_users').append(
-                                '<li><i class="glyphicon glyphicon-ok"></i> ' + items[i].Name + '</li>'
+                                '<li><i class="glyphicon glyphicon-ok user' + items[i].Color + '"></i> ' + items[i].Name + '</li>'
                             );
                         }
                         else
                         {
                             $('#list_users').append(
-                               '<li><i class="glyphicon glyphicon-user"></i> ' + items[i].Name + '</li>'
+                               '<li><i class="glyphicon glyphicon-user user' + items[i].Color + '"></i> ' + items[i].Name + '</li>'
                            );
                         }                       
                     }
@@ -273,7 +273,7 @@
             };
 
             // Add shared Item to list
-            function addSharedItem(itemGuid, column, autor, text, totalVotes, canVote) {
+            function addSharedItem(itemGuid, column, autor, text, totalVotes, canVote, color) {
                 var exist = false;
                 var hidden = "hidden";
                 var disabled = "";
@@ -301,7 +301,7 @@
                     itemIdList.push(itemGuid);
 
                     $('#' + listId).prepend(
-                        $('<li class="list-group-item well well-sm well-successs clearfix" name="' + itemGuid + '" column="' + listId + '">').append(
+                        $('<li class="list-group-item well well-sm well-shared' + color + ' clearfix" name="' + itemGuid + '" column="' + listId + '">').append(
                             $('<div class="text-center">' + text + '<div>' +
                                 '<div class="row sharedItem_votingPanel"' + hidden + '>' +
                                     '<div class="col-md-6 text-left">' +

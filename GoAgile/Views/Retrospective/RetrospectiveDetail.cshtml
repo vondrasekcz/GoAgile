@@ -23,13 +23,14 @@
                 addItem(data.Items[i].ItemGuid, 
                         data.Items[i].Column, 
                         data.Items[i].Autor, 
-                        data.Items[i].Text
+                        data.Items[i].Text,
+                        data.Items[i].Votes
                 );
             }
         });
         
         // Add Item to list
-        function addItem(itemGuid, column, autor, text) {          
+        function addItem(itemGuid, column, autor, text, votes) {          
             var listId;
             var well;
 
@@ -47,13 +48,19 @@
             {
                 well = "well-success"
                 listId = "list_continue";
-            }
-                
+            }                
 
             $('#' + listId).prepend(
                 $('<li class="list-group-item well well-sm ' + well + ' clearfix">').append(
                     $('<h5 class="break-word">' + text + '</h5>' +
-                      '<h6 class="text-right">' + autor + '</h6>'
+                      '<div class="row">' +
+                      '<div class="col-md-6 text-left">' +
+                        '<h6> Votes: ' + votes + '</h6>' +
+                      '</div>' +
+                      '<div class="col-md-6 text-right">' +
+                        '<h6>' + autor + '</h6>' +
+                      '</div>' +
+                      '</div>'
             )));            
         };
 
@@ -61,49 +68,49 @@
 </script>
 }
 
-<body>
+
     <div class="container">
-        <h2 class="text-center">Retrospective Detail</h2>
-        <div class="well">
-            <div class="row">
-                <div class="col-sm-12 text-center">
-                    <h3 id="div_name"></h3>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-4 text-center">
-                    <div>Date Planned</div>
-                    <div id="div_datePlanned"></div>
-                </div>
-                <div class="col-sm-4 text-center">
-                    <div>Date Started</div>
-                    <div id="div_dateStarted"></div>
-                </div>
-                <div class="col-sm-4 text-center">
-                    <div>Date Finished</div>
-                    <div id="div_dateFinished"></div>
-                </div>
-            </div>
-            <br>
+    <h2 class="text-center">Retrospective Detail</h2>
+    <div class="well">
+        <div class="row">
             <div class="col-sm-12 text-center">
-                <div id="div_comment"></div>
+                <h3 id="div_name"></h3>
             </div>
         </div>
-        <!-- Columns Start, Continue, Stop -->
         <div class="row">
             <div class="col-sm-4 text-center">
-                <div class="title-marketing"><h3>Start</h3></div>
-                <ul class="list-group" id="list_start"></ul>
+                <div>Date Planned</div>
+                <div id="div_datePlanned"></div>
             </div>
             <div class="col-sm-4 text-center">
-                <div class="title-marketing"><h3>Stop</h3></div>
-                <ul class="list-group" id="list_stop"></ul>
+                <div>Date Started</div>
+                <div id="div_dateStarted"></div>
             </div>
             <div class="col-sm-4 text-center">
-                <div class="title-marketing"><h3>Continue</h3></div>
-                <ul class="list-group" id="list_continue"></ul>
+                <div>Date Finished</div>
+                <div id="div_dateFinished"></div>
             </div>
-        </div><!-- /Columns Start, Continue, Stop -->
+        </div>
+        <br>
+        <div class="col-sm-12 text-center">
+            <div id="div_comment"></div>
+        </div>
     </div>
-</body>
+    <!-- Columns Start, Continue, Stop -->
+    <div class="row">
+        <div class="col-sm-4 text-center">
+            <div class="title-marketing"><h3>Start</h3></div>
+            <ul class="list-group" id="list_start"></ul>
+        </div>
+        <div class="col-sm-4 text-center">
+            <div class="title-marketing"><h3>Stop</h3></div>
+            <ul class="list-group" id="list_stop"></ul>
+        </div>
+        <div class="col-sm-4 text-center">
+            <div class="title-marketing"><h3>Continue</h3></div>
+            <ul class="list-group" id="list_continue"></ul>
+        </div>
+    </div><!-- /Columns Start, Continue, Stop -->
+</div>
+
 

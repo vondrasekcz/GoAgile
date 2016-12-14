@@ -149,6 +149,7 @@ namespace GoAgile.Dal
                 dbItem.UserName = modelItem.Autor;
                 dbItem.Text = modelItem.Text;
                 dbItem.Votes = 0;
+                dbItem.Color = modelItem.Color;
 
                 db.RetrospectiveItems.Add(dbItem);
                 db.SaveChanges();
@@ -173,7 +174,8 @@ namespace GoAgile.Dal
                         Text = s.Text,
                         ItemGuid = s.Id,
                         Votes = s.Votes,
-                        CanVote = true
+                        CanVote = true,
+                        Color = s.Color
                     }).ToList();
 
                 return ret;

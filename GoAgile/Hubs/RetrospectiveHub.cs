@@ -57,11 +57,11 @@ namespace GoAgile.Hubs
             if (phase == null || phase != "presenting")
                 return;
 
-            var userName = _store.GetUserName(connectionId: connectionId, retrospectiveGuidId: eventGuid);
-            if (userName == null)
-                return;
+            var itemModel = new RetrospectiveItemModel { Column = column, Text = text };
 
-            var itemModel = new RetrospectiveItemModel { Column = column, Text = text, Autor = userName };
+            if (!_store.GetUserName(connectionId: connectionId, retrospectiveGuidId: eventGuid, model: itemModel))
+                return;
+            
              _retrospectiveMan.AddRetrospectiveItem(itemModel, retrospectiveGuidId: eventGuid);
             var item = JsonConvert.SerializeObject(itemModel);
 

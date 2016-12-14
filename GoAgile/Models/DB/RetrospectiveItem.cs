@@ -25,5 +25,8 @@ namespace GoAgile.Models.DB
 
         [Required]
         public int Votes { get; set; }
+
+        [Required]
+        public int Color { get; set; }
     }   
 }

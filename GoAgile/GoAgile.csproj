@@ -235,6 +235,10 @@
     <Compile Include="DataContexts\AgileDbMigrations\201611231855564_AddEnableVoting.Designer.cs">
       <DependentUpon>201611231855564_AddEnableVoting.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataContexts\AgileDbMigrations\201612142050071_AddColorRetrospectiveItems.cs" />
+    <Compile Include="DataContexts\AgileDbMigrations\201612142050071_AddColorRetrospectiveItems.Designer.cs">
+      <DependentUpon>201612142050071_AddColorRetrospectiveItems.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataContexts\AgileDbMigrations\Configuration.cs" />
     <Compile Include="DataContexts\IdentityDb.cs" />
     <Compile Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.cs" />
@@ -451,6 +455,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DataContexts\AgileDbMigrations\201611231855564_AddEnableVoting.resx">
       <DependentUpon>201611231855564_AddEnableVoting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataContexts\AgileDbMigrations\201612142050071_AddColorRetrospectiveItems.resx">
+      <DependentUpon>201612142050071_AddColorRetrospectiveItems.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DataContexts\IdentityMigrations\201611032226556_InitialCreate.resx">
       <DependentUpon>201611032226556_InitialCreate.cs</DependentUpon>
