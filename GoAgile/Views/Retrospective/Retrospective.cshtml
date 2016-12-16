@@ -21,9 +21,6 @@
             // Retrospective Guid
             var guidId;
 
-            // User Name
-            var user;
-
             // List of items
             // TODO: binary search and inser at position
             var itemIdList = [];
@@ -74,8 +71,6 @@
 
                 // User is logged
                 retHub.client.userLogged = function (msgName) {
-                    user = msgName;
-
                     $('#modalLogin').modal('hide');                    
                 };
 

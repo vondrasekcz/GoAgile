@@ -8,20 +8,16 @@
 @section scripts{
     <script src="~/Scripts/jquery.signalR-2.2.1.js"></script>
     <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script src="~/Scripts/clipboard.min.js"></script>
     <link href="~/Content/GoAgileContent/modals.css" rel="stylesheet" />
     <link href="~/Content/GoAgileContent/text.css" rel="stylesheet" />
     <link href="~/Content/GoAgileContent/well.css" rel="stylesheet" />
     <link href="~/Content/GoAgileContent/sidebar.css" rel="stylesheet" />
     <script>
         $(function () {
-            // Retrospective URL
-            var ret_url;
 
             //  state: "waiting", "running", "presenting", "voting","finished"
             var state;
-
-            // User Name
-            var user;
 
             // List of items
             // TODO: binary search and inser at position
@@ -36,7 +32,9 @@
             // Page loaded
             $(document).ready(function () {
 
-                ret_url = '@Model.Url';
+
+                var clipboard = new Clipboard('.btn');
+
                 state = '@Model.State';
                 votes = '@Model.Votes';
                 enableVoting = '@Model.EnableVoting';
@@ -45,9 +43,7 @@
                     $('#btn_startVoting').hide();
                 $('#div_avaibleVotes').text("Remaining votes " + votes);
 
-                user = "Project Manager";
-
-                $('#div_url').text(ret_url);
+                $('#div_url').val('@Model.Url');
 
                 switch (state) {
                     case "waiting":
@@ -112,14 +108,14 @@
                     votes = item.RemainingVotes;
                     if (votes <= 0)
                         votes = 0;
-                        
+
                     $('#div_avaibleVotes').text("Remaining votes " + votes);
 
                     for (var i = 0; i < item.Items.length; i++)
                         addSharedItem(item.Items[i].ItemGuid, item.Items[i].Column, item.Items[i].Autor, item.Items[i].Text, item.Items[i].Votes, item.Items[i].CanVote, item.Items[i].Color);
 
                     if (item.Phase != state)
-                        retHub.server.GetState();                    
+                        retHub.server.GetState();
                 }
 
                 // update Online Users
@@ -141,7 +137,7 @@
                             $('#list_users').append(
                                '<li><i class="glyphicon glyphicon-user user' + items[i].Color + '"></i> ' + items[i].Name + '</li>'
                            );
-                        }                       
+                        }
                     }
                     $('#div_onlineUsers').text('Online Users: ' + i);
                 };
@@ -388,9 +384,12 @@
         <!-- Top well URL -->
         <div class="well">
             <div class="row text-center">
-                <div class="col-sm-12 text-center">
-                    <h3>Send this URL to your team</h3>
-                    <font size="4"><div class="break-word" id="div_url"></div></font>
+                <h3>Send this URL to your team</h3>
+                <div class="input-group">
+                    <input id="div_url" type="text" class="form-control" readonly="readonly">
+                    <span class="input-group-btn" style="width:0;">
+                        <button class="btn btn-default" type="button" data-clipboard-target="#div_url">Copy</button>
+                    </span>
                 </div>
             </div>
             <!-- Waiting State Manager -->
