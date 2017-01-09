@@ -2,10 +2,10 @@
 using System.Linq;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
-using GoAgile.Helpers.Logic;
+using GoAgile.Services.Logic;
 using GoAgile.Models.DB;
 using GoAgile.Models.Retrospective;
-using GoAgile.Helpers.StoreModels;
+using GoAgile.Services.StoreModels;
 using GoAgile.Dal;
 
 namespace GoAgile.Hubs
@@ -425,7 +425,11 @@ namespace GoAgile.Hubs
             if (string.IsNullOrWhiteSpace(name))
                 return "Your name cannot be empty.";
 
-            if (!name.All(char.IsLetterOrDigit))
+            if (name.Length > 30)
+                return "Please enter no more than 30 characters.";
+
+            name.Trim();
+            if (!name.All(a => char.IsLetterOrDigit(a) || char.IsWhiteSpace(a)))
                 return "Only alphanumeric characters may be used";
 
             return null;

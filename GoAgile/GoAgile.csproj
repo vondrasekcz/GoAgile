@@ -249,8 +249,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\Logic\RetStore.cs" />
-    <Compile Include="Helpers\StoreModels\UsersVotes.cs" />
+    <Compile Include="Services\Logic\RetStore.cs" />
+    <Compile Include="Services\StoreModels\UsersVotes.cs" />
     <Compile Include="Models\Retrospective\AllSaredItemsModel.cs" />
     <Compile Include="Models\Retrospective\EventModel.cs" />
     <Compile Include="Models\Retrospective\FullRetrospectiveModel.cs" />

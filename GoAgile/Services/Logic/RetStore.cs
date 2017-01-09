@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using GoAgile.Helpers.StoreModels;
+using GoAgile.Services.StoreModels;
 using GoAgile.Models.Retrospective;
 
-namespace GoAgile.Helpers.Logic
+namespace GoAgile.Services.Logic
 {
     public sealed class StoreRet
     {
@@ -11,10 +11,6 @@ namespace GoAgile.Helpers.Logic
         private Dictionary<string, EventRet> _retrospectives = new Dictionary<string, EventRet>();
 
         private Dictionary<string, string> _connectionIds = new Dictionary<string, string>();
-
-
-        // TODO: lock it all
-        private static readonly object Locker = new object();
 
 
 

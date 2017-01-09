@@ -43,7 +43,7 @@
                     $('#btn_startVoting').hide();
                 $('#div_avaibleVotes').text("Remaining votes " + votes);
 
-                $('#div_url').val('@Model.Url');
+                $('#div_url').text('@Model.Url');
 
                 switch (state) {
                     case "waiting":
@@ -385,12 +385,8 @@
         <div class="well">
             <div class="row text-center">
                 <h3>Send this URL to your team</h3>
-                <div class="input-group">
-                    <input id="div_url" type="text" class="form-control" readonly="readonly">
-                    <span class="input-group-btn" style="width:0;">
-                        <button class="btn btn-default" type="button" data-clipboard-target="#div_url">Copy</button>
-                    </span>
-                </div>
+                <h4 id="div_url" class="break-word"></h4>
+                <button class="btn btn-default" type="button" data-clipboard-target="#div_url">Copy</button>
             </div>
             <!-- Waiting State Manager -->
             <div class="row" hidden id="manage_waiting">
@@ -412,7 +408,7 @@
                 </div>
                 <div class="col-md-6 text-center">
                     <div class="btn-group btn-group-lg pull-right" role="group">
-                        <button type="button" id="btn_stop_running" class="btn btn-success text-center">Presenting</button>
+                        <button type="button" id="btn_stop_running" class="btn btn-success text-center">Share ideas</button>
                     </div>
                 </div>
             </div> <!-- /Running State Manager -->

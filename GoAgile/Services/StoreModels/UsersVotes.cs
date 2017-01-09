@@ -1,4 +1,4 @@
-﻿namespace GoAgile.Helpers.StoreModels
+﻿namespace GoAgile.Services.StoreModels
 {
     public class UsersVotes
     {
