@@ -182,6 +182,7 @@
                     column = $(this).parent().parent().parent().attr('name');
                     text = $(this).parent().parent().find('.itemPending').val();
 
+                    // TODO delete when shared item is recieved
                     $(this).parent().parent().remove();
 
                     retHub.server.sendSharedItem(column, text);
@@ -341,13 +342,13 @@
 
             function modeVoting() {
                 $('.itemPending').hide();
-
                 $('#manage_waiting').hide();
                 $('#manage_running').hide();
                 $('#manage_presenting').hide();
                 $("#manage_voting").show();
                 disableListButtons(true);
                 $('.sharedItem_votingPanel').show();
+                $('.itemPending').parent().remove();
             };
 
             function modeFinished() {
